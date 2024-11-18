@@ -1,0 +1,69 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+```{r}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+```
+
+```{r}
+train <- read.csv("../Data/train.csv")
+oil <- read.csv("../Data/oil.csv")
+```
+
+```{r}
+
+sales_by_year <- train %>%
+  mutate(date = as.Date(date)) %>%
+  group_by(date) %>%
+  summarise(total_sales = sum(sales)) %>%
+  mutate(year = format(date, "%Y"))
+  
+ggplot(sales_by_year, aes(x = date, y = total_sales, color = year)) +
+  geom_line() +
+  labs(
+    title = "Store Sales Over Time By Year",
+    x = "Date",
+    y = "Total Sales",
+    color = "Year"
+  ) +
+  theme_minimal()
+```
+
+```{r, warning=FALSE}
+
+train <- train %>%
+  mutate(date = as.Date(date))
+
+oil <- oil %>%
+  mutate(date = as.Date(date))
+
+sales_oil_data <- train %>%
+  group_by(date) %>%
+  summarise(total_sales = sum(sales)) %>%
+  left_join(oil, by = "date") %>%
+  rename(oil_price = dcoilwtico)
+  
+ggplot(sales_oil_data, aes(x = date)) +
+  geom_line(aes(y = total_sales, color = "Sales")) +
+  geom_line(aes(y = oil_price * 1000, color = "Oil Price (Scaled")) +
+  scale_y_continuous(
+    name = "Total Sales",
+    sec.axis = sec_axis(~ . / 1000, name = "Oil Price")
+  ) +
+  scale_color_manual(
+    name = "Legend",
+    values = c("Sales" = "blue", "Oil Price (Scaled)" = "red")
+  ) +
+  labs(
+    title = "Store Sales OVer Time with Oil Price Overlay",
+    x = "Date"
+  ) +
+  theme_minimal()
+```
+
+
+
