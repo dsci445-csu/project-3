@@ -113,33 +113,9 @@ write.csv(submission, "submission.csv", row.names = FALSE)
 checkresiduals(arima_model)
 ```
 
-```{r}
+First Model Received Score of 10.27115 on Kaggle. That lands the model at 763rd on the leaderboard on 11/18/24.
 
-ts_data <- ts(
-  time_series_data$total_sales,
-  frequency = 7,
-  start = c(year(min(time_series_data$date)), yday(min(time_series_data$date)))
-)
-
-sarima_model <- Arima(ts_data, order = c(5,1,1), seasonal = c(2, 1, 2))
-
-checkresiduals(sarima_model)
-
-summary(sarima_model)
-
-```
-
-```{r}
-holiday <- read.csv("../Data/holidays_events.csv")
-
-refined_model <- Arima(ts_data, 
-                       xreg = cbind(sales_oil_data$oil_price),
-                       order = c(2, 1, 2), 
-                       seasonal = c(3, 1, 2))
-
-checkresiduals(refined_model)
-
-```
+Second model did worse in the competition with a score of 11.98287. Submission 2 will be thrown out.
 
 
 
