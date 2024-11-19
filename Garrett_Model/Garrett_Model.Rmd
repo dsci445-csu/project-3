@@ -14,6 +14,7 @@ library(forecast)
 ```{r}
 train <- read.csv("../Data/train.csv")
 oil <- read.csv("../Data/oil.csv")
+test <- read.csv("../Data/test.csv")
 ```
 
 ```{r}
@@ -39,11 +40,15 @@ Can see a consistent upward trend in total sales by year.
 
 ```{r, warning=FALSE}
 
+#Garrett Sales Plot with Oil Price Overlay
+
 train <- train %>%
   mutate(date = as.Date(date))
 
 oil <- oil %>%
   mutate(date = as.Date(date))
+
+# Joining Oil and Training Sets for Plotting Purposes
 
 sales_oil_data <- train %>%
   group_by(date) %>%
@@ -51,6 +56,8 @@ sales_oil_data <- train %>%
   left_join(oil, by = "date") %>%
   rename(oil_price = dcoilwtico)
   
+# Scaling Oil Prices to Make Data Points Visible On Graph
+
 ggplot(sales_oil_data, aes(x = date)) +
   geom_line(aes(y = total_sales, color = "Sales")) +
   geom_line(aes(y = oil_price * 1000, color = "Oil Price (Scaled")) +
@@ -69,51 +76,6 @@ ggplot(sales_oil_data, aes(x = date)) +
   theme_minimal()
 ```
 Can see that higher oil prices in earlier years could have resulted in lower total sales because of factors such as transportation costs reducing overhead, and increased consumer spending because of higher disposable income values in the country.
-
-```{r}
-test <- read.csv("../Data/test.csv")
-
-train <- train %>% mutate(date = as.Date(date))
-test <- test %>% mutate(date = as.Date(date))
-
-time_series_data <- train %>%
-  group_by(date) %>%
-  summarise(total_sales = sum(sales))
-
-```
-
-```{r}
-
-ts_data <- ts(time_series_data$total_sales,
-              frequency = 365,
-              start = c(year(min(time_series_data$date)), yday(min(time_series_data$date)))
-)
-
-arima_model <- auto.arima(ts_data, seasonal = TRUE)
-summary(arima_model)
-```
-
-```{r}
-
-forecast_horizon <- nrow(test)
-arima_forecast <- forecast(arima_model, h = forecast_horizon)
-head(arima_forecast$mean)
-
-```
-```{r}
-
-submission <- data.frame(
-  id = test$id,
-  sales = as.numeric(arima_forecast$mean)
-)
-
-write.csv(submission, "submission.csv", row.names = FALSE)
-
-
-checkresiduals(arima_model)
-```
-
-First Model Received Score of 10.27115 on Kaggle. That lands the model at 763rd on the leaderboard on 11/18/24.
 
 ```{r}
 
@@ -136,9 +98,6 @@ forecasted_values <- forecast(model, h = forecast_horizon)
 forecasted_sales <- expm1(forecasted_values$mean)
 
 checkresiduals(model)
-
-
-
 
 ```
 
