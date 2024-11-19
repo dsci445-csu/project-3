@@ -3,10 +3,12 @@ output:
   pdf_document: default
   html_document: default
 ---
-```{r}
+```{r, output = FALSE}
 library(ggplot2)
 library(dplyr)
 library(tidyr)
+library(lubridate)
+library(forecast)
 ```
 
 ```{r}
@@ -32,6 +34,8 @@ ggplot(sales_by_year, aes(x = date, y = total_sales, color = year)) +
   ) +
   theme_minimal()
 ```
+
+Can see a consistent upward trend in total sales by year. 
 
 ```{r, warning=FALSE}
 
@@ -63,6 +67,78 @@ ggplot(sales_oil_data, aes(x = date)) +
     x = "Date"
   ) +
   theme_minimal()
+```
+Can see that higher oil prices in earlier years could have resulted in lower total sales because of factors such as transportation costs reducing overhead, and increased consumer spending because of higher disposable income values in the country.
+
+```{r}
+test <- read.csv("../Data/test.csv")
+
+train <- train %>% mutate(date = as.Date(date))
+test <- test %>% mutate(date = as.Date(date))
+
+time_series_data <- train %>%
+  group_by(date) %>%
+  summarise(total_sales = sum(sales))
+
+```
+
+```{r}
+
+ts_data <- ts(time_series_data$total_sales,
+              frequency = 365,
+              start = c(year(min(time_series_data$date)), yday(min(time_series_data$date)))
+)
+
+arima_model <- auto.arima(ts_data, seasonal = TRUE)
+summary(arima_model)
+```
+
+```{r}
+
+forecast_horizon <- nrow(test)
+arima_forecast <- forecast(arima_model, h = forecast_horizon)
+head(arima_forecast$mean)
+
+```
+```{r}
+
+submission <- data.frame(
+  id = test$id,
+  sales = as.numeric(arima_forecast$mean)
+)
+
+write.csv(submission, "submission.csv", row.names = FALSE)
+
+
+checkresiduals(arima_model)
+```
+
+```{r}
+
+ts_data <- ts(
+  time_series_data$total_sales,
+  frequency = 7,
+  start = c(year(min(time_series_data$date)), yday(min(time_series_data$date)))
+)
+
+sarima_model <- Arima(ts_data, order = c(5,1,1), seasonal = c(2, 1, 2))
+
+checkresiduals(sarima_model)
+
+summary(sarima_model)
+
+```
+
+```{r}
+holiday <- read.csv("../Data/holidays_events.csv")
+
+refined_model <- Arima(ts_data, 
+                       xreg = cbind(sales_oil_data$oil_price),
+                       order = c(2, 1, 2), 
+                       seasonal = c(3, 1, 2))
+
+checkresiduals(refined_model)
+
 ```
 
 
