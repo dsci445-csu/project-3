@@ -1,0 +1,18 @@
+---
+title: "Garrett_Paper"
+output:
+  pdf_document: default
+  html_document: default
+date: "2024-11-21"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The third model that we decided to use for this project was an ARIMA model, which is a model that we have not discussed in class but that we thought would provide a promising opportunity to work with the time series data. ARIMA stands for Autoregressive Integrated Moving Average and it's main goal is to "use time series data to either better understand the data set or predict future trends" (Hayes). For us, this meant that an ARIMA model would hopefully be able to better handle the time series data that we were using and could then use its understanding of the data to make predictions if we set the parameters of the model to the correct values. It also meant that, since we had a consistent stream of sales data over multiple years for Corporación Favorita and could see trends, future sales would most likely be more correlated to past sales which is exactly what ARIMA models are used for. ARIMA models are also extremely valuable when it comes to autocorrelation, which is "the degree of correlation of the same variables between two successive time intervals" (Taylor). Essentially, this means that ARIMA models can use a lagged value of a variable and compare it to the original value to optimally find patterns in the data that are related to specific time periods. This was especially valuable when it came to this data set because we needed to identify whether weekly or yearly trends (or both) impacted the overall sales data. The structure of an ARIMA model comes down to the actual code itself and the different parameters that we included within the model to attempt to better capture the relationships in the data. In our model specifically, it can be seen that there are 3 integers next to the ARIMA residual plots in the form [5,1,1]. 
+
+
+Hayes, Adam. “Autoregressive Integrated Moving Average (ARIMA) Prediction Model.” Investopedia, Investopedia, www.investopedia.com/terms/a/autoregressive-integrated-moving-average-arima.asp. Accessed 20 Nov. 2024.
+
+Taylor, Sebastian. “Autocorrelation.” Corporate Finance Institute, 21 Nov. 2023, corporatefinanceinstitute.com/resources/data-science/autocorrelation/. 
