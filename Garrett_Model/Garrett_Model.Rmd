@@ -17,6 +17,8 @@ oil <- read.csv("../Data/oil.csv")
 ```
 
 ```{r}
+train <- train %>%
+  filter(!(date %in% as.Date(c("2013-01-01", "2014-01-01", "2015-01-01", "2016-01-01", "2017-01-01"))))
 
 sales_by_year <- train %>%
   mutate(date = as.Date(date)) %>%
@@ -84,10 +86,21 @@ train_agg$sales_log <- log1p(train_agg$sales)
 
 train_ts <- ts(train_agg$sales_log, frequency = 7)
 
-model <- Arima(train_ts, order = c(5, 1, 1), seasonal = c(2, 1, 2))
+K <- 3
+fourier_terms <- fourier(train_ts, K = K)
+
+
+model <- Arima(train_ts, order = c(5, 1, 1), seasonal = c(2, 1, 2), xreg = fourier_terms)
 
 forecast_horizon <- length(unique(test$date))
-forecasted_values <- forecast(model, h = forecast_horizon)
+future_fourier_terms <- fourier(train_ts, K = K, h = forecast_horizon)
+
+forecasted_values <- forecast(
+  model,
+  xreg = future_fourier_terms,
+  h = forecast_horizon
+)
+
 forecasted_sales <- expm1(forecasted_values$mean)
 
 checkresiduals(model)
@@ -117,5 +130,5 @@ write.csv(submission, "UpdatedModel.csv", row.names = FALSE)
 ```
 The code above was needed because ARIMA model was trained on aggregated data for the store_nbr and family. For the final submission file I needed to put each of these back into each individual row so that the submission file could be in the correct format. To do this I found that using past values of the proportion of family and store_nbr sales was the best way to ensure that the total sales value for each day would be evenly distributed throughout each day. 
 
-Submission 4 garnered an RMSLE of 4.01083, the best so far. Will be attempting to build on this model from this point forward.
+Submission 6 garnered an RMSLE of 3.93254, the best so far. Will be attempting to build on this model from this point forward.
 
