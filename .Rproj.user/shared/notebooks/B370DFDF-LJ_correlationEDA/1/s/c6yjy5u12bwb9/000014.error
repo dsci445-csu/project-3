@@ -1,0 +1,1 @@
+{"frames":[{"func":"as.factor(final_train_lags$family)","file":"","line_number":0,"end_line_number":0,"character_number":0,"end_character_number":0},{"func":"is.factor(x)","file":"","line_number":0,"end_line_number":0,"character_number":0,"end_character_number":0}],"message":"Error in final_train_lags$family : \n  $ operator is invalid for atomic vectors\n"}

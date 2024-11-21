@@ -1,0 +1,26 @@
+{
+    "id": "D3BA9FDA",
+    "path": "/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/LJ_Model/LJ_RandomForest.Rmd",
+    "project_path": "LJ_Model/LJ_RandomForest.Rmd",
+    "type": "r_markdown",
+    "hash": "3878142202",
+    "contents": "",
+    "dirty": true,
+    "created": 1732215016689.0,
+    "source_on_save": false,
+    "relative_order": 4,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "107,0",
+        "scrollLine": "63"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1732215016,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1732215080850,
+    "read_only": false,
+    "read_only_alternatives": []
+}

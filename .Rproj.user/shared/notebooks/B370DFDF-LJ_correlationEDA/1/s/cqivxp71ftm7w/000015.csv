@@ -1,0 +1,7 @@
+"0",""
+"0","# check and get rid of columns used to merge datasets"
+"0","train_clean <- final_train %>%"
+"0","  select(-nation)"
+"0",""
+"0",""
+"0","train_clean[(train_clean$date == ""2014-06-25""),]"

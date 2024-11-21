@@ -1,0 +1,26 @@
+{
+    "id": "E02E10DB",
+    "path": "/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/LJ_Model/LJ_Cleaning.Rmd",
+    "project_path": "LJ_Model/LJ_Cleaning.Rmd",
+    "type": "r_markdown",
+    "hash": "3080536850",
+    "contents": "",
+    "dirty": false,
+    "created": 1732215377559.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "12,0",
+        "scrollLine": "2"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1732215404,
+    "encoding": "UTF-8",
+    "collab_server": "6384",
+    "source_window": "",
+    "last_content_update": 1732215403557,
+    "read_only": false,
+    "read_only_alternatives": []
+}
