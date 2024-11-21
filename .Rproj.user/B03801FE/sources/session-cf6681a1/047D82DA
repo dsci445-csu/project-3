@@ -1,0 +1,27 @@
+{
+    "id": "047D82DA",
+    "path": "/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/LJ_Model/ljEDA.Rmd",
+    "project_path": "LJ_Model/ljEDA.Rmd",
+    "type": "r_markdown",
+    "hash": "1469318949",
+    "contents": "",
+    "dirty": false,
+    "created": 1732060248270.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "last_setup_crc32": "cf6681a1bb338d19",
+        "cursorPosition": "225,0",
+        "scrollLine": "211"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1732062584,
+    "encoding": "UTF-8",
+    "collab_server": "7370",
+    "source_window": "",
+    "last_content_update": 1732060190,
+    "read_only": false,
+    "read_only_alternatives": []
+}

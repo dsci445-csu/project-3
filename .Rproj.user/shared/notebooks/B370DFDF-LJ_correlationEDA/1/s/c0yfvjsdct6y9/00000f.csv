@@ -1,0 +1,78 @@
+"0",""
+"0","# read in the data"
+"0","library(readr)"
+"0","holidays_events <- read_csv(""/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/holidays_events.csv"")"
+"1","[1mRows: [22m[34m350[39m [1mColumns: [22m[34m6[39m
+"
+"1","[36m──[39m [1mColumn specification[22m [36m───────────────────────────────────────────────────────────────────[39m
+[1mDelimiter:[22m "",""
+[31mchr[39m  (4): type, locale, locale_name, description
+[33mlgl[39m  (1): transferred
+[34mdate[39m (1): date
+"
+"1","
+[36mℹ[39m Use `spec()` to retrieve the full column specification for this data.
+[36mℹ[39m Specify the column types or set `show_col_types = FALSE` to quiet this message.
+"
+"0","oil <- read_csv(""/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/oil.csv"")"
+"1","[1mRows: [22m[34m1218[39m [1mColumns: [22m[34m2[39m
+"
+"1","[36m──[39m [1mColumn specification[22m [36m───────────────────────────────────────────────────────────────────[39m
+[1mDelimiter:[22m "",""
+[32mdbl[39m  (1): dcoilwtico
+[34mdate[39m (1): date
+"
+"1","
+[36mℹ[39m Use `spec()` to retrieve the full column specification for this data.
+[36mℹ[39m Specify the column types or set `show_col_types = FALSE` to quiet this message.
+"
+"0","stores <- read_csv(""/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/stores.csv"")"
+"1","[1mRows: [22m[34m54[39m [1mColumns: [22m[34m5[39m
+"
+"1","[36m──[39m [1mColumn specification[22m [36m───────────────────────────────────────────────────────────────────[39m
+[1mDelimiter:[22m "",""
+[31mchr[39m (3): city, state, type
+[32mdbl[39m (2): store_nbr, cluster
+"
+"1","
+[36mℹ[39m Use `spec()` to retrieve the full column specification for this data.
+[36mℹ[39m Specify the column types or set `show_col_types = FALSE` to quiet this message.
+"
+"0","test <- read_csv(""/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/test.csv"")"
+"1","[1mRows: [22m[34m28512[39m [1mColumns: [22m[34m5[39m
+"
+"1","[36m──[39m [1mColumn specification[22m [36m───────────────────────────────────────────────────────────────────[39m
+[1mDelimiter:[22m "",""
+[31mchr[39m  (1): family
+[32mdbl[39m  (3): id, store_nbr, onpromotion
+[34mdate[39m (1): date
+"
+"1","
+[36mℹ[39m Use `spec()` to retrieve the full column specification for this data.
+[36mℹ[39m Specify the column types or set `show_col_types = FALSE` to quiet this message.
+"
+"0","train <- read_csv(""/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/train.csv"")"
+"1","[1mRows: [22m[34m3000888[39m [1mColumns: [22m[34m6[39m
+"
+"1","[36m──[39m [1mColumn specification[22m [36m───────────────────────────────────────────────────────────────────[39m
+[1mDelimiter:[22m "",""
+[31mchr[39m  (1): family
+[32mdbl[39m  (4): id, store_nbr, sales, onpromotion
+[34mdate[39m (1): date
+"
+"1","
+[36mℹ[39m Use `spec()` to retrieve the full column specification for this data.
+[36mℹ[39m Specify the column types or set `show_col_types = FALSE` to quiet this message.
+"
+"0","transactions <- read_csv(""/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/transactions.csv"")"
+"1","[1mRows: [22m[34m83488[39m [1mColumns: [22m[34m3[39m
+"
+"1","[36m──[39m [1mColumn specification[22m [36m───────────────────────────────────────────────────────────────────[39m
+[1mDelimiter:[22m "",""
+[32mdbl[39m  (2): store_nbr, transactions
+[34mdate[39m (1): date
+"
+"1","
+[36mℹ[39m Use `spec()` to retrieve the full column specification for this data.
+[36mℹ[39m Specify the column types or set `show_col_types = FALSE` to quiet this message.
+"

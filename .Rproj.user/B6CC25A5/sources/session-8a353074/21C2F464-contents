@@ -1,0 +1,23 @@
+---
+title: "EDA"
+output: html_document
+date: "2024-11-14"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# garrett: sales over time and oil sales over time
+
+# D'Andre: store sales over the week (Tree Based Models-Gradient Boosting)
+
+# jillian and lauren correlation models 
+```{r}
+import 
+cor_matrix <- cor(your_data, use = "complete.obs")
+print(cor_matrix)
+heatmap(cor_matrix, col = colorRampPalette(c("blue", "white", "red"))(100))
+```
+

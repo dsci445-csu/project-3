@@ -1,0 +1,65 @@
+---
+title: "EDA"
+output: html_document
+date: "2024-11-14"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+
+# read in the data
+library(readr)
+holidays_events <- read_csv("Data/holidays_events.csv")
+oil <- read_csv("Data/oil.csv")
+stores <- read_csv("Data/stores.csv")
+test <- read_csv("Data/test.csv")
+train <- read_csv("Data/train.csv")
+transactions <- read_csv("Data/transactions.csv")
+
+```
+```{r}
+# Data Cleaning
+# Check for missing values
+
+sapply(train, function(x) sum(is.na(x)))
+sapply(oil, function(x) sum(is.na(x))) 
+sapply(holidays_events, function(x) sum(is.na(x)))
+sapply(transactions, function(x) sum(is.na(x)))
+sapply(test, function(x) sum(is.na(x)))
+sapply(stores, function(x) sum(is.na(x)))
+
+# Drop the missing values in the oil data set
+
+oil <- na.omit(oil)
+
+# Check to ensure there are no missing values in oil
+
+sapply(oil, function(x) sum(is.na(x))) 
+```
+
+```{r}
+
+# Lauren & Jillian
+
+# STEPS:
+  # 1) Create aggregate train and test set
+    # train features (17): 
+        # from train: id, date, store_nbr, family, sales (target), onpromotion
+        # from stores: city, state, type, cluster
+        # from holidays_events: type, locale, locale_name, description, transferred
+        # from transactions: transactions
+        # from oil: dcoilwtico
+  # 2) Create desired lags
+  # 3) Perform Lasso to choose lags
+  # 4) Create random forest with all predictors and chosen lags
+```
+
+```{r}
+# Don't trip bout me imma have it done tn-D'Andre
+```
+
+

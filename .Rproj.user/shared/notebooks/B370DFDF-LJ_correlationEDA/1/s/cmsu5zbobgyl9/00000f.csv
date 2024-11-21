@@ -1,0 +1,4 @@
+"0","# remove lags that are shrunk by lasso"
+"0",""
+"0","final_train_lags <- final_train_lagged_sales %>% select(-sales_lag_30 , -sales_lag_365)"
+"0",""
