@@ -34,6 +34,7 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 # Data
+Data/Unprocessed/*.csv
 Data/*.csv
 # R Project
 Group3FinalProject.Rproj
