@@ -14,7 +14,6 @@ library(forecast)
 ```{r}
 train <- read.csv("../Data/train.csv")
 oil <- read.csv("../Data/oil.csv")
-test <- read.csv("../Data/test.csv")
 ```
 
 ```{r}
@@ -40,15 +39,11 @@ Can see a consistent upward trend in total sales by year.
 
 ```{r, warning=FALSE}
 
-#Garrett Sales Plot with Oil Price Overlay
-
 train <- train %>%
   mutate(date = as.Date(date))
 
 oil <- oil %>%
   mutate(date = as.Date(date))
-
-# Joining Oil and Training Sets for Plotting Purposes
 
 sales_oil_data <- train %>%
   group_by(date) %>%
@@ -56,8 +51,6 @@ sales_oil_data <- train %>%
   left_join(oil, by = "date") %>%
   rename(oil_price = dcoilwtico)
   
-# Scaling Oil Prices to Make Data Points Visible On Graph
-
 ggplot(sales_oil_data, aes(x = date)) +
   geom_line(aes(y = total_sales, color = "Sales")) +
   geom_line(aes(y = oil_price * 1000, color = "Oil Price (Scaled")) +
@@ -78,6 +71,7 @@ ggplot(sales_oil_data, aes(x = date)) +
 Can see that higher oil prices in earlier years could have resulted in lower total sales because of factors such as transportation costs reducing overhead, and increased consumer spending because of higher disposable income values in the country.
 
 ```{r}
+test <- read.csv("../Data/test.csv")
 
 train$date <- as.Date(train$date)
 test$date <- as.Date(test$date)
@@ -94,15 +88,12 @@ model <- Arima(train_ts, order = c(5, 1, 1), seasonal = c(2, 1, 2))
 
 forecast_horizon <- length(unique(test$date))
 forecasted_values <- forecast(model, h = forecast_horizon)
-
 forecasted_sales <- expm1(forecasted_values$mean)
 
 checkresiduals(model)
-
 ```
 
 ```{r}
-
 test_dates <- unique(test$date)
 
 proportions <- train %>%
@@ -122,14 +113,9 @@ forecasted_sales_expanded <- test_with_proportions %>%
 submission <- forecasted_sales_expanded %>%
   select(id, sales)
 
-write.csv(submission, "submission4.csv", row.names = FALSE)
-
+write.csv(submission, "UpdatedModel.csv", row.names = FALSE)
 ```
-
 The code above was needed because ARIMA model was trained on aggregated data for the store_nbr and family. For the final submission file I needed to put each of these back into each individual row so that the submission file could be in the correct format. To do this I found that using past values of the proportion of family and store_nbr sales was the best way to ensure that the total sales value for each day would be evenly distributed throughout each day. 
 
-
 Submission 4 garnered an RMSLE of 4.01083, the best so far. Will be attempting to build on this model from this point forward.
-
-
 
