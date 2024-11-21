@@ -1,2 +1,0 @@
-"0","train <- read.csv(""../Data/train.csv"")"
-"0","oil <- read.csv(""../Data/oil.csv"")"

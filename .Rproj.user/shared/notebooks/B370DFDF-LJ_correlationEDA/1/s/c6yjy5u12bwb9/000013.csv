@@ -1,7 +1,0 @@
-"0","# need all variables to be numeric in order to produce a correlation heatmap"
-"0","#str(final_train_lags)"
-"0",""
-"0","final_train_lags$family <- as.numeric(as.factor(final_train_lags$family))  # Convert 'family' factor to numeric"
-"2","Error in final_train_lags$family : 
-  $ operator is invalid for atomic vectors
-"
