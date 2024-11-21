@@ -24,16 +24,17 @@ library(glmnet)
 library(ISLR)
 library(dials)
 library(tidymodels)
+
 ```
 
 ```{r}
 # Load Data
-holidays_events <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/holidays_events.csv")
-oil <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/oil.csv")
-stores <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/stores.csv")
-test <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/test.csv")
-train <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/train.csv")
-transactions <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/transactions.csv")
+holidays_events <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/Unprocessed/holidays_events.csv")
+oil <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/Unprocessed/oil.csv")
+stores <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/Unprocessed/stores.csv")
+test <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/Unprocessed/test.csv")
+train <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/Unprocessed/train.csv")
+transactions <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/Unprocessed/transactions.csv")
 ```
 
 
@@ -138,7 +139,7 @@ final_train <- final_train %>%
 # Check the final training dataset
 final_train[(final_train$date == "2014-06-25"),]
 
-write.csv(final_train, file = "final_train.csv", row.names = FALSE)
+write.csv(final_train, file = "/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/final_train.csv", row.names = FALSE)
 ```
 
 
@@ -158,7 +159,14 @@ final_train_lags <- final_train %>%
   ) %>%
   ungroup()
 
-write.csv(final_train_lags, file = "final_train_lags.csv", row.names = FALSE)
+# Replace NA values with 0
+
+final_train_lags$national_holiday[is.na(final_train_lags$national_holiday)] <- 0
+final_train_lags$state_holiday[is.na(final_train_lags$state_holiday)] <- 0
+final_train_lags$city_holiday[is.na(final_train_lags$city_holiday)] <- 0
+
+# Save as CSV
+write.csv(final_train_lags, file = "/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/final_train_lags.csv", row.names = FALSE)
 ```
 
 
