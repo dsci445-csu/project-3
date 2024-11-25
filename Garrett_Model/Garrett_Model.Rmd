@@ -12,8 +12,8 @@ library(forecast)
 ```
 
 ```{r}
-train <- read.csv("../Data/train.csv")
-oil <- read.csv("../Data/oil.csv")
+train <- read.csv("../Data/Unprocessed/train.csv")
+oil <- read.csv("../Data/Unprocessed/oil.csv")
 ```
 
 ```{r}
@@ -73,7 +73,7 @@ ggplot(sales_oil_data, aes(x = date)) +
 Can see that higher oil prices in earlier years could have resulted in lower total sales because of factors such as transportation costs reducing overhead, and increased consumer spending because of higher disposable income values in the country.
 
 ```{r}
-test <- read.csv("../Data/test.csv")
+test <- read.csv("../Data/Unprocessed/test.csv")
 
 train$date <- as.Date(train$date)
 test$date <- as.Date(test$date)
