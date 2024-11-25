@@ -12,7 +12,7 @@ library(forecast)
 ```
 
 ```{r}
-train <- read.csv("../Data/Unprocessed/train.csv")
+train <- read.csv("../Data/final_train.csv")
 oil <- read.csv("../Data/Unprocessed/oil.csv")
 ```
 
