@@ -1,11 +1,13 @@
-
+---
+title: "Dre_Model"
+output: html_document
+date: "2024-11-14"
 
 ```{r}
-# Step 1: Load necessary libraries
 library(xgboost)
 library(data.table)
 library(DiagrammeR)
-# Step 2: Load Datasets
+
 train_data <- fread("final_train_lags.csv")
 test_data <- fread("test.csv")
 
@@ -19,7 +21,7 @@ compute_rmsle <- function(actual, predicted) {
 ```
 
 ```{r}
-# Step 3: Define Columns and Check Missingness
+# Define Columns and Check Missingness
 lagged_sales_cols <- c("sales_lag_1", "sales_lag_7", "sales_lag_30", "sales_lag_60", "sales_lag_180")
 additional_cols <- c("dcoilwtico", "transactions")
 
@@ -28,27 +30,27 @@ missing_test_cols <- setdiff(c(lagged_sales_cols, additional_cols), colnames(tes
 if (length(missing_test_cols) > 0) {
   cat("Adding missing columns to test_data:", paste(missing_test_cols, collapse = ", "), "\n")
   for (col in missing_test_cols) {
-    test_data[, (col) := NA]  # Add missing columns with NA values
+    test_data[, (col) := NA]  # <-Add missing columns with NA values
   }
 }
 
-# Check missingness in training and test datasets
+# Check missingness in datasets
 cat("Missingness in Training Data:\n")
 print(sapply(train_data[, c(lagged_sales_cols, additional_cols), with = FALSE], function(x) mean(is.na(x))))
 
 cat("Missingness in Test Data:\n")
 print(sapply(test_data[, c(lagged_sales_cols, additional_cols), with = FALSE], function(x) mean(is.na(x))))
 
-# Step 4: Induce Missingness for Validation
-set.seed(123)
+# Induce Missingness for Validation
+set.seed(445)
 train_data[sample(.N, size = 0.1 * .N), sales_lag_7 := NA]
 
-# Step 5: Split Data for Cross-Validation
-set.seed(123)
+# Split Data for Cross-Validation
+set.seed(445)
 train_split <- train_data[1:(0.8 * .N)]
 valid_split <- train_data[(0.8 * .N + 1):.N]
 
-# Convert `transactions` to double for consistent handling
+# Convert `transactions` to double
 train_split[, transactions := as.double(transactions)]
 valid_split[, transactions := as.double(transactions)]
 
@@ -64,7 +66,7 @@ valid_split[, transactions := ifelse(is.na(transactions),
 ```
 
 ```{r}
-# Define features for the model
+# Define features
 features <- c(lagged_sales_cols, "onpromotion", "national_holiday", "state_holiday", 
               "city_holiday", "cluster", additional_cols)
 train_features <- as.matrix(train_split[, ..features])
@@ -72,7 +74,7 @@ train_labels <- train_split$sales
 valid_features <- as.matrix(valid_split[, ..features])
 valid_labels <- valid_split$sales
 
-# Convert to DMatrix
+# DMatrix
 dtrain <- xgb.DMatrix(data = train_features, label = train_labels)
 dvalid <- xgb.DMatrix(data = valid_features, label = valid_labels)
 
@@ -100,10 +102,9 @@ model_native <- xgb.train(
   verbose = 1
 )
 
-# Predict on Validation Set (Native Handling)
+# Predict on Validation Set (Native Handling) and ensure non negative predictions
 valid_predictions_native <- predict(model_native, dvalid)
 
-# Ensure non-negative predictions
 valid_predictions_native <- pmax(valid_predictions_native, 0)
 
 # Calculate RMSLE
@@ -134,7 +135,7 @@ valid_split[, dcoilwtico := ifelse(is.na(dcoilwtico),
                                    frollmean(dcoilwtico, n = 7, fill = NA, align = "right"), 
                                    dcoilwtico)]
 
-# Recreate DMatrix for Rolling Average Imputed Model
+# DMatrix for Rolling Average Imputed Model
 train_features_imputed <- as.matrix(train_split[, ..features])
 valid_features_imputed <- as.matrix(valid_split[, ..features])
 dtrain_imputed <- xgb.DMatrix(data = train_features_imputed, label = train_labels)
@@ -150,10 +151,9 @@ model_imputed <- xgb.train(
   verbose = 1
 )
 
-# Predict on Validation Set (Rolling Average)
+# Predict and Ensure non-negative predictions
 valid_predictions_imputed <- predict(model_imputed, dvalid_imputed)
 
-# Ensure non-negative predictions
 valid_predictions_imputed <- pmax(valid_predictions_imputed, 0)
 
 rmsle_imputed <- compute_rmsle(valid_labels, valid_predictions_imputed)
@@ -161,7 +161,6 @@ cat("RMSLE for Rolling Average Imputation Model:", rmsle_imputed, "\n")
 ```
 
 ```{r}
-# Compare Models
 cat("Comparison of Validation RMSLE:\n")
 cat("Native Handling RMSLE:", rmsle_native, "\n")
 cat("Rolling Average RMSLE:", rmsle_imputed, "\n")
@@ -170,7 +169,7 @@ cat("Rolling Average RMSLE:", rmsle_imputed, "\n")
 ```{r}
 # Visualize Trees and Dump Model Structure
 
-# Step 1: Visualize Trees
+# Visualize Trees
 cat("Visualizing the first tree for Native Handling Model...\n")
 xgb.plot.tree(
   model = model_native,
@@ -183,7 +182,7 @@ cat("Visualizing the first tree for Rolling Average Model...\n")
 xgb.plot.tree(
   model = model_imputed,
   feature_names = features,
-  trees = 0, # Visualize the first tree
+  trees = 0, # First tree
   render = TRUE
 )
 
@@ -202,7 +201,7 @@ xgb.dump(
   with_stats = TRUE
 )
 
-# Optionally print a sample of the dumped file
+# print a sample of the dumped file
 cat("Sample of Native Handling Model Structure:\n")
 native_model_dump <- readLines("native_model_dump.txt")
 cat(head(native_model_dump, 20), sep = "\n")
