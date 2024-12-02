@@ -27,7 +27,7 @@ sales_by_year <- train %>%
   summarise(total_sales = sum(sales)) %>%
   mutate(year = format(date, "%Y"))
   
-ggplot(sales_by_year, aes(x = date, y = total_sales, color = year)) +
+graph_1 <- ggplot(sales_by_year, aes(x = date, y = total_sales, color = year)) +
   geom_line() +
   labs(
     title = "Store Sales Over Time By Year",
@@ -36,6 +36,8 @@ ggplot(sales_by_year, aes(x = date, y = total_sales, color = year)) +
     color = "Year"
   ) +
   theme_minimal()
+
+graph_1
 ```
 
 Can see a consistent upward trend in total sales by year. 
@@ -54,7 +56,7 @@ sales_oil_data <- train %>%
   left_join(oil, by = "date") %>%
   rename(oil_price = dcoilwtico)
   
-ggplot(sales_oil_data, aes(x = date)) +
+graph_2 <- ggplot(sales_oil_data, aes(x = date)) +
   geom_line(aes(y = total_sales, color = "Sales")) +
   geom_line(aes(y = oil_price * 1000, color = "Oil Price (Scaled")) +
   scale_y_continuous(
@@ -70,6 +72,8 @@ ggplot(sales_oil_data, aes(x = date)) +
     x = "Date"
   ) +
   theme_minimal()
+
+graph_2
 ```
 Can see that higher oil prices in earlier years could have resulted in lower total sales because of factors such as transportation costs reducing overhead, and increased consumer spending because of higher disposable income values in the country.
 
