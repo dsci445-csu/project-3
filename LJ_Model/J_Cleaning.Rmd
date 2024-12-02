@@ -1,0 +1,253 @@
+---
+title: "Lauren and Jillian EDA"
+output: html_document
+date: "2024-11-14"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+
+# GIT COMMANDS
+# git add _____/
+# git commit -m "Message"
+# git push origin main
+
+library(readr)
+library(dplyr)
+library(leaps)
+library(ggplot2)
+library(glmnet)
+library(ISLR)
+library(dials)
+library(tidymodels)
+library(lubridate)
+
+```
+
+```{r}
+
+# Load Data
+holidays_events <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/Unprocessed/holidays_events.csv")
+oil <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/Unprocessed/oil.csv")
+stores <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/Unprocessed/stores.csv")
+test <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/Unprocessed/test.csv")
+transactions <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/Unprocessed/transactions.csv")
+train <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/Unprocessed/train.csv")
+
+```
+
+```{r}
+
+# Data Cleaning
+
+# Check for missing values
+sapply(train, function(x) sum(is.na(x)))
+sapply(oil, function(x) sum(is.na(x))) 
+sapply(holidays_events, function(x) sum(is.na(x)))
+sapply(transactions, function(x) sum(is.na(x)))
+sapply(stores, function(x) sum(is.na(x)))
+
+# Drop the missing values in the oil data set
+oil <- na.omit(oil)
+
+# Check to ensure there are no missing values in oil
+sapply(oil, function(x) sum(is.na(x))) 
+
+```
+
+```{r}
+
+# Join additional data sets to train that are easily transferrable
+
+final_train <- train %>%
+  left_join(stores, by = "store_nbr") %>%
+  left_join(oil, by = "date") %>%
+  left_join(transactions, by = c("date", "store_nbr"))
+
+```
+
+```{r}
+
+# Join holiday events to train (more complex)
+
+# Want a unique type variable for holiday types
+holidays_events <- holidays_events %>%
+  rename(holiday_type = type)
+
+final_train$nation <- "Ecuador"
+
+# Add flag for holiday events
+holidays_events_clean <- holidays_events %>%
+  mutate(
+    national_holiday = if_else(locale == "National", 1, 0),
+    state_holiday = if_else(locale == "Regional", 1, 0),
+    city_holiday = if_else(locale == "Local", 1, 0),
+    state = if_else(locale == "Regional", locale_name, NA_character_),
+    city = if_else(locale == "Local", locale_name, NA_character_),
+    nation = if_else(locale == "National", locale_name, NA_character_)
+  ) %>%
+  select(date, city, state, nation, city_holiday, state_holiday, national_holiday)
+
+# Perform a single join to merge all holiday information
+final_train <- final_train %>%
+  left_join(
+    holidays_events_clean %>% select(date, nation, national_holiday), 
+    by = c("date","nation")
+  ) %>% distinct()
+
+# Merge state holidays by date and state
+final_train <- final_train %>%
+  left_join(
+    holidays_events_clean %>% select(date, state, state_holiday), 
+    by = c("date", "state")
+  ) %>% distinct()
+
+# Merge city holidays by date and city
+final_train <- final_train %>%
+  left_join(
+    holidays_events_clean %>% select(date, city, city_holiday),
+    by = c("date", "city")
+  ) %>% distinct()
+
+final_train <- final_train %>%
+  select(-nation)
+
+```
+
+```{r}
+
+# Join additional data sets to test that are easily transferrable (just stores and oil)
+# transactions and holidays_events data are date-dependent, so more difficult to include for future dates in test
+
+final_test <- test %>%
+  left_join(stores, by = "store_nbr") %>%
+  left_join(oil, by = "date")
+
+```
+
+```{r}
+
+# I will extract summary information from transactions, so that I can merge it to test
+# I am taking the number of transactions per store per day, averaged across all available years
+
+transactions_summary <- transactions %>%
+  mutate(month = month(date), day = day(date)) %>%
+  group_by(store_nbr, month, day) %>%
+  summarize(avg_transactions = mean(transactions, na.rm = TRUE), .groups = "drop")
+
+final_test <- final_test %>% 
+  mutate(month = month(date), day = day(date))
+
+# Rename so test and train columns match
+transactions_summary <- transactions_summary %>%
+  rename(transactions = avg_transactions)
+
+# Now, able to merge with test data
+final_test <- final_test %>%
+  left_join(transactions_summary, by = c("store_nbr", "month", "day")) 
+
+```
+
+```{r}
+
+# Merging holidays_events and test
+
+holidays_events_test <- holidays_events %>%
+  mutate(
+    month = month(date),
+    day = day(date),
+    national_holiday = if_else(locale == "National", 1, 0),
+    state_holiday = if_else(locale == "Regional", 1, 0),
+    city_holiday = if_else(locale == "Local", 1, 0),
+    state = if_else(locale == "Regional", locale_name, NA_character_),
+    city = if_else(locale == "Local", locale_name, NA_character_),
+    nation = if_else(locale == "National", locale_name, NA_character_)
+  ) %>%
+  select(month, day, city, state, nation, city_holiday, state_holiday, national_holiday)
+
+final_test <- final_test %>%
+  mutate(
+    month = month(date),
+    day = day(date),
+    nation = "Ecuador"
+  )
+
+# Merge all national holidays
+final_test <- final_test %>%
+  left_join(
+    holidays_events_test %>% select(month, day, nation, national_holiday),
+    by = c("month", "day", "nation")
+  )
+
+# Merge state holidays by month and day
+final_test <- final_test %>%
+  left_join(
+    holidays_events_test %>% select(month, day, state, state_holiday),
+    by = c("month", "day", "state")
+  )
+
+# Merge city holidays by month and day
+final_test <- final_test %>%
+  left_join(
+    holidays_events_test %>% select(month, day, city, city_holiday),
+    by = c("month", "day", "city")
+  )
+
+# Remove columns that are no longer needed
+final_test <- final_test %>%
+  select(-nation, -month, -day)
+
+```
+
+```{r}
+
+# Saving train and test as csv files
+
+write.csv(final_train, file = "/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/final_train.csv", row.names = FALSE)
+
+write.csv(final_test, file = "/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/final_test.csv", row.names = FALSE)
+
+```
+
+```{r}
+
+# Creating lagged variables for train and test set
+
+final_train <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/final_train.csv")
+final_test <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/final_test.csv")
+
+# Temporarily combine train and test set to get lag variables for test data with future dates
+full_data <- bind_rows(
+  final_train %>% mutate(dataset = "train"),  # Tag rows as 'train'
+  final_test %>% mutate(dataset = "test")    # Tag rows as 'test'
+) %>%
+  arrange(store_nbr, family, date)
+
+# Create lags
+full_data <- full_data %>%
+  arrange(date) %>% 
+  group_by(store_nbr, family) %>%
+  mutate(
+    sales_lag_1 = lag(sales, 1),   
+    sales_lag_7 = lag(sales, 7),   
+    sales_lag_30 = lag(sales, 30),
+    sales_lag_60 = lag(sales, 60),
+    sales_lag_90 = lag(sales, 90),
+    sales_lag_180 = lag(sales, 180),
+    sales_lag_365 = lag(sales, 365)
+  ) %>%
+  ungroup()
+
+# Re-separate train and test
+final_train_lags <- full_data %>% filter(dataset == "train") %>% select(-dataset)
+final_test_lags <- full_data %>% filter(dataset == "test") %>% select(-dataset)
+
+# Save as csv files
+write.csv(final_train_lags, file = "/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/final_train_lags.csv", row.names = FALSE)
+
+write.csv(final_test_lags, file = "/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/final_test_lags.csv", row.names = FALSE)
+
+```

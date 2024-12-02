@@ -28,34 +28,35 @@ library(tidymodels)
 ```
 
 ```{r}
+
 # Load Data
+
 holidays_events <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/Unprocessed/holidays_events.csv")
 oil <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/Unprocessed/oil.csv")
 stores <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/Unprocessed/stores.csv")
-test <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/Unprocessed/test.csv")
 train <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/Unprocessed/train.csv")
 transactions <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/Unprocessed/transactions.csv")
+
 ```
 
 
 ```{r}
-# Data Cleaning
-# Check for missing values
 
+# Data cleaning
+
+# Check for missing values
 sapply(train, function(x) sum(is.na(x)))
 sapply(oil, function(x) sum(is.na(x))) 
 sapply(holidays_events, function(x) sum(is.na(x)))
 sapply(transactions, function(x) sum(is.na(x)))
-sapply(test, function(x) sum(is.na(x)))
 sapply(stores, function(x) sum(is.na(x)))
 
 # Drop the missing values in the oil data set
-
 oil <- na.omit(oil)
 
 # Check to ensure there are no missing values in oil
-
 sapply(oil, function(x) sum(is.na(x))) 
+
 ```
 
 
@@ -79,6 +80,7 @@ sapply(oil, function(x) sum(is.na(x)))
 ```
 
 ```{r}
+
 # Step 1): Creating aggregate training set
 final_train <- train %>%
   left_join(stores, by = "store_nbr") %>%
@@ -90,9 +92,11 @@ holidays_events <- holidays_events %>%
   rename(holiday_type = type)
 
 final_train$nation <- "Ecuador"
+
 ```
 
 ```{r}
+
 # Add flag for holiday events
 holidays_events_clean <- holidays_events %>%
   mutate(
@@ -125,10 +129,12 @@ final_train <- final_train %>%
     holidays_events_clean %>% select(date, city, city_holiday),
     by = c("date", "city")
   ) %>% distinct()
+
 ```
 
 
 ```{r}
+
 # Check and save the merged train dataset
 final_train[(final_train$date == "2014-06-25"),]
 
@@ -139,11 +145,11 @@ final_train <- final_train %>%
 # Check the final training dataset
 final_train[(final_train$date == "2014-06-25"),]
 
-write.csv(final_train, file = "/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/final_train.csv", row.names = FALSE)
 ```
 
 
 ```{r}
+
 # Step 2): add lags!
 final_train_lags <- final_train %>%
   arrange(date) %>%  # Sort by date to ensure correct lag calculation
@@ -167,8 +173,25 @@ final_train_lags$city_holiday[is.na(final_train_lags$city_holiday)] <- 0
 
 # Save as CSV
 write.csv(final_train_lags, file = "/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/final_train_lags.csv", row.names = FALSE)
+
 ```
 
 
+```{r}
 
+last_sales <- train %>%
+  arrange(store_nbr, family, date) %>%
+  group_by(store_nbr, family) %>%
+  summarize(
+    last_sales_lag_1 = sales[which.max(date)],            # Last available sales
+    last_sales_lag_7 = sales[which.max(date) - 6],        # 7 days prior
+    last_sales_lag_30 = sales[which.max(date) - 29],      # 30 days prior
+    last_sales_lag_60 = sales[which.max(date) - 59],      # 60 days prior
+    last_sales_lag_90 = sales[which.max(date) - 89],      # 90 days prior
+    last_sales_lag_365 = sales[which.max(date) - 364],    # 365 days prior
+    .groups = "drop"
+  )
 
+last_sales
+
+```
