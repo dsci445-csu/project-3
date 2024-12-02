@@ -10,7 +10,8 @@
 <link href="Slides_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.4.555">
 
-  <title>DSCI 445 Final Project Group - 3</title>
+  <meta name="author" content="Lauren Bair, Jillian Cook, Garrett Hayden, D’Andre Tafoya">
+  <title>Store Sales -  Time Series Forecasting</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -325,24 +326,30 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">DSCI 445 Final Project Group - 3</h1>
+  <h1 class="title">Store Sales - <br>Time Series Forecasting</h1>
+  <p class="subtitle">DSCI 445 Final Project - Group 3</p>
 
 <div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Lauren Bair, Jillian Cook, Garrett Hayden, D’Andre Tafoya 
+</div>
+</div>
 </div>
 
 </section>
-<section id="chosen-problem" class="slide level2">
-<h2>Chosen Problem</h2>
+<section id="motivation-kaggle-competition" class="slide level2">
+<h2>Motivation: Kaggle Competition</h2>
 <ul>
 <li><p>“Store Sales - Time Series Forecasting” From Kaggle</p></li>
-<li><p>Goal: Test the capability of different models to accurately forecast store sales based on past yearly data.</p></li>
+<li><p>Goal: Test the capability of different models to accurately forecast store sales based on past yearly data</p></li>
 <li><p>Evaluation Metric for Competition: Root Mean Squared Logarithmic Error</p>
 <p><img data-src="images/clipboard-1235366002.png" width="213" height="76"><img data-src="images/clipboard-765528567.png" width="231"></p></li>
 <li><p>Competition Link: <a href="https://www.kaggle.com/competitions/store-sales-time-series-forecasting" class="uri">https://www.kaggle.com/competitions/store-sales-time-series-forecasting</a></p></li>
 </ul>
 </section>
-<section id="initial-data-analysis" class="slide level2">
-<h2>Initial Data Analysis</h2>
+<section id="initial-exploratory-data-analysis" class="slide level2">
+<h2>Initial Exploratory Data Analysis</h2>
 
 <img data-src="Slides_files/figure-revealjs/unnamed-chunk-2-1.png" width="960" class="r-stretch"></section>
 <section>
@@ -359,7 +366,7 @@
 <li><p>Could potentially identify more granular patterns within specific time periods</p></li>
 </ul></li>
 <li><p>Able to use lagged values of variables to better quantify autocorrelation within the data set</p></li>
-<li><p>Autocorrelation: “The degree of correlation of the same variables between two successivetime intervals”</p></li>
+<li><p>Autocorrelation: “The degree of correlation of the same variables between two successive time intervals”</p></li>
 </ul>
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
