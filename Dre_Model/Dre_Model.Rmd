@@ -8,9 +8,8 @@ library(xgboost)
 library(data.table)
 library(DiagrammeR)
 
-train_data <- fread("final_train_lags.csv")
-test_data <- fread("test.csv")
-
+train_data <- fread("../Data/final_train_lags.csv")
+test_data <- fread("../Data/final_train.csv")
 # RMSLE Function
 compute_rmsle <- function(actual, predicted) {
   actual <- as.numeric(actual)

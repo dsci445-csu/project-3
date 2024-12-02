@@ -1592,9 +1592,8 @@ display: none;
 library(data.table)
 library(DiagrammeR)
 
-train_data &lt;- fread(&quot;final_train_lags.csv&quot;)
-test_data &lt;- fread(&quot;test.csv&quot;)
-
+train_data &lt;- fread(&quot;../Data/final_train_lags.csv&quot;)
+test_data &lt;- fread(&quot;../Data/final_train.csv&quot;)
 # RMSLE Function
 compute_rmsle &lt;- function(actual, predicted) {
   actual &lt;- as.numeric(actual)
@@ -1613,7 +1612,7 @@ if (length(missing_test_cols) &gt; 0) {
     test_data[, (col) := NA]  # &lt;-Add missing columns with NA values
   }
 }</code></pre>
-<pre><code>## Adding missing columns to test_data: sales_lag_1, sales_lag_7, sales_lag_30, sales_lag_60, sales_lag_180, dcoilwtico, transactions</code></pre>
+<pre><code>## Adding missing columns to test_data: sales_lag_1, sales_lag_7, sales_lag_30, sales_lag_60, sales_lag_180</code></pre>
 <pre class="r"><code># Check missingness in datasets
 cat(&quot;Missingness in Training Data:\n&quot;)</code></pre>
 <pre><code>## Missingness in Training Data:</code></pre>
@@ -1626,9 +1625,9 @@ cat(&quot;Missingness in Training Data:\n&quot;)</code></pre>
 <pre><code>## Missingness in Test Data:</code></pre>
 <pre class="r"><code>print(sapply(test_data[, c(lagged_sales_cols, additional_cols), with = FALSE], function(x) mean(is.na(x))))</code></pre>
 <pre><code>##   sales_lag_1   sales_lag_7  sales_lag_30  sales_lag_60 sales_lag_180 
-##             1             1             1             1             1 
+##    1.00000000    1.00000000    1.00000000    1.00000000    1.00000000 
 ##    dcoilwtico  transactions 
-##             1             1</code></pre>
+##    0.30938242    0.08190376</code></pre>
 <pre class="r"><code># Induce Missingness for Validation
 set.seed(445)
 train_data[sample(.N, size = 0.1 * .N), sales_lag_7 := NA]
@@ -1683,231 +1682,229 @@ model_native &lt;- xgb.train(
   early_stopping_rounds = 10, 
   verbose = 1
 )</code></pre>
-<pre><code>## [1]  train-rmse:980.191790   valid-rmse:1315.236471 
+<pre><code>## [1]  train-rmse:980.188339   valid-rmse:1316.149115 
 ## Multiple eval metrics are present. Will use valid_rmse for early stopping.
 ## Will train until valid_rmse hasn&#39;t improved in 10 rounds.
 ## 
-## [2]  train-rmse:891.990193   valid-rmse:1197.723585 
-## [3]  train-rmse:813.157780   valid-rmse:1095.011018 
-## [4]  train-rmse:743.183934   valid-rmse:1003.438349 
-## [5]  train-rmse:680.485908   valid-rmse:919.830948 
-## [6]  train-rmse:626.537098   valid-rmse:847.140018 
-## [7]  train-rmse:578.431592   valid-rmse:782.397781 
-## [8]  train-rmse:534.446172   valid-rmse:723.581502 
-## [9]  train-rmse:495.716122   valid-rmse:672.577168 
-## [10] train-rmse:461.352517   valid-rmse:626.461482 
-## [11] train-rmse:431.801160   valid-rmse:586.315185 
-## [12] train-rmse:405.608105   valid-rmse:550.194715 
-## [13] train-rmse:382.244092   valid-rmse:518.161360 
-## [14] train-rmse:362.581370   valid-rmse:489.718998 
-## [15] train-rmse:345.526127   valid-rmse:465.434550 
-## [16] train-rmse:330.880691   valid-rmse:444.914261 
-## [17] train-rmse:317.823307   valid-rmse:428.136457 
-## [18] train-rmse:307.951425   valid-rmse:412.365084 
-## [19] train-rmse:298.499424   valid-rmse:398.897920 
-## [20] train-rmse:291.297265   valid-rmse:387.354565 
-## [21] train-rmse:285.060663   valid-rmse:377.185864 
-## [22] train-rmse:278.801133   valid-rmse:369.046131 
-## [23] train-rmse:273.329911   valid-rmse:361.240800 
-## [24] train-rmse:269.048349   valid-rmse:355.527413 
-## [25] train-rmse:265.363305   valid-rmse:350.549788 
-## [26] train-rmse:261.847603   valid-rmse:345.275035 
-## [27] train-rmse:259.315795   valid-rmse:341.262470 
-## [28] train-rmse:256.106752   valid-rmse:338.682081 
-## [29] train-rmse:253.587702   valid-rmse:335.068129 
-## [30] train-rmse:251.685291   valid-rmse:332.584784 
-## [31] train-rmse:249.794806   valid-rmse:330.322938 
-## [32] train-rmse:248.124547   valid-rmse:328.359724 
-## [33] train-rmse:246.865017   valid-rmse:326.976260 
-## [34] train-rmse:245.442108   valid-rmse:325.508331 
-## [35] train-rmse:244.250297   valid-rmse:324.323661 
-## [36] train-rmse:242.894444   valid-rmse:323.015736 
-## [37] train-rmse:241.604290   valid-rmse:322.066380 
-## [38] train-rmse:240.447273   valid-rmse:321.030632 
-## [39] train-rmse:239.554658   valid-rmse:319.691858 
-## [40] train-rmse:238.981171   valid-rmse:318.977477 
-## [41] train-rmse:238.186346   valid-rmse:318.030705 
-## [42] train-rmse:237.611036   valid-rmse:317.442304 
-## [43] train-rmse:236.754851   valid-rmse:316.536541 
-## [44] train-rmse:236.198661   valid-rmse:316.250378 
-## [45] train-rmse:235.559916   valid-rmse:315.299770 
-## [46] train-rmse:235.024230   valid-rmse:314.840262 
-## [47] train-rmse:234.322602   valid-rmse:314.396177 
-## [48] train-rmse:233.730221   valid-rmse:313.948638 
-## [49] train-rmse:233.151581   valid-rmse:313.365551 
-## [50] train-rmse:232.727983   valid-rmse:313.300076 
-## [51] train-rmse:232.274387   valid-rmse:312.831075 
-## [52] train-rmse:231.903699   valid-rmse:312.519979 
-## [53] train-rmse:230.950346   valid-rmse:312.364728 
-## [54] train-rmse:230.134983   valid-rmse:312.005756 
-## [55] train-rmse:229.720945   valid-rmse:311.841053 
-## [56] train-rmse:229.462552   valid-rmse:311.762139 
-## [57] train-rmse:229.130013   valid-rmse:311.644662 
-## [58] train-rmse:228.825337   valid-rmse:311.621523 
-## [59] train-rmse:228.526357   valid-rmse:311.383005 
-## [60] train-rmse:228.436090   valid-rmse:311.402728 
-## [61] train-rmse:228.137654   valid-rmse:311.445713 
-## [62] train-rmse:227.484096   valid-rmse:311.303679 
-## [63] train-rmse:227.139897   valid-rmse:311.048087 
-## [64] train-rmse:226.905681   valid-rmse:310.840777 
-## [65] train-rmse:226.574254   valid-rmse:310.501290 
-## [66] train-rmse:226.102964   valid-rmse:310.406810 
-## [67] train-rmse:226.078934   valid-rmse:310.424268 
-## [68] train-rmse:225.915625   valid-rmse:310.503128 
-## [69] train-rmse:225.020701   valid-rmse:310.318522 
-## [70] train-rmse:224.839148   valid-rmse:310.303844 
-## [71] train-rmse:224.691277   valid-rmse:310.174989 
-## [72] train-rmse:224.498426   valid-rmse:310.054730 
-## [73] train-rmse:223.493981   valid-rmse:309.810601 
-## [74] train-rmse:223.025907   valid-rmse:309.650465 
-## [75] train-rmse:222.832666   valid-rmse:309.568204 
-## [76] train-rmse:222.758491   valid-rmse:309.570068 
-## [77] train-rmse:222.686740   valid-rmse:309.496558 
-## [78] train-rmse:222.515930   valid-rmse:309.368445 
-## [79] train-rmse:222.416050   valid-rmse:309.334296 
-## [80] train-rmse:221.196756   valid-rmse:309.399975 
-## [81] train-rmse:221.146151   valid-rmse:309.406206 
-## [82] train-rmse:221.020026   valid-rmse:309.380086 
-## [83] train-rmse:220.945786   valid-rmse:309.433515 
-## [84] train-rmse:220.717878   valid-rmse:309.282885 
-## [85] train-rmse:220.651580   valid-rmse:309.173032 
-## [86] train-rmse:220.571751   valid-rmse:309.109256 
-## [87] train-rmse:220.476959   valid-rmse:309.180100 
-## [88] train-rmse:220.378903   valid-rmse:309.164914 
-## [89] train-rmse:220.334797   valid-rmse:309.115824 
-## [90] train-rmse:220.252416   valid-rmse:309.066875 
-## [91] train-rmse:219.420660   valid-rmse:309.238890 
-## [92] train-rmse:219.290970   valid-rmse:309.145330 
-## [93] train-rmse:219.148067   valid-rmse:309.129338 
-## [94] train-rmse:218.824344   valid-rmse:308.921139 
-## [95] train-rmse:218.701805   valid-rmse:308.948681 
-## [96] train-rmse:218.475614   valid-rmse:308.751652 
-## [97] train-rmse:218.104609   valid-rmse:308.808149 
-## [98] train-rmse:217.769106   valid-rmse:308.767998 
-## [99] train-rmse:217.504355   valid-rmse:308.588074 
-## [100]    train-rmse:217.270792   valid-rmse:308.517555 
-## [101]    train-rmse:216.696166   valid-rmse:308.639703 
-## [102]    train-rmse:216.470861   valid-rmse:308.487002 
-## [103]    train-rmse:216.316772   valid-rmse:308.528917 
-## [104]    train-rmse:216.007880   valid-rmse:308.345980 
-## [105]    train-rmse:215.725827   valid-rmse:308.057053 
-## [106]    train-rmse:215.578956   valid-rmse:308.047676 
-## [107]    train-rmse:215.467209   valid-rmse:308.043742 
-## [108]    train-rmse:214.961605   valid-rmse:307.879077 
-## [109]    train-rmse:214.770703   valid-rmse:307.787527 
-## [110]    train-rmse:214.528964   valid-rmse:307.773212 
-## [111]    train-rmse:214.269495   valid-rmse:307.611116 
-## [112]    train-rmse:214.214862   valid-rmse:307.636974 
-## [113]    train-rmse:214.032768   valid-rmse:307.402139 
-## [114]    train-rmse:213.610712   valid-rmse:307.365968 
-## [115]    train-rmse:213.529853   valid-rmse:307.358729 
-## [116]    train-rmse:213.236576   valid-rmse:307.197862 
-## [117]    train-rmse:213.075144   valid-rmse:307.205166 
-## [118]    train-rmse:212.758563   valid-rmse:307.278776 
-## [119]    train-rmse:212.081236   valid-rmse:307.053048 
-## [120]    train-rmse:212.012406   valid-rmse:307.069960 
-## [121]    train-rmse:211.789830   valid-rmse:306.946751 
-## [122]    train-rmse:211.673541   valid-rmse:307.009894 
-## [123]    train-rmse:211.559749   valid-rmse:307.046093 
-## [124]    train-rmse:211.380464   valid-rmse:306.972993 
-## [125]    train-rmse:211.274570   valid-rmse:306.973697 
-## [126]    train-rmse:211.100003   valid-rmse:306.891832 
-## [127]    train-rmse:211.027439   valid-rmse:306.923315 
-## [128]    train-rmse:210.893830   valid-rmse:306.885241 
-## [129]    train-rmse:210.759715   valid-rmse:306.839339 
-## [130]    train-rmse:210.509839   valid-rmse:306.742190 
-## [131]    train-rmse:210.354508   valid-rmse:306.650899 
-## [132]    train-rmse:210.067175   valid-rmse:306.515047 
-## [133]    train-rmse:209.875647   valid-rmse:306.444390 
-## [134]    train-rmse:209.585152   valid-rmse:306.405181 
-## [135]    train-rmse:209.530993   valid-rmse:306.399728 
-## [136]    train-rmse:209.314853   valid-rmse:306.462139 
-## [137]    train-rmse:208.511752   valid-rmse:306.748465 
-## [138]    train-rmse:208.463796   valid-rmse:306.637690 
-## [139]    train-rmse:208.296134   valid-rmse:306.580154 
-## [140]    train-rmse:208.174740   valid-rmse:306.584923 
-## [141]    train-rmse:207.970094   valid-rmse:306.545445 
-## [142]    train-rmse:207.767143   valid-rmse:306.383371 
-## [143]    train-rmse:207.583499   valid-rmse:306.381385 
-## [144]    train-rmse:207.313743   valid-rmse:306.257270 
-## [145]    train-rmse:207.245736   valid-rmse:306.300440 
-## [146]    train-rmse:206.913196   valid-rmse:306.214357 
-## [147]    train-rmse:206.689276   valid-rmse:306.172887 
-## [148]    train-rmse:206.388883   valid-rmse:306.201059 
-## [149]    train-rmse:206.281772   valid-rmse:306.201447 
-## [150]    train-rmse:206.210997   valid-rmse:306.100544 
-## [151]    train-rmse:205.631876   valid-rmse:306.069083 
-## [152]    train-rmse:205.514388   valid-rmse:306.053797 
-## [153]    train-rmse:205.011154   valid-rmse:305.976224 
-## [154]    train-rmse:204.772505   valid-rmse:305.835121 
-## [155]    train-rmse:204.521389   valid-rmse:306.095098 
-## [156]    train-rmse:204.437878   valid-rmse:306.135837 
-## [157]    train-rmse:204.135671   valid-rmse:306.111553 
-## [158]    train-rmse:204.093247   valid-rmse:306.128721 
-## [159]    train-rmse:204.045740   valid-rmse:306.132107 
-## [160]    train-rmse:203.940724   valid-rmse:306.091305 
-## [161]    train-rmse:203.845763   valid-rmse:306.086764 
-## [162]    train-rmse:203.329334   valid-rmse:305.934055 
-## [163]    train-rmse:203.247009   valid-rmse:305.926051 
-## [164]    train-rmse:203.053952   valid-rmse:305.797969 
-## [165]    train-rmse:202.951277   valid-rmse:305.730927 
-## [166]    train-rmse:202.744034   valid-rmse:305.727551 
-## [167]    train-rmse:202.445867   valid-rmse:305.725918 
-## [168]    train-rmse:202.194840   valid-rmse:305.727667 
-## [169]    train-rmse:201.942681   valid-rmse:305.647769 
-## [170]    train-rmse:201.856437   valid-rmse:305.646929 
-## [171]    train-rmse:201.774196   valid-rmse:305.488300 
-## [172]    train-rmse:201.618345   valid-rmse:305.477796 
-## [173]    train-rmse:201.503396   valid-rmse:305.447211 
-## [174]    train-rmse:201.317379   valid-rmse:305.363317 
-## [175]    train-rmse:201.281604   valid-rmse:305.433611 
-## [176]    train-rmse:201.150264   valid-rmse:305.358947 
-## [177]    train-rmse:201.071737   valid-rmse:305.319526 
-## [178]    train-rmse:201.030743   valid-rmse:305.355992 
-## [179]    train-rmse:200.915810   valid-rmse:305.334239 
-## [180]    train-rmse:200.683373   valid-rmse:305.483588 
-## [181]    train-rmse:200.651246   valid-rmse:305.517095 
-## [182]    train-rmse:200.602031   valid-rmse:305.507329 
-## [183]    train-rmse:200.310053   valid-rmse:305.221333 
-## [184]    train-rmse:200.153075   valid-rmse:305.117708 
-## [185]    train-rmse:199.938981   valid-rmse:305.053923 
-## [186]    train-rmse:199.884644   valid-rmse:305.070340 
-## [187]    train-rmse:199.865258   valid-rmse:305.092423 
-## [188]    train-rmse:199.844276   valid-rmse:305.082191 
-## [189]    train-rmse:199.528845   valid-rmse:304.967897 
-## [190]    train-rmse:199.439167   valid-rmse:304.983602 
-## [191]    train-rmse:199.299640   valid-rmse:304.920306 
-## [192]    train-rmse:199.218307   valid-rmse:304.878126 
-## [193]    train-rmse:199.145448   valid-rmse:304.863948 
-## [194]    train-rmse:199.074902   valid-rmse:304.912803 
-## [195]    train-rmse:199.040515   valid-rmse:304.922870 
-## [196]    train-rmse:199.002785   valid-rmse:304.940710 
-## [197]    train-rmse:198.956451   valid-rmse:304.904253 
-## [198]    train-rmse:198.900485   valid-rmse:304.846999 
-## [199]    train-rmse:198.694086   valid-rmse:304.855557 
-## [200]    train-rmse:198.652850   valid-rmse:304.978449 
-## [201]    train-rmse:198.467260   valid-rmse:304.865606 
-## [202]    train-rmse:198.130299   valid-rmse:304.621798 
-## [203]    train-rmse:197.915021   valid-rmse:304.521110 
-## [204]    train-rmse:197.706338   valid-rmse:304.514156 
-## [205]    train-rmse:197.683378   valid-rmse:304.498510 
-## [206]    train-rmse:197.593249   valid-rmse:304.538283 
-## [207]    train-rmse:197.448762   valid-rmse:304.531183 
-## [208]    train-rmse:197.273038   valid-rmse:304.453224 
-## [209]    train-rmse:197.168484   valid-rmse:304.396180 
-## [210]    train-rmse:196.995756   valid-rmse:304.300474 
-## [211]    train-rmse:196.931103   valid-rmse:304.316409 
-## [212]    train-rmse:196.641032   valid-rmse:304.305443 
-## [213]    train-rmse:196.425172   valid-rmse:304.353776 
-## [214]    train-rmse:196.379565   valid-rmse:304.364871 
-## [215]    train-rmse:196.275948   valid-rmse:304.409364 
-## [216]    train-rmse:196.113990   valid-rmse:304.398538 
-## [217]    train-rmse:195.608339   valid-rmse:304.350269 
-## [218]    train-rmse:195.572554   valid-rmse:304.365421 
-## [219]    train-rmse:195.398991   valid-rmse:304.375874 
-## [220]    train-rmse:195.312319   valid-rmse:304.349229 
+## [2]  train-rmse:891.812973   valid-rmse:1199.099473 
+## [3]  train-rmse:812.997606   valid-rmse:1094.393327 
+## [4]  train-rmse:742.914615   valid-rmse:1003.191117 
+## [5]  train-rmse:680.360267   valid-rmse:920.224167 
+## [6]  train-rmse:626.095994   valid-rmse:847.457851 
+## [7]  train-rmse:578.373963   valid-rmse:782.450422 
+## [8]  train-rmse:534.413750   valid-rmse:724.195447 
+## [9]  train-rmse:495.665611   valid-rmse:674.408512 
+## [10] train-rmse:461.359953   valid-rmse:627.349413 
+## [11] train-rmse:431.507261   valid-rmse:586.378145 
+## [12] train-rmse:404.829119   valid-rmse:551.224264 
+## [13] train-rmse:382.202881   valid-rmse:519.672797 
+## [14] train-rmse:362.161856   valid-rmse:492.295479 
+## [15] train-rmse:345.413506   valid-rmse:468.582377 
+## [16] train-rmse:330.212043   valid-rmse:448.439884 
+## [17] train-rmse:317.731340   valid-rmse:431.317424 
+## [18] train-rmse:307.801342   valid-rmse:415.434583 
+## [19] train-rmse:298.921165   valid-rmse:401.293451 
+## [20] train-rmse:291.895475   valid-rmse:389.848811 
+## [21] train-rmse:285.637069   valid-rmse:379.871272 
+## [22] train-rmse:279.380569   valid-rmse:371.696233 
+## [23] train-rmse:274.132527   valid-rmse:363.787692 
+## [24] train-rmse:269.483612   valid-rmse:357.793396 
+## [25] train-rmse:266.042892   valid-rmse:351.809923 
+## [26] train-rmse:262.539861   valid-rmse:346.310459 
+## [27] train-rmse:259.297971   valid-rmse:342.370846 
+## [28] train-rmse:256.734281   valid-rmse:339.558038 
+## [29] train-rmse:254.639992   valid-rmse:336.242628 
+## [30] train-rmse:252.591562   valid-rmse:333.398899 
+## [31] train-rmse:250.568457   valid-rmse:331.015278 
+## [32] train-rmse:248.462522   valid-rmse:329.179100 
+## [33] train-rmse:247.105021   valid-rmse:327.457239 
+## [34] train-rmse:245.586076   valid-rmse:325.856857 
+## [35] train-rmse:244.578411   valid-rmse:324.482194 
+## [36] train-rmse:242.860645   valid-rmse:323.460178 
+## [37] train-rmse:241.808992   valid-rmse:323.049556 
+## [38] train-rmse:240.989541   valid-rmse:322.289116 
+## [39] train-rmse:239.693915   valid-rmse:321.457066 
+## [40] train-rmse:238.840982   valid-rmse:320.885901 
+## [41] train-rmse:238.044461   valid-rmse:320.218362 
+## [42] train-rmse:237.280030   valid-rmse:319.687606 
+## [43] train-rmse:236.552064   valid-rmse:318.956769 
+## [44] train-rmse:235.028798   valid-rmse:318.295091 
+## [45] train-rmse:233.721729   valid-rmse:318.037965 
+## [46] train-rmse:233.113449   valid-rmse:317.243490 
+## [47] train-rmse:232.688144   valid-rmse:316.898024 
+## [48] train-rmse:231.754830   valid-rmse:316.740215 
+## [49] train-rmse:230.579202   valid-rmse:317.285355 
+## [50] train-rmse:229.837534   valid-rmse:316.924950 
+## [51] train-rmse:229.488120   valid-rmse:316.505321 
+## [52] train-rmse:229.220347   valid-rmse:316.358245 
+## [53] train-rmse:228.382322   valid-rmse:316.566985 
+## [54] train-rmse:227.417439   valid-rmse:316.304922 
+## [55] train-rmse:227.099269   valid-rmse:316.227677 
+## [56] train-rmse:226.729170   valid-rmse:315.955302 
+## [57] train-rmse:226.372160   valid-rmse:315.800523 
+## [58] train-rmse:226.043416   valid-rmse:315.863781 
+## [59] train-rmse:225.778908   valid-rmse:315.838767 
+## [60] train-rmse:225.406286   valid-rmse:315.807087 
+## [61] train-rmse:224.665036   valid-rmse:316.179226 
+## [62] train-rmse:224.513064   valid-rmse:316.145005 
+## [63] train-rmse:224.174318   valid-rmse:316.048093 
+## [64] train-rmse:224.016170   valid-rmse:315.965384 
+## [65] train-rmse:223.960764   valid-rmse:315.901821 
+## [66] train-rmse:223.652427   valid-rmse:315.636704 
+## [67] train-rmse:223.452356   valid-rmse:315.733299 
+## [68] train-rmse:223.264741   valid-rmse:315.696982 
+## [69] train-rmse:223.001061   valid-rmse:315.481009 
+## [70] train-rmse:222.689499   valid-rmse:315.455804 
+## [71] train-rmse:222.646204   valid-rmse:315.396697 
+## [72] train-rmse:222.346440   valid-rmse:315.360593 
+## [73] train-rmse:221.758895   valid-rmse:315.345693 
+## [74] train-rmse:221.525841   valid-rmse:315.160082 
+## [75] train-rmse:221.325471   valid-rmse:315.179643 
+## [76] train-rmse:221.219180   valid-rmse:315.104007 
+## [77] train-rmse:220.966115   valid-rmse:315.099323 
+## [78] train-rmse:220.783850   valid-rmse:315.126771 
+## [79] train-rmse:220.584214   valid-rmse:314.984855 
+## [80] train-rmse:219.988496   valid-rmse:315.335124 
+## [81] train-rmse:219.779338   valid-rmse:315.350119 
+## [82] train-rmse:219.481888   valid-rmse:315.291808 
+## [83] train-rmse:219.350843   valid-rmse:315.270403 
+## [84] train-rmse:219.227928   valid-rmse:315.239107 
+## [85] train-rmse:218.901925   valid-rmse:315.147516 
+## [86] train-rmse:218.770839   valid-rmse:314.998135 
+## [87] train-rmse:218.652829   valid-rmse:314.854647 
+## [88] train-rmse:218.330655   valid-rmse:314.731169 
+## [89] train-rmse:218.215547   valid-rmse:314.715896 
+## [90] train-rmse:218.127071   valid-rmse:314.644061 
+## [91] train-rmse:218.049252   valid-rmse:314.622354 
+## [92] train-rmse:217.809956   valid-rmse:314.197089 
+## [93] train-rmse:217.304241   valid-rmse:314.332232 
+## [94] train-rmse:217.091283   valid-rmse:314.364959 
+## [95] train-rmse:216.820988   valid-rmse:314.283472 
+## [96] train-rmse:216.531956   valid-rmse:314.214858 
+## [97] train-rmse:216.454497   valid-rmse:314.201151 
+## [98] train-rmse:216.411115   valid-rmse:314.166654 
+## [99] train-rmse:215.762834   valid-rmse:313.882015 
+## [100]    train-rmse:215.238877   valid-rmse:313.869419 
+## [101]    train-rmse:215.019876   valid-rmse:313.876896 
+## [102]    train-rmse:214.854346   valid-rmse:313.805891 
+## [103]    train-rmse:214.775619   valid-rmse:313.771893 
+## [104]    train-rmse:214.655685   valid-rmse:313.785843 
+## [105]    train-rmse:214.506831   valid-rmse:313.768759 
+## [106]    train-rmse:214.015048   valid-rmse:313.649840 
+## [107]    train-rmse:213.793776   valid-rmse:313.553380 
+## [108]    train-rmse:213.187107   valid-rmse:313.466790 
+## [109]    train-rmse:213.111736   valid-rmse:313.441136 
+## [110]    train-rmse:213.000953   valid-rmse:313.504922 
+## [111]    train-rmse:212.790878   valid-rmse:313.336931 
+## [112]    train-rmse:212.706822   valid-rmse:313.248018 
+## [113]    train-rmse:212.330433   valid-rmse:313.284125 
+## [114]    train-rmse:211.927253   valid-rmse:313.077978 
+## [115]    train-rmse:211.849309   valid-rmse:313.011007 
+## [116]    train-rmse:211.484775   valid-rmse:313.018709 
+## [117]    train-rmse:211.216671   valid-rmse:312.857095 
+## [118]    train-rmse:211.141079   valid-rmse:312.817911 
+## [119]    train-rmse:210.893396   valid-rmse:312.688319 
+## [120]    train-rmse:210.795043   valid-rmse:312.672479 
+## [121]    train-rmse:210.572368   valid-rmse:312.411680 
+## [122]    train-rmse:210.346014   valid-rmse:312.377360 
+## [123]    train-rmse:210.256081   valid-rmse:312.384965 
+## [124]    train-rmse:210.197531   valid-rmse:312.373515 
+## [125]    train-rmse:209.718117   valid-rmse:312.467391 
+## [126]    train-rmse:209.610064   valid-rmse:312.425561 
+## [127]    train-rmse:209.461003   valid-rmse:312.356567 
+## [128]    train-rmse:209.022816   valid-rmse:312.154806 
+## [129]    train-rmse:208.857094   valid-rmse:312.135540 
+## [130]    train-rmse:208.684008   valid-rmse:312.101566 
+## [131]    train-rmse:208.340896   valid-rmse:312.137640 
+## [132]    train-rmse:208.109518   valid-rmse:312.023487 
+## [133]    train-rmse:207.764205   valid-rmse:311.977382 
+## [134]    train-rmse:207.666539   valid-rmse:311.988846 
+## [135]    train-rmse:207.624165   valid-rmse:311.988168 
+## [136]    train-rmse:207.545377   valid-rmse:311.904559 
+## [137]    train-rmse:207.423705   valid-rmse:311.774948 
+## [138]    train-rmse:207.172274   valid-rmse:312.183813 
+## [139]    train-rmse:206.746406   valid-rmse:312.124345 
+## [140]    train-rmse:206.676829   valid-rmse:312.077443 
+## [141]    train-rmse:206.359586   valid-rmse:311.957043 
+## [142]    train-rmse:206.070818   valid-rmse:311.742583 
+## [143]    train-rmse:205.871264   valid-rmse:311.758730 
+## [144]    train-rmse:205.762741   valid-rmse:311.669623 
+## [145]    train-rmse:205.690667   valid-rmse:311.676440 
+## [146]    train-rmse:205.571542   valid-rmse:311.680475 
+## [147]    train-rmse:205.544762   valid-rmse:311.700572 
+## [148]    train-rmse:205.261027   valid-rmse:311.460386 
+## [149]    train-rmse:204.968922   valid-rmse:311.490117 
+## [150]    train-rmse:204.921191   valid-rmse:311.476791 
+## [151]    train-rmse:204.579568   valid-rmse:311.470248 
+## [152]    train-rmse:204.258382   valid-rmse:311.684936 
+## [153]    train-rmse:204.050456   valid-rmse:311.643201 
+## [154]    train-rmse:203.972320   valid-rmse:311.646299 
+## [155]    train-rmse:203.862883   valid-rmse:311.600971 
+## [156]    train-rmse:203.771210   valid-rmse:311.564620 
+## [157]    train-rmse:203.725320   valid-rmse:311.575880 
+## [158]    train-rmse:203.427902   valid-rmse:311.415532 
+## [159]    train-rmse:203.377005   valid-rmse:311.334955 
+## [160]    train-rmse:203.292535   valid-rmse:311.313274 
+## [161]    train-rmse:203.043696   valid-rmse:311.178985 
+## [162]    train-rmse:202.893779   valid-rmse:311.202871 
+## [163]    train-rmse:202.768718   valid-rmse:311.142175 
+## [164]    train-rmse:202.568480   valid-rmse:311.116155 
+## [165]    train-rmse:202.414748   valid-rmse:311.028375 
+## [166]    train-rmse:202.377289   valid-rmse:311.041262 
+## [167]    train-rmse:202.342502   valid-rmse:311.016074 
+## [168]    train-rmse:202.261992   valid-rmse:310.968907 
+## [169]    train-rmse:202.169256   valid-rmse:310.909701 
+## [170]    train-rmse:202.114125   valid-rmse:310.907467 
+## [171]    train-rmse:202.067881   valid-rmse:310.942929 
+## [172]    train-rmse:201.974445   valid-rmse:310.894247 
+## [173]    train-rmse:201.646845   valid-rmse:310.805774 
+## [174]    train-rmse:201.492019   valid-rmse:310.733535 
+## [175]    train-rmse:201.431788   valid-rmse:310.756193 
+## [176]    train-rmse:201.015889   valid-rmse:310.467816 
+## [177]    train-rmse:200.897805   valid-rmse:310.420493 
+## [178]    train-rmse:200.815509   valid-rmse:310.430232 
+## [179]    train-rmse:200.733103   valid-rmse:310.457988 
+## [180]    train-rmse:200.441690   valid-rmse:310.372247 
+## [181]    train-rmse:200.373173   valid-rmse:310.364131 
+## [182]    train-rmse:200.258151   valid-rmse:310.153915 
+## [183]    train-rmse:200.181381   valid-rmse:310.127812 
+## [184]    train-rmse:200.146018   valid-rmse:310.134902 
+## [185]    train-rmse:199.986106   valid-rmse:310.131189 
+## [186]    train-rmse:199.960650   valid-rmse:310.165216 
+## [187]    train-rmse:199.838616   valid-rmse:310.124653 
+## [188]    train-rmse:199.813034   valid-rmse:310.117857 
+## [189]    train-rmse:199.572963   valid-rmse:310.203650 
+## [190]    train-rmse:199.542980   valid-rmse:310.177101 
+## [191]    train-rmse:199.503486   valid-rmse:310.139781 
+## [192]    train-rmse:199.053243   valid-rmse:310.268851 
+## [193]    train-rmse:198.842073   valid-rmse:310.287785 
+## [194]    train-rmse:198.629913   valid-rmse:310.153560 
+## [195]    train-rmse:198.495440   valid-rmse:310.016538 
+## [196]    train-rmse:198.259473   valid-rmse:309.993176 
+## [197]    train-rmse:198.069015   valid-rmse:310.015575 
+## [198]    train-rmse:198.023538   valid-rmse:310.030493 
+## [199]    train-rmse:197.661147   valid-rmse:310.026154 
+## [200]    train-rmse:197.275864   valid-rmse:310.086162 
+## [201]    train-rmse:197.244254   valid-rmse:310.085938 
+## [202]    train-rmse:197.211995   valid-rmse:310.107166 
+## [203]    train-rmse:197.147453   valid-rmse:310.077988 
+## [204]    train-rmse:196.964727   valid-rmse:309.988462 
+## [205]    train-rmse:196.767610   valid-rmse:309.835855 
+## [206]    train-rmse:196.518520   valid-rmse:309.718256 
+## [207]    train-rmse:196.351649   valid-rmse:309.599891 
+## [208]    train-rmse:196.202400   valid-rmse:309.543221 
+## [209]    train-rmse:196.105967   valid-rmse:309.590972 
+## [210]    train-rmse:196.032552   valid-rmse:309.577506 
+## [211]    train-rmse:195.923378   valid-rmse:309.566273 
+## [212]    train-rmse:195.887373   valid-rmse:309.560343 
+## [213]    train-rmse:195.871736   valid-rmse:309.575728 
+## [214]    train-rmse:195.845715   valid-rmse:309.593254 
+## [215]    train-rmse:195.760767   valid-rmse:309.612187 
+## [216]    train-rmse:195.489679   valid-rmse:310.038282 
+## [217]    train-rmse:195.421001   valid-rmse:309.973207 
+## [218]    train-rmse:195.388616   valid-rmse:309.976901 
 ## Stopping. Best iteration:
-## [210]    train-rmse:196.995756   valid-rmse:304.300474</code></pre>
+## [208]    train-rmse:196.202400   valid-rmse:309.543221</code></pre>
 <pre class="r"><code># Predict on Validation Set (Native Handling) and ensure non negative predictions
 valid_predictions_native &lt;- predict(model_native, dvalid)
 
@@ -1916,7 +1913,7 @@ valid_predictions_native &lt;- pmax(valid_predictions_native, 0)
 # Calculate RMSLE
 rmsle_native &lt;- compute_rmsle(valid_labels, valid_predictions_native)
 cat(&quot;RMSLE for Native Handling Model:&quot;, rmsle_native, &quot;\n&quot;)</code></pre>
-<pre><code>## RMSLE for Native Handling Model: 0.7113274</code></pre>
+<pre><code>## RMSLE for Native Handling Model: 0.7118312</code></pre>
 <pre class="r"><code># Rolling Average Imputation for Lagged Sales and `dcoilwtico`
 impute_with_rolling_avg &lt;- function(data, col, n = 7) {
   data[, (col) := ifelse(is.na(get(col)), 
@@ -1955,119 +1952,103 @@ cat(&quot;Training with Rolling Average Imputed Values...\n&quot;)</code></pre>
   early_stopping_rounds = 10, 
   verbose = 1
 )</code></pre>
-<pre><code>## [1]  train-rmse:977.447817   valid-rmse:1311.584541 
+<pre><code>## [1]  train-rmse:977.235608   valid-rmse:1313.397161 
 ## Multiple eval metrics are present. Will use valid_rmse for early stopping.
 ## Will train until valid_rmse hasn&#39;t improved in 10 rounds.
 ## 
-## [2]  train-rmse:891.781774   valid-rmse:1197.971680 
-## [3]  train-rmse:816.076183   valid-rmse:1095.049053 
-## [4]  train-rmse:745.239579   valid-rmse:1003.705366 
-## [5]  train-rmse:681.673516   valid-rmse:922.471153 
-## [6]  train-rmse:628.052499   valid-rmse:849.118385 
-## [7]  train-rmse:578.731045   valid-rmse:781.249182 
-## [8]  train-rmse:537.214491   valid-rmse:723.616033 
-## [9]  train-rmse:500.620370   valid-rmse:672.550375 
-## [10] train-rmse:466.012203   valid-rmse:627.070337 
-## [11] train-rmse:435.577244   valid-rmse:586.338495 
-## [12] train-rmse:411.560061   valid-rmse:549.990698 
-## [13] train-rmse:391.100512   valid-rmse:518.520909 
-## [14] train-rmse:370.517386   valid-rmse:490.985214 
-## [15] train-rmse:352.935537   valid-rmse:466.290088 
-## [16] train-rmse:339.442092   valid-rmse:445.867534 
-## [17] train-rmse:325.498691   valid-rmse:428.298940 
-## [18] train-rmse:313.720688   valid-rmse:412.629592 
-## [19] train-rmse:303.723323   valid-rmse:399.150797 
-## [20] train-rmse:295.311532   valid-rmse:386.506457 
-## [21] train-rmse:287.756980   valid-rmse:376.954519 
-## [22] train-rmse:281.648760   valid-rmse:369.040443 
-## [23] train-rmse:277.284278   valid-rmse:361.491422 
-## [24] train-rmse:272.591138   valid-rmse:354.490065 
-## [25] train-rmse:268.306310   valid-rmse:348.914206 
-## [26] train-rmse:264.773623   valid-rmse:343.469875 
-## [27] train-rmse:260.700499   valid-rmse:339.130655 
-## [28] train-rmse:258.116357   valid-rmse:335.944264 
-## [29] train-rmse:256.148071   valid-rmse:332.499888 
-## [30] train-rmse:253.943825   valid-rmse:329.556582 
-## [31] train-rmse:252.169951   valid-rmse:326.755486 
-## [32] train-rmse:250.318251   valid-rmse:324.623995 
-## [33] train-rmse:248.715131   valid-rmse:322.368481 
-## [34] train-rmse:247.282101   valid-rmse:320.771792 
-## [35] train-rmse:245.335451   valid-rmse:320.696579 
-## [36] train-rmse:244.521616   valid-rmse:319.598397 
-## [37] train-rmse:243.609475   valid-rmse:318.541632 
-## [38] train-rmse:242.807541   valid-rmse:317.863100 
-## [39] train-rmse:242.205074   valid-rmse:317.351722 
-## [40] train-rmse:241.278742   valid-rmse:316.455207 
-## [41] train-rmse:240.667662   valid-rmse:315.829269 
-## [42] train-rmse:240.042802   valid-rmse:315.069253 
-## [43] train-rmse:239.531405   valid-rmse:314.546998 
-## [44] train-rmse:237.988205   valid-rmse:314.522172 
-## [45] train-rmse:237.402505   valid-rmse:314.026939 
-## [46] train-rmse:237.054114   valid-rmse:313.725730 
-## [47] train-rmse:236.709964   valid-rmse:313.535591 
-## [48] train-rmse:236.272377   valid-rmse:313.205055 
-## [49] train-rmse:235.284848   valid-rmse:312.994404 
-## [50] train-rmse:234.790970   valid-rmse:312.598838 
-## [51] train-rmse:234.360327   valid-rmse:312.438101 
-## [52] train-rmse:233.598308   valid-rmse:312.291292 
-## [53] train-rmse:233.098364   valid-rmse:312.158083 
-## [54] train-rmse:232.599636   valid-rmse:312.187787 
-## [55] train-rmse:232.202891   valid-rmse:312.085500 
-## [56] train-rmse:231.804982   valid-rmse:311.921200 
-## [57] train-rmse:231.511135   valid-rmse:311.791739 
-## [58] train-rmse:230.938750   valid-rmse:311.666834 
-## [59] train-rmse:230.739491   valid-rmse:311.641398 
-## [60] train-rmse:230.392623   valid-rmse:311.496105 
-## [61] train-rmse:230.171858   valid-rmse:311.299498 
-## [62] train-rmse:229.808496   valid-rmse:310.998051 
-## [63] train-rmse:229.139847   valid-rmse:310.760839 
-## [64] train-rmse:228.909129   valid-rmse:310.732262 
-## [65] train-rmse:228.709387   valid-rmse:310.621608 
-## [66] train-rmse:228.372908   valid-rmse:310.581225 
-## [67] train-rmse:228.153673   valid-rmse:310.519566 
-## [68] train-rmse:227.761995   valid-rmse:310.496211 
-## [69] train-rmse:227.581631   valid-rmse:310.505707 
-## [70] train-rmse:227.511000   valid-rmse:310.470587 
-## [71] train-rmse:227.212094   valid-rmse:310.097800 
-## [72] train-rmse:226.672228   valid-rmse:310.073949 
-## [73] train-rmse:226.521968   valid-rmse:310.126499 
-## [74] train-rmse:226.257432   valid-rmse:309.982374 
-## [75] train-rmse:226.085147   valid-rmse:309.861077 
-## [76] train-rmse:225.622497   valid-rmse:309.738290 
-## [77] train-rmse:225.369880   valid-rmse:309.722505 
-## [78] train-rmse:225.343108   valid-rmse:309.719917 
-## [79] train-rmse:225.193006   valid-rmse:309.850818 
-## [80] train-rmse:225.141446   valid-rmse:309.853462 
-## [81] train-rmse:225.103379   valid-rmse:309.807748 
-## [82] train-rmse:224.478798   valid-rmse:309.361181 
-## [83] train-rmse:224.272083   valid-rmse:309.408428 
-## [84] train-rmse:223.487955   valid-rmse:309.625468 
-## [85] train-rmse:223.452969   valid-rmse:309.589215 
-## [86] train-rmse:223.039289   valid-rmse:309.315891 
-## [87] train-rmse:222.938664   valid-rmse:309.319470 
-## [88] train-rmse:222.840146   valid-rmse:309.364171 
-## [89] train-rmse:222.582353   valid-rmse:309.167436 
-## [90] train-rmse:222.499611   valid-rmse:309.208010 
-## [91] train-rmse:222.200141   valid-rmse:309.095100 
-## [92] train-rmse:222.093889   valid-rmse:309.126467 
-## [93] train-rmse:221.293495   valid-rmse:308.976658 
-## [94] train-rmse:220.993865   valid-rmse:309.003995 
-## [95] train-rmse:220.747140   valid-rmse:308.965261 
-## [96] train-rmse:220.296588   valid-rmse:308.950905 
-## [97] train-rmse:220.124828   valid-rmse:308.796282 
-## [98] train-rmse:219.902037   valid-rmse:308.765582 
-## [99] train-rmse:219.777545   valid-rmse:308.812839 
-## [100]    train-rmse:219.746307   valid-rmse:308.866791 
-## [101]    train-rmse:219.006678   valid-rmse:308.935602 
-## [102]    train-rmse:218.930338   valid-rmse:308.941935 
-## [103]    train-rmse:218.563203   valid-rmse:308.778077 
-## [104]    train-rmse:218.422718   valid-rmse:308.837275 
-## [105]    train-rmse:217.577380   valid-rmse:309.288573 
-## [106]    train-rmse:217.510514   valid-rmse:309.269099 
-## [107]    train-rmse:217.142489   valid-rmse:309.380948 
-## [108]    train-rmse:217.054269   valid-rmse:309.437659 
+## [2]  train-rmse:891.619752   valid-rmse:1201.061594 
+## [3]  train-rmse:812.682416   valid-rmse:1096.524387 
+## [4]  train-rmse:744.740363   valid-rmse:1006.561093 
+## [5]  train-rmse:684.848328   valid-rmse:924.716447 
+## [6]  train-rmse:628.494116   valid-rmse:850.565406 
+## [7]  train-rmse:578.609120   valid-rmse:786.187525 
+## [8]  train-rmse:536.797898   valid-rmse:727.810329 
+## [9]  train-rmse:498.092576   valid-rmse:674.040805 
+## [10] train-rmse:466.194675   valid-rmse:629.311290 
+## [11] train-rmse:438.349680   valid-rmse:589.292221 
+## [12] train-rmse:411.756596   valid-rmse:553.811298 
+## [13] train-rmse:388.225775   valid-rmse:522.108986 
+## [14] train-rmse:370.138447   valid-rmse:493.564794 
+## [15] train-rmse:354.760031   valid-rmse:469.834283 
+## [16] train-rmse:338.625176   valid-rmse:449.191596 
+## [17] train-rmse:324.758936   valid-rmse:429.186118 
+## [18] train-rmse:314.810640   valid-rmse:413.458731 
+## [19] train-rmse:304.653838   valid-rmse:400.418075 
+## [20] train-rmse:296.219055   valid-rmse:387.922707 
+## [21] train-rmse:287.933486   valid-rmse:377.953682 
+## [22] train-rmse:281.739847   valid-rmse:368.619363 
+## [23] train-rmse:276.628310   valid-rmse:362.052070 
+## [24] train-rmse:271.385597   valid-rmse:356.489050 
+## [25] train-rmse:267.899678   valid-rmse:350.478641 
+## [26] train-rmse:264.250070   valid-rmse:344.970757 
+## [27] train-rmse:261.042306   valid-rmse:340.853597 
+## [28] train-rmse:258.237303   valid-rmse:336.681125 
+## [29] train-rmse:255.305400   valid-rmse:333.814275 
+## [30] train-rmse:253.264033   valid-rmse:331.291700 
+## [31] train-rmse:251.813571   valid-rmse:328.642254 
+## [32] train-rmse:250.011472   valid-rmse:326.526757 
+## [33] train-rmse:248.636495   valid-rmse:324.284670 
+## [34] train-rmse:247.382497   valid-rmse:322.558527 
+## [35] train-rmse:246.243315   valid-rmse:321.190577 
+## [36] train-rmse:245.154852   valid-rmse:320.132605 
+## [37] train-rmse:244.180428   valid-rmse:318.783320 
+## [38] train-rmse:242.594150   valid-rmse:317.529736 
+## [39] train-rmse:241.568462   valid-rmse:316.538260 
+## [40] train-rmse:240.859832   valid-rmse:315.743696 
+## [41] train-rmse:240.009441   valid-rmse:315.205859 
+## [42] train-rmse:238.632292   valid-rmse:314.507104 
+## [43] train-rmse:237.997324   valid-rmse:313.900444 
+## [44] train-rmse:237.467544   valid-rmse:313.349772 
+## [45] train-rmse:236.518082   valid-rmse:313.029167 
+## [46] train-rmse:235.727830   valid-rmse:312.417693 
+## [47] train-rmse:235.426954   valid-rmse:312.011301 
+## [48] train-rmse:234.953063   valid-rmse:311.655121 
+## [49] train-rmse:234.592260   valid-rmse:311.364834 
+## [50] train-rmse:233.992735   valid-rmse:311.230137 
+## [51] train-rmse:233.570749   valid-rmse:310.805439 
+## [52] train-rmse:232.677772   valid-rmse:310.325728 
+## [53] train-rmse:231.691298   valid-rmse:310.174436 
+## [54] train-rmse:231.161753   valid-rmse:310.153225 
+## [55] train-rmse:230.781721   valid-rmse:309.904927 
+## [56] train-rmse:230.320813   valid-rmse:309.913727 
+## [57] train-rmse:229.661875   valid-rmse:309.565841 
+## [58] train-rmse:229.008702   valid-rmse:309.333385 
+## [59] train-rmse:228.591848   valid-rmse:309.090772 
+## [60] train-rmse:228.130691   valid-rmse:309.073241 
+## [61] train-rmse:227.452725   valid-rmse:308.807727 
+## [62] train-rmse:227.293887   valid-rmse:308.734385 
+## [63] train-rmse:227.047171   valid-rmse:308.588773 
+## [64] train-rmse:226.844636   valid-rmse:308.361154 
+## [65] train-rmse:226.631040   valid-rmse:308.052417 
+## [66] train-rmse:225.998454   valid-rmse:308.108639 
+## [67] train-rmse:225.732939   valid-rmse:308.066779 
+## [68] train-rmse:225.515589   valid-rmse:308.078857 
+## [69] train-rmse:225.336196   valid-rmse:308.040428 
+## [70] train-rmse:225.173687   valid-rmse:308.018604 
+## [71] train-rmse:224.832661   valid-rmse:308.004700 
+## [72] train-rmse:224.227540   valid-rmse:307.859143 
+## [73] train-rmse:223.908383   valid-rmse:307.655753 
+## [74] train-rmse:223.647186   valid-rmse:307.442554 
+## [75] train-rmse:222.976362   valid-rmse:307.331332 
+## [76] train-rmse:222.578287   valid-rmse:307.301183 
+## [77] train-rmse:222.367616   valid-rmse:307.222919 
+## [78] train-rmse:222.164737   valid-rmse:307.114395 
+## [79] train-rmse:221.993121   valid-rmse:307.249020 
+## [80] train-rmse:221.519237   valid-rmse:307.245394 
+## [81] train-rmse:221.458308   valid-rmse:307.105779 
+## [82] train-rmse:221.380627   valid-rmse:307.092653 
+## [83] train-rmse:221.303825   valid-rmse:307.205655 
+## [84] train-rmse:220.950218   valid-rmse:307.777197 
+## [85] train-rmse:220.892043   valid-rmse:307.726701 
+## [86] train-rmse:220.476932   valid-rmse:307.707844 
+## [87] train-rmse:220.106322   valid-rmse:307.755561 
+## [88] train-rmse:219.807288   valid-rmse:307.628494 
+## [89] train-rmse:219.414417   valid-rmse:307.582100 
+## [90] train-rmse:219.295597   valid-rmse:307.561851 
+## [91] train-rmse:218.862570   valid-rmse:307.400583 
+## [92] train-rmse:218.239562   valid-rmse:307.229610 
 ## Stopping. Best iteration:
-## [98] train-rmse:219.902037   valid-rmse:308.765582</code></pre>
+## [82] train-rmse:221.380627   valid-rmse:307.092653</code></pre>
 <pre class="r"><code># Predict and Ensure non-negative predictions
 valid_predictions_imputed &lt;- predict(model_imputed, dvalid_imputed)
 
@@ -2075,13 +2056,13 @@ valid_predictions_imputed &lt;- pmax(valid_predictions_imputed, 0)
 
 rmsle_imputed &lt;- compute_rmsle(valid_labels, valid_predictions_imputed)
 cat(&quot;RMSLE for Rolling Average Imputation Model:&quot;, rmsle_imputed, &quot;\n&quot;)</code></pre>
-<pre><code>## RMSLE for Rolling Average Imputation Model: 0.7054424</code></pre>
+<pre><code>## RMSLE for Rolling Average Imputation Model: 0.6840425</code></pre>
 <pre class="r"><code>cat(&quot;Comparison of Validation RMSLE:\n&quot;)</code></pre>
 <pre><code>## Comparison of Validation RMSLE:</code></pre>
 <pre class="r"><code>cat(&quot;Native Handling RMSLE:&quot;, rmsle_native, &quot;\n&quot;)</code></pre>
-<pre><code>## Native Handling RMSLE: 0.7113274</code></pre>
+<pre><code>## Native Handling RMSLE: 0.7118312</code></pre>
 <pre class="r"><code>cat(&quot;Rolling Average RMSLE:&quot;, rmsle_imputed, &quot;\n&quot;)</code></pre>
-<pre><code>## Rolling Average RMSLE: 0.7054424</code></pre>
+<pre><code>## Rolling Average RMSLE: 0.6840425</code></pre>
 <pre class="r"><code># Visualize Trees and Dump Model Structure
 
 # Visualize Trees
@@ -2093,8 +2074,8 @@ cat(&quot;Visualizing the first tree for Native Handling Model...\n&quot;)</code
   trees = 0, # Visualize the first tree
   render = TRUE
 )</code></pre>
-<div class="grViz html-widget html-fill-item" id="htmlwidget-28c23f6dc258cd628ef1" style="width:672px;height:480px;"></div>
-<script type="application/json" data-for="htmlwidget-28c23f6dc258cd628ef1">{"x":{"diagram":"digraph {\n\ngraph [layout = \"dot\",\n       rankdir = \"LR\"]\n\nnode [color = \"DimGray\",\n      style = \"filled\",\n      fontname = \"Helvetica\"]\n\nedge [color = \"DimGray\",\n     arrowsize = \"1.5\",\n     arrowhead = \"vee\",\n     fontname = \"Helvetica\"]\n\n  \"1\" [label = \"Tree 0\nsales_lag_7\nCover: 1920691\nGain: 1097324560000\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"2\" [label = \"sales_lag_30\nCover: 1850832\nGain: 195992584000\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"3\" [label = \"sales_lag_7\nCover: 69859\nGain: 216878285000\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"4\" [label = \"sales_lag_7\nCover: 1704145\nGain: 28743745500\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"5\" [label = \"sales_lag_60\nCover: 146687\nGain: 44114788400\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"6\" [label = \"sales_lag_7\nCover: 57071\nGain: 32719568900\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"7\" [label = \"sales_lag_7\nCover: 12788\nGain: 33593622500\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"8\" [label = \"sales_lag_60\nCover: 1547091\nGain: 5786544130\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"9\" [label = \"sales_lag_7\nCover: 157054\nGain: 5657006080\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"10\" [label = \"sales_lag_7\nCover: 142125\nGain: 25971097600\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"11\" [label = \"sales_lag_30\nCover: 4562\nGain: 15145943000\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"12\" [label = \"sales_lag_7\nCover: 35474\nGain: 3929112580\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"13\" [label = \"sales_lag_7\nCover: 21597\nGain: 6070534140\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"14\" [label = \"transactions\nCover: 9193\nGain: 6212124670\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"15\" [label = \"transactions\nCover: 3595\nGain: 9361719300\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"16\" [label = \"onpromotion\nCover: 1314304\nGain: 1540847870\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"17\" [label = \"sales_lag_180\nCover: 232787\nGain: 2162043390\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"18\" [label = \"sales_lag_7\nCover: 133132\nGain: 1169379330\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"19\" [label = \"sales_lag_7\nCover: 23922\nGain: 1146175490\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"20\" [label = \"sales_lag_7\nCover: 78180\nGain: 3442405380\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"21\" [label = \"sales_lag_30\nCover: 63945\nGain: 8229945340\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"22\" [label = \"sales_lag_7\nCover: 2827\nGain: 2225623040\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"23\" [label = \"sales_lag_7\nCover: 1735\nGain: 5418926080\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"24\" [label = \"sales_lag_60\nCover: 19690\nGain: 678338560\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"25\" [label = \"sales_lag_60\nCover: 15784\nGain: 749387776\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"26\" [label = \"transactions\nCover: 12973\nGain: 1168637950\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"27\" [label = \"transactions\nCover: 8624\nGain: 1949859840\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"28\" [label = \"transactions\nCover: 5166\nGain: 1885683710\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"29\" [label = \"sales_lag_7\nCover: 4027\nGain: 1338966020\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"30\" [label = \"transactions\nCover: 1146\nGain: 1030709250\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"31\" [label = \"transactions\nCover: 2449\nGain: 2134278140\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"32\" [label = \"sales_lag_30\nCover: 1314269\nGain: 823336512\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"33\" [label = \"sales_lag_180\nCover: 35\nGain: 271814144\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"34\" [label = \"sales_lag_180\nCover: 232686\nGain: 951400960\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"35\" [label = \"sales_lag_60\nCover: 101\nGain: 557527296\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"36\" [label = \"sales_lag_7\nCover: 84880\nGain: 164785152\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"37\" [label = \"sales_lag_7\nCover: 48252\nGain: 152771584\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"38\" [label = \"sales_lag_7\nCover: 19695\nGain: 226420736\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"39\" [label = \"transactions\nCover: 4227\nGain: 267831808\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"40\" [label = \"sales_lag_7\nCover: 34816\nGain: 666174464\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"41\" [label = \"sales_lag_7\nCover: 43364\nGain: 549396480\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"42\" [label = \"sales_lag_7\nCover: 45002\nGain: 2156101630\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"43\" [label = \"sales_lag_7\nCover: 18943\nGain: 3380682750\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"44\" [label = \"sales_lag_7\nCover: 1570\nGain: 155795456\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"45\" [label = \"sales_lag_30\nCover: 1257\nGain: 695918592\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"46\" [label = \"transactions\nCover: 1596\nGain: 5027766270\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"47\" [label = \"sales_lag_7\nCover: 139\nGain: 150864256\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"48\" [label = \"transactions\nCover: 7574\nGain: 122880000\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"49\" [label = \"sales_lag_30\nCover: 12116\nGain: 394846208\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"50\" [label = \"transactions\nCover: 6308\nGain: 168943616\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"51\" [label = \"transactions\nCover: 9476\nGain: 419430400\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"52\" [label = \"transactions\nCover: 2736\nGain: 278691840\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"53\" [label = \"sales_lag_30\nCover: 10237\nGain: 854261760\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"54\" [label = \"transactions\nCover: 1740\nGain: 401379328\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"55\" [label = \"sales_lag_30\nCover: 6884\nGain: 1092698110\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"56\" [label = \"transactions\nCover: 282\nGain: 118172416\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"57\" [label = \"sales_lag_7\nCover: 4884\nGain: 824360960\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"58\" [label = \"onpromotion\nCover: 2223\nGain: 506740736\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"59\" [label = \"transactions\nCover: 1804\nGain: 651051008\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"60\" [label = \"transactions\nCover: 110\nGain: 163652608\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"61\" [label = \"onpromotion\nCover: 1036\nGain: 306257920\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"62\" [label = \"onpromotion\nCover: 1496\nGain: 900890624\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"63\" [label = \"sales_lag_60\nCover: 953\nGain: 506167296\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"64\" [label = \"Leaf\nCover: 1129823\nValue: 0.820228279\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"65\" [label = \"Leaf\nCover: 184446\nValue: 8.02615833\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"66\" [label = \"Leaf\nCover: 20\nValue: 384.179169\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"67\" [label = \"Leaf\nCover: 15\nValue: 971.917419\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"68\" [label = \"Leaf\nCover: 220591\nValue: 17.2557869\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"69\" [label = \"Leaf\nCover: 12095\nValue: 46.0603333\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"70\" [label = \"Leaf\nCover: 26\nValue: 76.3822327\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"71\" [label = \"Leaf\nCover: 75\nValue: 616.07428\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"72\" [label = \"Leaf\nCover: 47273\nValue: 30.27841\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"73\" [label = \"Leaf\nCover: 37607\nValue: 39.1514282\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"74\" [label = \"Leaf\nCover: 27779\nValue: 48.8717842\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"75\" [label = \"Leaf\nCover: 20473\nValue: 60.2672195\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"76\" [label = \"Leaf\nCover: 12972\nValue: 76.210762\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"77\" [label = \"Leaf\nCover: 6723\nValue: 98.8571854\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"78\" [label = \"Leaf\nCover: 4182\nValue: 138.669083\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"79\" [label = \"Leaf\nCover: 45\nValue: 382.192169\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"80\" [label = \"Leaf\nCover: 5837\nValue: 26.2860203\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"81\" [label = \"Leaf\nCover: 28979\nValue: 63.3217468\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"82\" [label = \"Leaf\nCover: 22755\nValue: 88.6139908\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"83\" [label = \"Leaf\nCover: 20609\nValue: 111.172997\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"84\" [label = \"Leaf\nCover: 27951\nValue: 126.07412\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"85\" [label = \"Leaf\nCover: 17051\nValue: 171.215302\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"86\" [label = \"Leaf\nCover: 5803\nValue: 285.361298\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"87\" [label = \"Leaf\nCover: 13140\nValue: 193.657516\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"88\" [label = \"Leaf\nCover: 496\nValue: 165.447708\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"89\" [label = \"Leaf\nCover: 1074\nValue: 234.126877\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"90\" [label = \"Leaf\nCover: 484\nValue: 296.120697\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"91\" [label = \"Leaf\nCover: 773\nValue: 450.56601\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"92\" [label = \"Leaf\nCover: 1274\nValue: 629.585876\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"93\" [label = \"Leaf\nCover: 322\nValue: 1073.54651\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"94\" [label = \"Leaf\nCover: 100\nValue: 2.58811879\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"95\" [label = \"Leaf\nCover: 39\nValue: 232.402451\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"96\" [label = \"Leaf\nCover: 169\nValue: 140.087997\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"97\" [label = \"Leaf\nCover: 7405\nValue: 227.846069\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"98\" [label = \"Leaf\nCover: 7399\nValue: 249.668213\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"99\" [label = \"Leaf\nCover: 4717\nValue: 287.013702\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"100\" [label = \"Leaf\nCover: 155\nValue: 184.295731\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"101\" [label = \"Leaf\nCover: 6153\nValue: 292.255188\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"102\" [label = \"Leaf\nCover: 1437\nValue: 283.97348\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"103\" [label = \"Leaf\nCover: 8039\nValue: 343.388031\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"104\" [label = \"Leaf\nCover: 370\nValue: 251.410309\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"105\" [label = \"Leaf\nCover: 2366\nValue: 346.470123\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"106\" [label = \"Leaf\nCover: 9167\nValue: 397.74765\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"107\" [label = \"Leaf\nCover: 1070\nValue: 493.044159\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"108\" [label = \"Leaf\nCover: 132\nValue: 234.799057\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"109\" [label = \"Leaf\nCover: 1608\nValue: 419.218262\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"110\" [label = \"Leaf\nCover: 4578\nValue: 495.880096\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"111\" [label = \"Leaf\nCover: 2306\nValue: 581.332214\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"112\" [label = \"Leaf\nCover: 114\nValue: 282.211182\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"113\" [label = \"Leaf\nCover: 168\nValue: 420.843231\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"114\" [label = \"Leaf\nCover: 2642\nValue: 595.305176\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"115\" [label = \"Leaf\nCover: 2242\nValue: 679.719543\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"116\" [label = \"Leaf\nCover: 1273\nValue: 688.922058\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"117\" [label = \"Leaf\nCover: 950\nValue: 790.367737\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"118\" [label = \"Leaf\nCover: 1150\nValue: 802.962891\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"119\" [label = \"Leaf\nCover: 654\nValue: 934.607727\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"120\" [label = \"Leaf\nCover: 40\nValue: 340.344452\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"121\" [label = \"Leaf\nCover: 70\nValue: 610.77533\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"122\" [label = \"Leaf\nCover: 925\nValue: 825.388367\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"123\" [label = \"Leaf\nCover: 111\nValue: 1019.88342\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"124\" [label = \"Leaf\nCover: 1079\nValue: 1034.79614\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"125\" [label = \"Leaf\nCover: 417\nValue: 1218.67346\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"126\" [label = \"Leaf\nCover: 315\nValue: 1163.66321\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"127\" [label = \"Leaf\nCover: 638\nValue: 1341.79431\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n\"1\"->\"2\" [label = \"< 2167.74609\", style = \"bold\"] \n\"2\"->\"4\" [label = \"< 663.744507\", style = \"bold\"] \n\"3\"->\"6\" [label = \"< 5863.5\", style = \"solid\"] \n\"4\"->\"8\" [label = \"< 267.617401\", style = \"bold\"] \n\"5\"->\"10\" [label = \"< 4007.41309\", style = \"bold\"] \n\"6\"->\"12\" [label = \"< 3550.88306\", style = \"solid\"] \n\"7\"->\"14\" [label = \"< 9173.1582\", style = \"solid\"] \n\"8\"->\"16\" [label = \"< 91.0530014\", style = \"bold\"] \n\"9\"->\"18\" [label = \"< 719.015503\", style = \"solid\"] \n\"10\"->\"20\" [label = \"< 1209.01758\", style = \"solid\"] \n\"11\"->\"22\" [label = \"< 4780.35889\", style = \"solid\"] \n\"12\"->\"24\" [label = \"< 2808.02393\", style = \"solid\"] \n\"13\"->\"26\" [label = \"< 4552.35205\", style = \"solid\"] \n\"14\"->\"28\" [label = \"< 3190.45605\", style = \"solid\"] \n\"15\"->\"30\" [label = \"< 3662.5\", style = \"solid\"] \n\"16\"->\"32\" [label = \"< 162\", style = \"bold\"] \n\"17\"->\"34\" [label = \"< 4561.65625\", style = \"bold\"] \n\"18\"->\"36\" [label = \"< 448.434021\", style = \"solid\"] \n\"19\"->\"38\" [label = \"< 1251.0575\", style = \"solid\"] \n\"20\"->\"40\" [label = \"< 730.85144\", style = \"solid\"] \n\"21\"->\"42\" [label = \"< 1968.89001\", style = \"solid\"] \n\"22\"->\"44\" [label = \"< 4334\", style = \"solid\"] \n\"23\"->\"46\" [label = \"< 0.5\", style = \"bold\"] \n\"24\"->\"48\" [label = \"< 1948.42053\", style = \"bold\"] \n\"25\"->\"50\" [label = \"< 2431.54346\", style = \"bold\"] \n\"26\"->\"52\" [label = \"< 1381.5\", style = \"solid\"] \n\"27\"->\"54\" [label = \"< 1596\", style = \"solid\"] \n\"28\"->\"56\" [label = \"< 1484\", style = \"solid\"] \n\"29\"->\"58\" [label = \"< 7568\", style = \"solid\"] \n\"30\"->\"60\" [label = \"< 2125.5\", style = \"solid\"] \n\"31\"->\"62\" [label = \"< 4687.5\", style = \"solid\"] \n\"32\"->\"64\" [label = \"< 33.1544991\", style = \"solid\"] \n\"33\"->\"66\" [label = \"< 3907.1167\", style = \"solid\"] \n\"34\"->\"68\" [label = \"< 430.309509\", style = \"bold\"] \n\"35\"->\"70\" [label = \"< 4052.08008\", style = \"solid\"] \n\"36\"->\"72\" [label = \"< 348.531494\", style = \"solid\"] \n\"37\"->\"74\" [label = \"< 563.453491\", style = \"solid\"] \n\"38\"->\"76\" [label = \"< 942.108521\", style = \"solid\"] \n\"39\"->\"78\" [label = \"< 5708.5\", style = \"solid\"] \n\"40\"->\"80\" [label = \"< 334.992493\", style = \"solid\"] \n\"41\"->\"82\" [label = \"< 959.891602\", style = \"solid\"] \n\"42\"->\"84\" [label = \"< 1501.48999\", style = \"bold\"] \n\"43\"->\"86\" [label = \"< 1209.45654\", style = \"bold\"] \n\"44\"->\"88\" [label = \"< 1554.5\", style = \"solid\"] \n\"45\"->\"90\" [label = \"< 3201.5\", style = \"solid\"] \n\"46\"->\"92\" [label = \"< 3915\", style = \"solid\"] \n\"47\"->\"94\" [label = \"< 1293.5\", style = \"solid\"] \n\"48\"->\"96\" [label = \"< 698.5\", style = \"solid\"] \n\"49\"->\"98\" [label = \"< 2964.5\", style = \"solid\"] \n\"50\"->\"100\" [label = \"< 843\", style = \"solid\"] \n\"51\"->\"102\" [label = \"< 1181.5\", style = \"solid\"] \n\"52\"->\"104\" [label = \"< 1013.83917\", style = \"solid\"] \n\"53\"->\"106\" [label = \"< 6222.78125\", style = \"bold\"] \n\"54\"->\"108\" [label = \"< 1073\", style = \"solid\"] \n\"55\"->\"110\" [label = \"< 5674.13867\", style = \"bold\"] \n\"56\"->\"112\" [label = \"< 1285.63232\", style = \"solid\"] \n\"57\"->\"114\" [label = \"< 6860.16406\", style = \"solid\"] \n\"58\"->\"116\" [label = \"< 4.5\", style = \"bold\"] \n\"59\"->\"118\" [label = \"< 4114.5\", style = \"solid\"] \n\"60\"->\"120\" [label = \"< 1393.5\", style = \"solid\"] \n\"61\"->\"122\" [label = \"< 102.5\", style = \"bold\"] \n\"62\"->\"124\" [label = \"< 21.5\", style = \"bold\"] \n\"63\"->\"126\" [label = \"< 6355.5\", style = \"bold\"] \n\"1\"->\"3\" [style = \"bold\", style = \"solid\"] \n\"2\"->\"5\" [style = \"solid\", style = \"solid\"] \n\"3\"->\"7\" [style = \"solid\", style = \"bold\"] \n\"4\"->\"9\" [style = \"bold\", style = \"solid\"] \n\"5\"->\"11\" [style = \"solid\", style = \"solid\"] \n\"6\"->\"13\" [style = \"solid\", style = \"bold\"] \n\"7\"->\"15\" [style = \"bold\", style = \"bold\"] \n\"8\"->\"17\" [style = \"bold\", style = \"solid\"] \n\"9\"->\"19\" [style = \"solid\", style = \"bold\"] \n\"10\"->\"21\" [style = \"bold\", style = \"bold\"] \n\"11\"->\"23\" [style = \"bold\", style = \"bold\"] \n\"12\"->\"25\" [style = \"bold\", style = \"bold\"] \n\"13\"->\"27\" [style = \"bold\", style = \"bold\"] \n\"14\"->\"29\" [style = \"bold\", style = \"bold\"] \n\"15\"->\"31\" [style = \"bold\", style = \"bold\"] \n\"16\"->\"33\" [style = \"bold\", style = \"solid\"] \n\"17\"->\"35\" [style = \"solid\", style = \"solid\"] \n\"18\"->\"37\" [style = \"solid\", style = \"bold\"] \n\"19\"->\"39\" [style = \"bold\", style = \"bold\"] \n\"20\"->\"41\" [style = \"bold\", style = \"bold\"] \n\"21\"->\"43\" [style = \"bold\", style = \"bold\"] \n\"22\"->\"45\" [style = \"bold\", style = \"bold\"] \n\"23\"->\"47\" [style = \"bold\", style = \"solid\"] \n\"24\"->\"49\" [style = \"solid\", style = \"solid\"] \n\"25\"->\"51\" [style = \"solid\", style = \"solid\"] \n\"26\"->\"53\" [style = \"solid\", style = \"bold\"] \n\"27\"->\"55\" [style = \"bold\", style = \"bold\"] \n\"28\"->\"57\" [style = \"bold\", style = \"bold\"] \n\"29\"->\"59\" [style = \"bold\", style = \"bold\"] \n\"30\"->\"61\" [style = \"bold\", style = \"bold\"] \n\"31\"->\"63\" [style = \"bold\", style = \"bold\"] \n\"32\"->\"65\" [style = \"bold\", style = \"bold\"] \n\"33\"->\"67\" [style = \"bold\", style = \"bold\"] \n\"34\"->\"69\" [style = \"bold\", style = \"solid\"] \n\"35\"->\"71\" [style = \"solid\", style = \"bold\"] \n\"36\"->\"73\" [style = \"bold\", style = \"bold\"] \n\"37\"->\"75\" [style = \"bold\", style = \"bold\"] \n\"38\"->\"77\" [style = \"bold\", style = \"bold\"] \n\"39\"->\"79\" [style = \"bold\", style = \"bold\"] \n\"40\"->\"81\" [style = \"bold\", style = \"bold\"] \n\"41\"->\"83\" [style = \"bold\", style = \"bold\"] \n\"42\"->\"85\" [style = \"bold\", style = \"solid\"] \n\"43\"->\"87\" [style = \"solid\", style = \"solid\"] \n\"44\"->\"89\" [style = \"solid\", style = \"bold\"] \n\"45\"->\"91\" [style = \"bold\", style = \"bold\"] \n\"46\"->\"93\" [style = \"bold\", style = \"bold\"] \n\"47\"->\"95\" [style = \"bold\", style = \"bold\"] \n\"48\"->\"97\" [style = \"bold\", style = \"bold\"] \n\"49\"->\"99\" [style = \"bold\", style = \"bold\"] \n\"50\"->\"101\" [style = \"bold\", style = \"bold\"] \n\"51\"->\"103\" [style = \"bold\", style = \"bold\"] \n\"52\"->\"105\" [style = \"bold\", style = \"bold\"] \n\"53\"->\"107\" [style = \"bold\", style = \"solid\"] \n\"54\"->\"109\" [style = \"solid\", style = \"bold\"] \n\"55\"->\"111\" [style = \"bold\", style = \"solid\"] \n\"56\"->\"113\" [style = \"solid\", style = \"bold\"] \n\"57\"->\"115\" [style = \"bold\", style = \"bold\"] \n\"58\"->\"117\" [style = \"bold\", style = \"solid\"] \n\"59\"->\"119\" [style = \"solid\", style = \"bold\"] \n\"60\"->\"121\" [style = \"bold\", style = \"bold\"] \n\"61\"->\"123\" [style = \"bold\", style = \"solid\"] \n\"62\"->\"125\" [style = \"solid\", style = \"solid\"] \n\"63\"->\"127\" [style = \"solid\", style = \"solid\"] \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div class="grViz html-widget html-fill-item" id="htmlwidget-580c282873bacec95ae9" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-580c282873bacec95ae9">{"x":{"diagram":"digraph {\n\ngraph [layout = \"dot\",\n       rankdir = \"LR\"]\n\nnode [color = \"DimGray\",\n      style = \"filled\",\n      fontname = \"Helvetica\"]\n\nedge [color = \"DimGray\",\n     arrowsize = \"1.5\",\n     arrowhead = \"vee\",\n     fontname = \"Helvetica\"]\n\n  \"1\" [label = \"Tree 0\nsales_lag_7\nCover: 1920691\nGain: 1098214080000\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"2\" [label = \"sales_lag_30\nCover: 1851023\nGain: 196990026000\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"3\" [label = \"sales_lag_7\nCover: 69668\nGain: 216874222000\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"4\" [label = \"sales_lag_7\nCover: 1703983\nGain: 28782321700\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"5\" [label = \"sales_lag_60\nCover: 147040\nGain: 44738789400\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"6\" [label = \"sales_lag_7\nCover: 56416\nGain: 31151947800\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"7\" [label = \"sales_lag_7\nCover: 13252\nGain: 35267739600\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"8\" [label = \"sales_lag_60\nCover: 1551957\nGain: 5958275070\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"9\" [label = \"sales_lag_7\nCover: 152026\nGain: 5473071100\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"10\" [label = \"sales_lag_7\nCover: 142996\nGain: 26505855000\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"11\" [label = \"sales_lag_7\nCover: 4044\nGain: 13890363400\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"12\" [label = \"sales_lag_7\nCover: 35286\nGain: 3829596160\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"13\" [label = \"sales_lag_7\nCover: 21130\nGain: 5220958210\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"14\" [label = \"transactions\nCover: 9890\nGain: 7385448450\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"15\" [label = \"transactions\nCover: 3362\nGain: 9313419260\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"16\" [label = \"onpromotion\nCover: 1316581\nGain: 1453835780\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"17\" [label = \"sales_lag_180\nCover: 235376\nGain: 1983725570\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"18\" [label = \"sales_lag_7\nCover: 128247\nGain: 1109614590\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"19\" [label = \"sales_lag_7\nCover: 23779\nGain: 1131513860\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"20\" [label = \"sales_lag_7\nCover: 78180\nGain: 3437371390\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"21\" [label = \"sales_lag_30\nCover: 64816\nGain: 8639807490\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"22\" [label = \"sales_lag_7\nCover: 1463\nGain: 347866624\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"23\" [label = \"transactions\nCover: 2581\nGain: 9668632580\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"24\" [label = \"sales_lag_60\nCover: 19113\nGain: 647487488\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"25\" [label = \"sales_lag_60\nCover: 16173\nGain: 793919488\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"26\" [label = \"sales_lag_60\nCover: 12878\nGain: 1061797890\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"27\" [label = \"transactions\nCover: 8252\nGain: 1800404990\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"28\" [label = \"transactions\nCover: 4899\nGain: 1788035070\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"29\" [label = \"sales_lag_7\nCover: 4991\nGain: 1815511040\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"30\" [label = \"transactions\nCover: 947\nGain: 1215033340\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"31\" [label = \"sales_lag_7\nCover: 2415\nGain: 2099347460\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"32\" [label = \"sales_lag_30\nCover: 1316548\nGain: 833998336\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"33\" [label = \"sales_lag_180\nCover: 33\nGain: 220961152\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"34\" [label = \"sales_lag_7\nCover: 235276\nGain: 960080384\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"35\" [label = \"sales_lag_60\nCover: 100\nGain: 699695616\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"36\" [label = \"sales_lag_7\nCover: 80111\nGain: 144756736\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"37\" [label = \"sales_lag_7\nCover: 48136\nGain: 158858240\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"38\" [label = \"sales_lag_7\nCover: 19607\nGain: 219833344\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"39\" [label = \"transactions\nCover: 4172\nGain: 217516544\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"40\" [label = \"sales_lag_7\nCover: 34667\nGain: 625422336\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"41\" [label = \"sales_lag_7\nCover: 43513\nGain: 549531648\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"42\" [label = \"sales_lag_7\nCover: 45229\nGain: 2239971330\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"43\" [label = \"sales_lag_7\nCover: 19587\nGain: 3479658500\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"44\" [label = \"sales_lag_60\nCover: 98\nGain: 233453440\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"45\" [label = \"sales_lag_7\nCover: 1365\nGain: 608258560\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"46\" [label = \"sales_lag_30\nCover: 1865\nGain: 1935757310\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"47\" [label = \"transactions\nCover: 716\nGain: 1697435650\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"48\" [label = \"sales_lag_180\nCover: 7974\nGain: 127557632\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"49\" [label = \"sales_lag_30\nCover: 11139\nGain: 373604352\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"50\" [label = \"transactions\nCover: 7079\nGain: 187736064\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"51\" [label = \"transactions\nCover: 9094\nGain: 445317120\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"52\" [label = \"transactions\nCover: 8053\nGain: 487964672\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"53\" [label = \"sales_lag_7\nCover: 4825\nGain: 1276370940\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"54\" [label = \"transactions\nCover: 1334\nGain: 300165120\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"55\" [label = \"sales_lag_30\nCover: 6918\nGain: 1148305410\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"56\" [label = \"sales_lag_180\nCover: 374\nGain: 157024256\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"57\" [label = \"sales_lag_7\nCover: 4525\nGain: 647987200\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"58\" [label = \"onpromotion\nCover: 2861\nGain: 747651072\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"59\" [label = \"transactions\nCover: 2130\nGain: 880525312\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"60\" [label = \"transactions\nCover: 108\nGain: 181442816\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"61\" [label = \"onpromotion\nCover: 839\nGain: 381227008\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"62\" [label = \"transactions\nCover: 1491\nGain: 946749440\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"63\" [label = \"transactions\nCover: 924\nGain: 452608000\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"64\" [label = \"Leaf\nCover: 1130145\nValue: 0.820440292\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"65\" [label = \"Leaf\nCover: 186403\nValue: 8.03992939\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"66\" [label = \"Leaf\nCover: 19\nValue: 399.748596\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"67\" [label = \"Leaf\nCover: 14\nValue: 953.394714\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"68\" [label = \"Leaf\nCover: 132606\nValue: 13.3222151\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"69\" [label = \"Leaf\nCover: 102670\nValue: 26.2030926\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"70\" [label = \"Leaf\nCover: 32\nValue: 73.2847824\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"71\" [label = \"Leaf\nCover: 68\nValue: 641.537415\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"72\" [label = \"Leaf\nCover: 45823\nValue: 31.0111885\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"73\" [label = \"Leaf\nCover: 34288\nValue: 39.6058617\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"74\" [label = \"Leaf\nCover: 30476\nValue: 49.5234566\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"75\" [label = \"Leaf\nCover: 17660\nValue: 61.4537849\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"76\" [label = \"Leaf\nCover: 12747\nValue: 76.2804489\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"77\" [label = \"Leaf\nCover: 6860\nValue: 98.5164108\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"78\" [label = \"Leaf\nCover: 4125\nValue: 138.926102\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"79\" [label = \"Leaf\nCover: 47\nValue: 354.018188\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"80\" [label = \"Leaf\nCover: 9378\nValue: 35.1441154\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"81\" [label = \"Leaf\nCover: 25289\nValue: 65.3866806\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"82\" [label = \"Leaf\nCover: 22900\nValue: 88.7444382\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"83\" [label = \"Leaf\nCover: 20613\nValue: 111.271172\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"84\" [label = \"Leaf\nCover: 28103\nValue: 125.772636\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"85\" [label = \"Leaf\nCover: 17126\nValue: 171.672714\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"86\" [label = \"Leaf\nCover: 6042\nValue: 285.808807\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"87\" [label = \"Leaf\nCover: 13545\nValue: 194.491776\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"88\" [label = \"Leaf\nCover: 71\nValue: 290.524017\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"89\" [label = \"Leaf\nCover: 27\nValue: 641.775085\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"90\" [label = \"Leaf\nCover: 157\nValue: 12.1871815\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"91\" [label = \"Leaf\nCover: 1208\nValue: 221.48909\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"92\" [label = \"Leaf\nCover: 682\nValue: 341.179199\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"93\" [label = \"Leaf\nCover: 1183\nValue: 553.816589\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"94\" [label = \"Leaf\nCover: 377\nValue: 758.529724\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"95\" [label = \"Leaf\nCover: 339\nValue: 1073.87292\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"96\" [label = \"Leaf\nCover: 3581\nValue: 212.994064\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"97\" [label = \"Leaf\nCover: 4393\nValue: 238.927963\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"98\" [label = \"Leaf\nCover: 6755\nValue: 249.897812\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"99\" [label = \"Leaf\nCover: 4384\nValue: 287.731171\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"100\" [label = \"Leaf\nCover: 139\nValue: 172.844391\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"101\" [label = \"Leaf\nCover: 6940\nValue: 292.398987\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"102\" [label = \"Leaf\nCover: 2195\nValue: 295.263031\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"103\" [label = \"Leaf\nCover: 6899\nValue: 347.61377\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"104\" [label = \"Leaf\nCover: 723\nValue: 291.315399\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"105\" [label = \"Leaf\nCover: 7330\nValue: 378.57431\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"106\" [label = \"Leaf\nCover: 9\nValue: 1567.19617\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"107\" [label = \"Leaf\nCover: 4816\nValue: 428.075684\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"108\" [label = \"Leaf\nCover: 134\nValue: 242.982834\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"109\" [label = \"Leaf\nCover: 1200\nValue: 404.148346\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"110\" [label = \"Leaf\nCover: 4734\nValue: 487.788666\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"111\" [label = \"Leaf\nCover: 2184\nValue: 576.436707\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"112\" [label = \"Leaf\nCover: 82\nValue: 263.441376\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"113\" [label = \"Leaf\nCover: 292\nValue: 426.669586\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"114\" [label = \"Leaf\nCover: 2848\nValue: 591.184998\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"115\" [label = \"Leaf\nCover: 1677\nValue: 671.816101\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"116\" [label = \"Leaf\nCover: 1731\nValue: 681.132019\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"117\" [label = \"Leaf\nCover: 1130\nValue: 789.266541\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"118\" [label = \"Leaf\nCover: 1478\nValue: 803.218079\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"119\" [label = \"Leaf\nCover: 652\nValue: 948.217102\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"120\" [label = \"Leaf\nCover: 44\nValue: 307.929291\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"121\" [label = \"Leaf\nCover: 64\nValue: 584.830017\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"122\" [label = \"Leaf\nCover: 745\nValue: 812.7948\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"123\" [label = \"Leaf\nCover: 94\nValue: 1044.31433\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"124\" [label = \"Leaf\nCover: 1015\nValue: 1036.20752\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"125\" [label = \"Leaf\nCover: 476\nValue: 1217.47119\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"126\" [label = \"Leaf\nCover: 370\nValue: 1191.31873\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"127\" [label = \"Leaf\nCover: 554\nValue: 1358.23962\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n\"1\"->\"2\" [label = \"< 2172.58643\", style = \"bold\"] \n\"2\"->\"4\" [label = \"< 663.744507\", style = \"bold\"] \n\"3\"->\"6\" [label = \"< 5781.81201\", style = \"solid\"] \n\"4\"->\"8\" [label = \"< 274.080505\", style = \"bold\"] \n\"5\"->\"10\" [label = \"< 4206.5\", style = \"bold\"] \n\"6\"->\"12\" [label = \"< 3550.88306\", style = \"solid\"] \n\"7\"->\"14\" [label = \"< 9392.5\", style = \"solid\"] \n\"8\"->\"16\" [label = \"< 92.0410004\", style = \"bold\"] \n\"9\"->\"18\" [label = \"< 723.078003\", style = \"solid\"] \n\"10\"->\"20\" [label = \"< 1209.02502\", style = \"solid\"] \n\"11\"->\"22\" [label = \"< 4345.01221\", style = \"solid\"] \n\"12\"->\"24\" [label = \"< 2792.87451\", style = \"solid\"] \n\"13\"->\"26\" [label = \"< 4552.03809\", style = \"solid\"] \n\"14\"->\"28\" [label = \"< 3056.5\", style = \"solid\"] \n\"15\"->\"30\" [label = \"< 3608\", style = \"solid\"] \n\"16\"->\"32\" [label = \"< 162\", style = \"bold\"] \n\"17\"->\"34\" [label = \"< 4279.61035\", style = \"bold\"] \n\"18\"->\"36\" [label = \"< 449.439026\", style = \"solid\"] \n\"19\"->\"38\" [label = \"< 1258.35254\", style = \"solid\"] \n\"20\"->\"40\" [label = \"< 729.997986\", style = \"solid\"] \n\"21\"->\"42\" [label = \"< 1968.89001\", style = \"solid\"] \n\"22\"->\"44\" [label = \"< 0.5\", style = \"solid\"] \n\"23\"->\"46\" [label = \"< 3333.5\", style = \"solid\"] \n\"24\"->\"48\" [label = \"< 2032.5\", style = \"bold\"] \n\"25\"->\"50\" [label = \"< 2549.21655\", style = \"bold\"] \n\"26\"->\"52\" [label = \"< 3701.78516\", style = \"bold\"] \n\"27\"->\"54\" [label = \"< 1506.5\", style = \"solid\"] \n\"28\"->\"56\" [label = \"< 1526\", style = \"solid\"] \n\"29\"->\"58\" [label = \"< 7600.1084\", style = \"solid\"] \n\"30\"->\"60\" [label = \"< 2125.5\", style = \"solid\"] \n\"31\"->\"62\" [label = \"< 12594.5\", style = \"solid\"] \n\"32\"->\"64\" [label = \"< 33.1569977\", style = \"solid\"] \n\"33\"->\"66\" [label = \"< 4053.61353\", style = \"solid\"] \n\"34\"->\"68\" [label = \"< 188.808502\", style = \"solid\"] \n\"35\"->\"70\" [label = \"< 4110.70312\", style = \"solid\"] \n\"36\"->\"72\" [label = \"< 356.40802\", style = \"solid\"] \n\"37\"->\"74\" [label = \"< 581.295044\", style = \"solid\"] \n\"38\"->\"76\" [label = \"< 942.803467\", style = \"solid\"] \n\"39\"->\"78\" [label = \"< 5724\", style = \"solid\"] \n\"40\"->\"80\" [label = \"< 425.878479\", style = \"solid\"] \n\"41\"->\"82\" [label = \"< 959.926514\", style = \"solid\"] \n\"42\"->\"84\" [label = \"< 1501.33057\", style = \"bold\"] \n\"43\"->\"86\" [label = \"< 1209.15552\", style = \"bold\"] \n\"44\"->\"88\" [label = \"< 9025.5\", style = \"solid\"] \n\"45\"->\"90\" [label = \"< 832\", style = \"solid\"] \n\"46\"->\"92\" [label = \"< 4097.31201\", style = \"solid\"] \n\"47\"->\"94\" [label = \"< 4102\", style = \"solid\"] \n\"48\"->\"96\" [label = \"< 1618.5\", style = \"solid\"] \n\"49\"->\"98\" [label = \"< 2965.5\", style = \"solid\"] \n\"50\"->\"100\" [label = \"< 813\", style = \"solid\"] \n\"51\"->\"102\" [label = \"< 1290.5\", style = \"solid\"] \n\"52\"->\"104\" [label = \"< 1145.5\", style = \"solid\"] \n\"53\"->\"106\" [label = \"< 3552.10693\", style = \"solid\"] \n\"54\"->\"108\" [label = \"< 1073.5\", style = \"solid\"] \n\"55\"->\"110\" [label = \"< 5668.5\", style = \"bold\"] \n\"56\"->\"112\" [label = \"< 2268.49268\", style = \"bold\"] \n\"57\"->\"114\" [label = \"< 7055.5\", style = \"solid\"] \n\"58\"->\"116\" [label = \"< 5.5\", style = \"bold\"] \n\"59\"->\"118\" [label = \"< 4159\", style = \"solid\"] \n\"60\"->\"120\" [label = \"< 1369.41943\", style = \"solid\"] \n\"61\"->\"122\" [label = \"< 108\", style = \"bold\"] \n\"62\"->\"124\" [label = \"< 4676.5\", style = \"solid\"] \n\"63\"->\"126\" [label = \"< 4503.5\", style = \"solid\"] \n\"1\"->\"3\" [style = \"solid\", style = \"solid\"] \n\"2\"->\"5\" [style = \"solid\", style = \"solid\"] \n\"3\"->\"7\" [style = \"solid\", style = \"bold\"] \n\"4\"->\"9\" [style = \"bold\", style = \"solid\"] \n\"5\"->\"11\" [style = \"solid\", style = \"solid\"] \n\"6\"->\"13\" [style = \"solid\", style = \"bold\"] \n\"7\"->\"15\" [style = \"bold\", style = \"bold\"] \n\"8\"->\"17\" [style = \"bold\", style = \"solid\"] \n\"9\"->\"19\" [style = \"solid\", style = \"bold\"] \n\"10\"->\"21\" [style = \"bold\", style = \"bold\"] \n\"11\"->\"23\" [style = \"bold\", style = \"bold\"] \n\"12\"->\"25\" [style = \"bold\", style = \"bold\"] \n\"13\"->\"27\" [style = \"bold\", style = \"bold\"] \n\"14\"->\"29\" [style = \"bold\", style = \"bold\"] \n\"15\"->\"31\" [style = \"bold\", style = \"bold\"] \n\"16\"->\"33\" [style = \"bold\", style = \"solid\"] \n\"17\"->\"35\" [style = \"solid\", style = \"solid\"] \n\"18\"->\"37\" [style = \"solid\", style = \"bold\"] \n\"19\"->\"39\" [style = \"bold\", style = \"bold\"] \n\"20\"->\"41\" [style = \"bold\", style = \"bold\"] \n\"21\"->\"43\" [style = \"bold\", style = \"bold\"] \n\"22\"->\"45\" [style = \"bold\", style = \"bold\"] \n\"23\"->\"47\" [style = \"bold\", style = \"bold\"] \n\"24\"->\"49\" [style = \"bold\", style = \"solid\"] \n\"25\"->\"51\" [style = \"solid\", style = \"solid\"] \n\"26\"->\"53\" [style = \"solid\", style = \"solid\"] \n\"27\"->\"55\" [style = \"solid\", style = \"bold\"] \n\"28\"->\"57\" [style = \"bold\", style = \"bold\"] \n\"29\"->\"59\" [style = \"bold\", style = \"bold\"] \n\"30\"->\"61\" [style = \"bold\", style = \"bold\"] \n\"31\"->\"63\" [style = \"bold\", style = \"bold\"] \n\"32\"->\"65\" [style = \"bold\", style = \"bold\"] \n\"33\"->\"67\" [style = \"bold\", style = \"bold\"] \n\"34\"->\"69\" [style = \"bold\", style = \"bold\"] \n\"35\"->\"71\" [style = \"bold\", style = \"bold\"] \n\"36\"->\"73\" [style = \"bold\", style = \"bold\"] \n\"37\"->\"75\" [style = \"bold\", style = \"bold\"] \n\"38\"->\"77\" [style = \"bold\", style = \"bold\"] \n\"39\"->\"79\" [style = \"bold\", style = \"bold\"] \n\"40\"->\"81\" [style = \"bold\", style = \"bold\"] \n\"41\"->\"83\" [style = \"bold\", style = \"bold\"] \n\"42\"->\"85\" [style = \"bold\", style = \"solid\"] \n\"43\"->\"87\" [style = \"solid\", style = \"solid\"] \n\"44\"->\"89\" [style = \"solid\", style = \"bold\"] \n\"45\"->\"91\" [style = \"bold\", style = \"bold\"] \n\"46\"->\"93\" [style = \"bold\", style = \"bold\"] \n\"47\"->\"95\" [style = \"bold\", style = \"bold\"] \n\"48\"->\"97\" [style = \"bold\", style = \"bold\"] \n\"49\"->\"99\" [style = \"bold\", style = \"bold\"] \n\"50\"->\"101\" [style = \"bold\", style = \"bold\"] \n\"51\"->\"103\" [style = \"bold\", style = \"bold\"] \n\"52\"->\"105\" [style = \"bold\", style = \"bold\"] \n\"53\"->\"107\" [style = \"bold\", style = \"bold\"] \n\"54\"->\"109\" [style = \"bold\", style = \"bold\"] \n\"55\"->\"111\" [style = \"bold\", style = \"solid\"] \n\"56\"->\"113\" [style = \"solid\", style = \"solid\"] \n\"57\"->\"115\" [style = \"solid\", style = \"bold\"] \n\"58\"->\"117\" [style = \"bold\", style = \"solid\"] \n\"59\"->\"119\" [style = \"solid\", style = \"bold\"] \n\"60\"->\"121\" [style = \"bold\", style = \"bold\"] \n\"61\"->\"123\" [style = \"bold\", style = \"solid\"] \n\"62\"->\"125\" [style = \"solid\", style = \"bold\"] \n\"63\"->\"127\" [style = \"bold\", style = \"bold\"] \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <pre class="r"><code>cat(&quot;Visualizing the first tree for Rolling Average Model...\n&quot;)</code></pre>
 <pre><code>## Visualizing the first tree for Rolling Average Model...</code></pre>
 <pre class="r"><code>xgb.plot.tree(
@@ -2103,8 +2084,8 @@ cat(&quot;Visualizing the first tree for Native Handling Model...\n&quot;)</code
   trees = 0, # First tree
   render = TRUE
 )</code></pre>
-<div class="grViz html-widget html-fill-item" id="htmlwidget-42242008fd351a85c820" style="width:672px;height:480px;"></div>
-<script type="application/json" data-for="htmlwidget-42242008fd351a85c820">{"x":{"diagram":"digraph {\n\ngraph [layout = \"dot\",\n       rankdir = \"LR\"]\n\nnode [color = \"DimGray\",\n      style = \"filled\",\n      fontname = \"Helvetica\"]\n\nedge [color = \"DimGray\",\n     arrowsize = \"1.5\",\n     arrowhead = \"vee\",\n     fontname = \"Helvetica\"]\n\n  \"1\" [label = \"Tree 0\nsales_lag_1\nCover: 1919665\nGain: 1219372120000\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"2\" [label = \"sales_lag_1\nCover: 1836195\nGain: 154219626000\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"3\" [label = \"sales_lag_1\nCover: 83470\nGain: 244797538000\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"4\" [label = \"sales_lag_1\nCover: 1670411\nGain: 18356334600\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"5\" [label = \"sales_lag_7\nCover: 165784\nGain: 22553624600\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"6\" [label = \"sales_lag_7\nCover: 66465\nGain: 39525482500\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"7\" [label = \"sales_lag_7\nCover: 17005\nGain: 47073919000\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"8\" [label = \"sales_lag_7\nCover: 1408820\nGain: 1955929340\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"9\" [label = \"sales_lag_7\nCover: 261591\nGain: 2916255740\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"10\" [label = \"sales_lag_1\nCover: 126762\nGain: 5017878530\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"11\" [label = \"sales_lag_7\nCover: 39022\nGain: 3603963900\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"12\" [label = \"sales_lag_7\nCover: 49970\nGain: 10335584300\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"13\" [label = \"sales_lag_7\nCover: 16495\nGain: 7372242940\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"14\" [label = \"sales_lag_7\nCover: 13452\nGain: 12831096800\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"15\" [label = \"sales_lag_1\nCover: 3553\nGain: 5370380290\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"16\" [label = \"sales_lag_7\nCover: 1408362\nGain: 1637811840\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"17\" [label = \"sales_lag_1\nCover: 458\nGain: 1872484860\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"18\" [label = \"sales_lag_7\nCover: 197731\nGain: 641069056\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"19\" [label = \"sales_lag_7\nCover: 63860\nGain: 471070720\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"20\" [label = \"sales_lag_7\nCover: 85715\nGain: 1561460740\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"21\" [label = \"sales_lag_7\nCover: 41047\nGain: 1116495870\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"22\" [label = \"sales_lag_7\nCover: 28315\nGain: 544813056\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"23\" [label = \"sales_lag_7\nCover: 10707\nGain: 663191552\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"24\" [label = \"sales_lag_1\nCover: 22000\nGain: 1229070340\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"25\" [label = \"sales_lag_1\nCover: 27970\nGain: 3737518080\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"26\" [label = \"sales_lag_1\nCover: 12464\nGain: 1259274240\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"27\" [label = \"sales_lag_7\nCover: 4031\nGain: 1148469250\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"28\" [label = \"sales_lag_1\nCover: 5700\nGain: 2424045570\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"29\" [label = \"sales_lag_1\nCover: 7752\nGain: 4051369980\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"30\" [label = \"sales_lag_7\nCover: 2085\nGain: 936034304\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"31\" [label = \"dcoilwtico\nCover: 1468\nGain: 3694526460\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"32\" [label = \"sales_lag_1\nCover: 1265224\nGain: 270169440\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"33\" [label = \"sales_lag_7\nCover: 143138\nGain: 190741632\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"34\" [label = \"sales_lag_7\nCover: 231\nGain: 1453254660\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"35\" [label = \"dcoilwtico\nCover: 227\nGain: 4088542\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"36\" [label = \"sales_lag_7\nCover: 95563\nGain: 82136576\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"37\" [label = \"sales_lag_1\nCover: 102168\nGain: 254687232\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"38\" [label = \"sales_lag_7\nCover: 46042\nGain: 64232448\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"39\" [label = \"sales_lag_7\nCover: 17818\nGain: 94331392\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"40\" [label = \"sales_lag_7\nCover: 40335\nGain: 212367360\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"41\" [label = \"sales_lag_7\nCover: 45380\nGain: 451014656\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"42\" [label = \"sales_lag_60\nCover: 22291\nGain: 204646400\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"43\" [label = \"sales_lag_1\nCover: 18756\nGain: 579588096\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"44\" [label = \"sales_lag_1\nCover: 17009\nGain: 211243008\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"45\" [label = \"sales_lag_1\nCover: 11306\nGain: 133533696\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"46\" [label = \"sales_lag_1\nCover: 7866\nGain: 134815744\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"47\" [label = \"sales_lag_1\nCover: 2841\nGain: 245942272\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"48\" [label = \"sales_lag_7\nCover: 13000\nGain: 781111296\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"49\" [label = \"sales_lag_7\nCover: 9000\nGain: 407760896\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"50\" [label = \"sales_lag_7\nCover: 16729\nGain: 831995904\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"51\" [label = \"sales_lag_7\nCover: 11241\nGain: 747225088\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"52\" [label = \"dcoilwtico\nCover: 5347\nGain: 263954432\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"53\" [label = \"sales_lag_7\nCover: 7117\nGain: 586973184\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"54\" [label = \"sales_lag_1\nCover: 2786\nGain: 254197760\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"55\" [label = \"sales_lag_1\nCover: 1245\nGain: 574283776\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"56\" [label = \"sales_lag_60\nCover: 4106\nGain: 1144799230\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"57\" [label = \"national_holiday\nCover: 1594\nGain: 700346368\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"58\" [label = \"sales_lag_7\nCover: 5098\nGain: 1269760000\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"59\" [label = \"dcoilwtico\nCover: 2654\nGain: 3180265470\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"60\" [label = \"dcoilwtico\nCover: 1044\nGain: 319692800\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"61\" [label = \"cluster\nCover: 1041\nGain: 420601856\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"62\" [label = \"sales_lag_1\nCover: 1059\nGain: 1010417660\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"63\" [label = \"sales_lag_1\nCover: 409\nGain: 354029568\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"64\" [label = \"Leaf\nCover: 1137013\nValue: 0.46226722\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"65\" [label = \"Leaf\nCover: 128211\nValue: 5.30460405\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"66\" [label = \"Leaf\nCover: 105485\nValue: 10.0574741\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"67\" [label = \"Leaf\nCover: 37653\nValue: 18.3486748\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"68\" [label = \"Leaf\nCover: 201\nValue: 308.205841\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"69\" [label = \"Leaf\nCover: 30\nValue: 1047.74158\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"70\" [label = \"Leaf\nCover: 9\nValue: 66.8788376\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"71\" [label = \"Leaf\nCover: 218\nValue: 1.47848308\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"72\" [label = \"Leaf\nCover: 43538\nValue: 15.9178057\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"73\" [label = \"Leaf\nCover: 52025\nValue: 21.805769\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"74\" [label = \"Leaf\nCover: 69647\nValue: 27.1055584\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"75\" [label = \"Leaf\nCover: 32521\nValue: 37.8257256\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"76\" [label = \"Leaf\nCover: 28634\nValue: 41.3282127\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"77\" [label = \"Leaf\nCover: 17408\nValue: 49.0423546\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"78\" [label = \"Leaf\nCover: 13831\nValue: 59.4810562\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"79\" [label = \"Leaf\nCover: 3987\nValue: 76.9749298\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"80\" [label = \"Leaf\nCover: 19906\nValue: 51.8932877\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"81\" [label = \"Leaf\nCover: 20429\nValue: 66.4183197\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"82\" [label = \"Leaf\nCover: 31710\nValue: 79.7437592\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"83\" [label = \"Leaf\nCover: 13670\nValue: 101.490402\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"84\" [label = \"Leaf\nCover: 7364\nValue: 87.2737885\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"85\" [label = \"Leaf\nCover: 14927\nValue: 107.694847\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"86\" [label = \"Leaf\nCover: 14602\nValue: 124.682045\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"87\" [label = \"Leaf\nCover: 4154\nValue: 167.07753\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"88\" [label = \"Leaf\nCover: 9330\nValue: 134.076294\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"89\" [label = \"Leaf\nCover: 7679\nValue: 156.57933\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"90\" [label = \"Leaf\nCover: 4487\nValue: 159.069427\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"91\" [label = \"Leaf\nCover: 6819\nValue: 181.526871\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"92\" [label = \"Leaf\nCover: 2376\nValue: 188.443756\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"93\" [label = \"Leaf\nCover: 5490\nValue: 217.407837\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"94\" [label = \"Leaf\nCover: 629\nValue: 209.256302\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"95\" [label = \"Leaf\nCover: 2212\nValue: 281.079803\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"96\" [label = \"Leaf\nCover: 3554\nValue: 164.568054\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"97\" [label = \"Leaf\nCover: 9446\nValue: 219.706772\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"98\" [label = \"Leaf\nCover: 301\nValue: 367.911591\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"99\" [label = \"Leaf\nCover: 8699\nValue: 248.791656\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"100\" [label = \"Leaf\nCover: 10400\nValue: 268.49469\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"101\" [label = \"Leaf\nCover: 6329\nValue: 314.701263\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"102\" [label = \"Leaf\nCover: 5191\nValue: 332.5448\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"103\" [label = \"Leaf\nCover: 6050\nValue: 384.704193\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"104\" [label = \"Leaf\nCover: 3229\nValue: 397.564362\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"105\" [label = \"Leaf\nCover: 2118\nValue: 350.92514\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"106\" [label = \"Leaf\nCover: 4375\nValue: 420.641113\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"107\" [label = \"Leaf\nCover: 2742\nValue: 480.625061\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"108\" [label = \"Leaf\nCover: 1089\nValue: 495.612213\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"109\" [label = \"Leaf\nCover: 1697\nValue: 560.889099\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"110\" [label = \"Leaf\nCover: 119\nValue: 436.619843\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"111\" [label = \"Leaf\nCover: 1126\nValue: 675.110535\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"112\" [label = \"Leaf\nCover: 1636\nValue: 438.770508\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"113\" [label = \"Leaf\nCover: 2470\nValue: 547.787109\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"114\" [label = \"Leaf\nCover: 1346\nValue: 620.878357\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"115\" [label = \"Leaf\nCover: 248\nValue: 808.863647\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"116\" [label = \"Leaf\nCover: 3550\nValue: 657.093201\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"117\" [label = \"Leaf\nCover: 1548\nValue: 767.617126\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"118\" [label = \"Leaf\nCover: 2076\nValue: 785.428406\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"119\" [label = \"Leaf\nCover: 578\nValue: 1053.40552\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"120\" [label = \"Leaf\nCover: 690\nValue: 937.341431\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"121\" [label = \"Leaf\nCover: 354\nValue: 806.821228\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"122\" [label = \"Leaf\nCover: 305\nValue: 1143.71057\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"123\" [label = \"Leaf\nCover: 736\nValue: 987.52179\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"124\" [label = \"Leaf\nCover: 717\nValue: 1242.20715\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"125\" [label = \"Leaf\nCover: 342\nValue: 1468.01746\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"126\" [label = \"Leaf\nCover: 373\nValue: 920.875916\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"127\" [label = \"Leaf\nCover: 36\nValue: 1284.50293\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n\"1\"->\"2\" [label = \"< 2042.00806\", style = \"bold\"] \n\"2\"->\"4\" [label = \"< 554.788513\", style = \"bold\"] \n\"3\"->\"6\" [label = \"< 5398.00391\", style = \"solid\"] \n\"4\"->\"8\" [label = \"< 155.378494\", style = \"bold\"] \n\"5\"->\"10\" [label = \"< 1326.0625\", style = \"bold\"] \n\"6\"->\"12\" [label = \"< 3760.98755\", style = \"bold\"] \n\"7\"->\"14\" [label = \"< 8991.56738\", style = \"bold\"] \n\"8\"->\"16\" [label = \"< 2399.93359\", style = \"bold\"] \n\"9\"->\"18\" [label = \"< 382.729004\", style = \"bold\"] \n\"10\"->\"20\" [label = \"< 1006.9895\", style = \"solid\"] \n\"11\"->\"22\" [label = \"< 2057.50195\", style = \"solid\"] \n\"12\"->\"24\" [label = \"< 2545.09155\", style = \"solid\"] \n\"13\"->\"26\" [label = \"< 5528.75879\", style = \"solid\"] \n\"14\"->\"28\" [label = \"< 5862.07959\", style = \"solid\"] \n\"15\"->\"30\" [label = \"< 9314.72461\", style = \"solid\"] \n\"16\"->\"32\" [label = \"< 63.0014992\", style = \"bold\"] \n\"17\"->\"34\" [label = \"< 0.5\", style = \"solid\"] \n\"18\"->\"36\" [label = \"< 239.030502\", style = \"solid\"] \n\"19\"->\"38\" [label = \"< 585.494507\", style = \"solid\"] \n\"20\"->\"40\" [label = \"< 716.930542\", style = \"solid\"] \n\"21\"->\"42\" [label = \"< 1110.16797\", style = \"solid\"] \n\"22\"->\"44\" [label = \"< 1664.77295\", style = \"solid\"] \n\"23\"->\"46\" [label = \"< 2784.854\", style = \"solid\"] \n\"24\"->\"48\" [label = \"< 2677.38599\", style = \"solid\"] \n\"25\"->\"50\" [label = \"< 3260.89844\", style = \"solid\"] \n\"26\"->\"52\" [label = \"< 3523.5\", style = \"solid\"] \n\"27\"->\"54\" [label = \"< 6961.5\", style = \"solid\"] \n\"28\"->\"56\" [label = \"< 7517.24951\", style = \"solid\"] \n\"29\"->\"58\" [label = \"< 8253.5\", style = \"solid\"] \n\"30\"->\"60\" [label = \"< 10644.1582\", style = \"solid\"] \n\"31\"->\"62\" [label = \"< 28.2950001\", style = \"bold\"] \n\"32\"->\"64\" [label = \"< 26.0345001\", style = \"bold\"] \n\"33\"->\"66\" [label = \"< 153.623993\", style = \"solid\"] \n\"34\"->\"68\" [label = \"< 7623.67676\", style = \"solid\"] \n\"35\"->\"70\" [label = \"< 47.6750031\", style = \"solid\"] \n\"36\"->\"72\" [label = \"< 167.822998\", style = \"solid\"] \n\"37\"->\"74\" [label = \"< 340.273987\", style = \"solid\"] \n\"38\"->\"76\" [label = \"< 480.010498\", style = \"solid\"] \n\"39\"->\"78\" [label = \"< 817.056519\", style = \"solid\"] \n\"40\"->\"80\" [label = \"< 543.989014\", style = \"solid\"] \n\"41\"->\"82\" [label = \"< 960.586487\", style = \"bold\"] \n\"42\"->\"84\" [label = \"< 726.856995\", style = \"solid\"] \n\"43\"->\"86\" [label = \"< 1622.13306\", style = \"solid\"] \n\"44\"->\"88\" [label = \"< 1362.18042\", style = \"solid\"] \n\"45\"->\"90\" [label = \"< 1427.03198\", style = \"solid\"] \n\"46\"->\"92\" [label = \"< 1527.03552\", style = \"solid\"] \n\"47\"->\"94\" [label = \"< 1528.39893\", style = \"solid\"] \n\"48\"->\"96\" [label = \"< 1607.52856\", style = \"solid\"] \n\"49\"->\"98\" [label = \"< 58.1829987\", style = \"solid\"] \n\"50\"->\"100\" [label = \"< 3025.87939\", style = \"bold\"] \n\"51\"->\"102\" [label = \"< 3316.39697\", style = \"solid\"] \n\"52\"->\"104\" [label = \"< 27.75\", style = \"bold\"] \n\"53\"->\"106\" [label = \"< 4671.21484\", style = \"solid\"] \n\"54\"->\"108\" [label = \"< 4196.7334\", style = \"solid\"] \n\"55\"->\"110\" [label = \"< 3499\", style = \"solid\"] \n\"56\"->\"112\" [label = \"< 3709\", style = \"solid\"] \n\"57\"->\"114\" [label = \"< 0.5\", style = \"bold\"] \n\"58\"->\"116\" [label = \"< 7402.5\", style = \"bold\"] \n\"59\"->\"118\" [label = \"< 219.240005\", style = \"solid\"] \n\"60\"->\"120\" [label = \"< 28.5049992\", style = \"bold\"] \n\"61\"->\"122\" [label = \"< 5.5\", style = \"bold\"] \n\"62\"->\"124\" [label = \"< 12143.5\", style = \"solid\"] \n\"63\"->\"126\" [label = \"< 16444.5\", style = \"solid\"] \n\"1\"->\"3\" [style = \"solid\", style = \"solid\"] \n\"2\"->\"5\" [style = \"solid\", style = \"solid\"] \n\"3\"->\"7\" [style = \"solid\", style = \"bold\"] \n\"4\"->\"9\" [style = \"bold\", style = \"solid\"] \n\"5\"->\"11\" [style = \"solid\", style = \"solid\"] \n\"6\"->\"13\" [style = \"solid\", style = \"solid\"] \n\"7\"->\"15\" [style = \"solid\", style = \"solid\"] \n\"8\"->\"17\" [style = \"solid\", style = \"solid\"] \n\"9\"->\"19\" [style = \"solid\", style = \"solid\"] \n\"10\"->\"21\" [style = \"solid\", style = \"bold\"] \n\"11\"->\"23\" [style = \"bold\", style = \"bold\"] \n\"12\"->\"25\" [style = \"bold\", style = \"bold\"] \n\"13\"->\"27\" [style = \"bold\", style = \"bold\"] \n\"14\"->\"29\" [style = \"bold\", style = \"bold\"] \n\"15\"->\"31\" [style = \"bold\", style = \"bold\"] \n\"16\"->\"33\" [style = \"bold\", style = \"solid\"] \n\"17\"->\"35\" [style = \"solid\", style = \"bold\"] \n\"18\"->\"37\" [style = \"bold\", style = \"bold\"] \n\"19\"->\"39\" [style = \"bold\", style = \"bold\"] \n\"20\"->\"41\" [style = \"bold\", style = \"bold\"] \n\"21\"->\"43\" [style = \"bold\", style = \"bold\"] \n\"22\"->\"45\" [style = \"bold\", style = \"bold\"] \n\"23\"->\"47\" [style = \"bold\", style = \"bold\"] \n\"24\"->\"49\" [style = \"bold\", style = \"bold\"] \n\"25\"->\"51\" [style = \"bold\", style = \"bold\"] \n\"26\"->\"53\" [style = \"bold\", style = \"bold\"] \n\"27\"->\"55\" [style = \"bold\", style = \"bold\"] \n\"28\"->\"57\" [style = \"bold\", style = \"bold\"] \n\"29\"->\"59\" [style = \"bold\", style = \"bold\"] \n\"30\"->\"61\" [style = \"bold\", style = \"bold\"] \n\"31\"->\"63\" [style = \"bold\", style = \"solid\"] \n\"32\"->\"65\" [style = \"solid\", style = \"solid\"] \n\"33\"->\"67\" [style = \"solid\", style = \"bold\"] \n\"34\"->\"69\" [style = \"bold\", style = \"bold\"] \n\"35\"->\"71\" [style = \"bold\", style = \"bold\"] \n\"36\"->\"73\" [style = \"bold\", style = \"bold\"] \n\"37\"->\"75\" [style = \"bold\", style = \"bold\"] \n\"38\"->\"77\" [style = \"bold\", style = \"bold\"] \n\"39\"->\"79\" [style = \"bold\", style = \"bold\"] \n\"40\"->\"81\" [style = \"bold\", style = \"bold\"] \n\"41\"->\"83\" [style = \"bold\", style = \"solid\"] \n\"42\"->\"85\" [style = \"solid\", style = \"bold\"] \n\"43\"->\"87\" [style = \"bold\", style = \"bold\"] \n\"44\"->\"89\" [style = \"bold\", style = \"bold\"] \n\"45\"->\"91\" [style = \"bold\", style = \"bold\"] \n\"46\"->\"93\" [style = \"bold\", style = \"bold\"] \n\"47\"->\"95\" [style = \"bold\", style = \"bold\"] \n\"48\"->\"97\" [style = \"bold\", style = \"bold\"] \n\"49\"->\"99\" [style = \"bold\", style = \"bold\"] \n\"50\"->\"101\" [style = \"bold\", style = \"solid\"] \n\"51\"->\"103\" [style = \"solid\", style = \"bold\"] \n\"52\"->\"105\" [style = \"bold\", style = \"solid\"] \n\"53\"->\"107\" [style = \"solid\", style = \"bold\"] \n\"54\"->\"109\" [style = \"bold\", style = \"bold\"] \n\"55\"->\"111\" [style = \"bold\", style = \"bold\"] \n\"56\"->\"113\" [style = \"bold\", style = \"bold\"] \n\"57\"->\"115\" [style = \"bold\", style = \"solid\"] \n\"58\"->\"117\" [style = \"solid\", style = \"solid\"] \n\"59\"->\"119\" [style = \"solid\", style = \"bold\"] \n\"60\"->\"121\" [style = \"bold\", style = \"solid\"] \n\"61\"->\"123\" [style = \"solid\", style = \"solid\"] \n\"62\"->\"125\" [style = \"solid\", style = \"bold\"] \n\"63\"->\"127\" [style = \"bold\", style = \"bold\"] \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div class="grViz html-widget html-fill-item" id="htmlwidget-0157fed1148dc08ac987" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-0157fed1148dc08ac987">{"x":{"diagram":"digraph {\n\ngraph [layout = \"dot\",\n       rankdir = \"LR\"]\n\nnode [color = \"DimGray\",\n      style = \"filled\",\n      fontname = \"Helvetica\"]\n\nedge [color = \"DimGray\",\n     arrowsize = \"1.5\",\n     arrowhead = \"vee\",\n     fontname = \"Helvetica\"]\n\n  \"1\" [label = \"Tree 0\nsales_lag_1\nCover: 1921090\nGain: 1216116820000\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"2\" [label = \"sales_lag_1\nCover: 1837564\nGain: 154059571000\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"3\" [label = \"sales_lag_1\nCover: 83526\nGain: 242787680000\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"4\" [label = \"sales_lag_1\nCover: 1672057\nGain: 18390636500\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"5\" [label = \"sales_lag_7\nCover: 165507\nGain: 22390030300\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"6\" [label = \"sales_lag_7\nCover: 66111\nGain: 38545391600\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"7\" [label = \"transactions\nCover: 17415\nGain: 54583492600\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"8\" [label = \"sales_lag_7\nCover: 1409985\nGain: 1821605630\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"9\" [label = \"sales_lag_7\nCover: 262072\nGain: 2928193540\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"10\" [label = \"sales_lag_1\nCover: 126245\nGain: 5025972220\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"11\" [label = \"sales_lag_7\nCover: 39262\nGain: 3506421760\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"12\" [label = \"sales_lag_7\nCover: 49832\nGain: 9935683580\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"13\" [label = \"sales_lag_7\nCover: 16279\nGain: 6922502140\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"14\" [label = \"sales_lag_7\nCover: 11840\nGain: 8906997760\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"15\" [label = \"sales_lag_7\nCover: 5575\nGain: 13441564700\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"16\" [label = \"sales_lag_7\nCover: 1409508\nGain: 1622207740\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"17\" [label = \"sales_lag_1\nCover: 477\nGain: 1840805760\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"18\" [label = \"sales_lag_7\nCover: 197923\nGain: 641736704\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"19\" [label = \"sales_lag_7\nCover: 64149\nGain: 479132672\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"20\" [label = \"sales_lag_7\nCover: 83118\nGain: 1444532220\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"21\" [label = \"sales_lag_7\nCover: 43127\nGain: 1136300030\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"22\" [label = \"sales_lag_7\nCover: 28295\nGain: 580308992\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"23\" [label = \"sales_lag_7\nCover: 10967\nGain: 679100416\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"24\" [label = \"sales_lag_1\nCover: 22058\nGain: 1209942020\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"25\" [label = \"sales_lag_1\nCover: 27774\nGain: 3370811390\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"26\" [label = \"sales_lag_7\nCover: 12684\nGain: 1283063810\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"27\" [label = \"transactions\nCover: 3595\nGain: 1503641600\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"28\" [label = \"sales_lag_60\nCover: 7183\nGain: 2740240380\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"29\" [label = \"transactions\nCover: 4657\nGain: 1350434820\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"30\" [label = \"sales_lag_1\nCover: 3483\nGain: 3035054080\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"31\" [label = \"sales_lag_1\nCover: 2092\nGain: 2500689920\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"32\" [label = \"sales_lag_1\nCover: 1266261\nGain: 268055696\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"33\" [label = \"sales_lag_7\nCover: 143247\nGain: 185348864\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"34\" [label = \"sales_lag_60\nCover: 235\nGain: 1228943100\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"35\" [label = \"onpromotion\nCover: 242\nGain: 5206609\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"36\" [label = \"sales_lag_7\nCover: 97888\nGain: 88927744\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"37\" [label = \"sales_lag_1\nCover: 100035\nGain: 250298368\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"38\" [label = \"sales_lag_7\nCover: 47618\nGain: 74511360\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"39\" [label = \"sales_lag_7\nCover: 16531\nGain: 88951808\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"40\" [label = \"sales_lag_7\nCover: 39298\nGain: 197051392\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"41\" [label = \"sales_lag_7\nCover: 43820\nGain: 415176704\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"42\" [label = \"sales_lag_60\nCover: 23619\nGain: 217376768\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"43\" [label = \"sales_lag_1\nCover: 19508\nGain: 542920704\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"44\" [label = \"sales_lag_1\nCover: 16045\nGain: 199520256\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"45\" [label = \"sales_lag_1\nCover: 12250\nGain: 170360832\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"46\" [label = \"sales_lag_1\nCover: 7813\nGain: 131139584\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"47\" [label = \"sales_lag_1\nCover: 3154\nGain: 246274048\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"48\" [label = \"sales_lag_7\nCover: 13229\nGain: 764960768\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"49\" [label = \"sales_lag_1\nCover: 8829\nGain: 371793920\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"50\" [label = \"sales_lag_7\nCover: 16352\nGain: 858259456\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"51\" [label = \"transactions\nCover: 11422\nGain: 773029888\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"52\" [label = \"sales_lag_1\nCover: 8512\nGain: 541130752\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"53\" [label = \"transactions\nCover: 4172\nGain: 527245312\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"54\" [label = \"transactions\nCover: 416\nGain: 128271872\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"55\" [label = \"sales_lag_7\nCover: 3179\nGain: 859684864\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"56\" [label = \"sales_lag_7\nCover: 2477\nGain: 582340608\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"57\" [label = \"sales_lag_1\nCover: 4706\nGain: 1326415870\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"58\" [label = \"onpromotion\nCover: 2569\nGain: 571899904\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"59\" [label = \"sales_lag_7\nCover: 2088\nGain: 543285248\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"60\" [label = \"sales_lag_7\nCover: 2371\nGain: 1502773250\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"61\" [label = \"transactions\nCover: 1112\nGain: 2406055940\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"62\" [label = \"transactions\nCover: 1250\nGain: 433700864\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"63\" [label = \"transactions\nCover: 842\nGain: 925794304\", fillcolor = \"Beige\", shape = \"rectangle\", fontcolor = \"black\"] \n  \"64\" [label = \"Leaf\nCover: 1137804\nValue: 0.465043277\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"65\" [label = \"Leaf\nCover: 128457\nValue: 5.28407812\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"66\" [label = \"Leaf\nCover: 109037\nValue: 10.1663542\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"67\" [label = \"Leaf\nCover: 34210\nValue: 18.6033268\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"68\" [label = \"Leaf\nCover: 209\nValue: 312.223358\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"69\" [label = \"Leaf\nCover: 26\nValue: 1033.4823\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"70\" [label = \"Leaf\nCover: 241\nValue: 2.19268632\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"71\" [label = \"Leaf\nCover: 1\nValue: 164.225006\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"72\" [label = \"Leaf\nCover: 43625\nValue: 15.8714437\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"73\" [label = \"Leaf\nCover: 54263\nValue: 21.936697\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"74\" [label = \"Leaf\nCover: 67899\nValue: 27.1811314\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"75\" [label = \"Leaf\nCover: 32136\nValue: 37.8951683\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"76\" [label = \"Leaf\nCover: 27317\nValue: 41.0658455\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"77\" [label = \"Leaf\nCover: 20301\nValue: 49.0749779\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"78\" [label = \"Leaf\nCover: 12329\nValue: 59.9496422\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"79\" [label = \"Leaf\nCover: 4202\nValue: 76.8344879\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"80\" [label = \"Leaf\nCover: 18358\nValue: 51.4425735\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"81\" [label = \"Leaf\nCover: 20940\nValue: 65.647728\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"82\" [label = \"Leaf\nCover: 31260\nValue: 79.2457962\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"83\" [label = \"Leaf\nCover: 12560\nValue: 100.78994\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"84\" [label = \"Leaf\nCover: 9286\nValue: 88.299736\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"85\" [label = \"Leaf\nCover: 14333\nValue: 107.984756\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"86\" [label = \"Leaf\nCover: 12944\nValue: 120.974426\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"87\" [label = \"Leaf\nCover: 6564\nValue: 156.336166\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"88\" [label = \"Leaf\nCover: 9001\nValue: 132.692795\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"89\" [label = \"Leaf\nCover: 7044\nValue: 155.275803\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"90\" [label = \"Leaf\nCover: 5511\nValue: 158.412781\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"91\" [label = \"Leaf\nCover: 6739\nValue: 182.319626\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"92\" [label = \"Leaf\nCover: 2269\nValue: 185.308777\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"93\" [label = \"Leaf\nCover: 5544\nValue: 214.300705\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"94\" [label = \"Leaf\nCover: 684\nValue: 207.205673\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"95\" [label = \"Leaf\nCover: 2470\nValue: 275.900208\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"96\" [label = \"Leaf\nCover: 4257\nValue: 170.444443\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"97\" [label = \"Leaf\nCover: 8972\nValue: 222.05513\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"98\" [label = \"Leaf\nCover: 8215\nValue: 247.669662\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"99\" [label = \"Leaf\nCover: 614\nValue: 328.97287\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"100\" [label = \"Leaf\nCover: 10265\nValue: 267.662689\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"101\" [label = \"Leaf\nCover: 6087\nValue: 315.276794\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"102\" [label = \"Leaf\nCover: 4147\nValue: 321.54071\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"103\" [label = \"Leaf\nCover: 7275\nValue: 376.076141\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"104\" [label = \"Leaf\nCover: 3827\nValue: 366.443115\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"105\" [label = \"Leaf\nCover: 4685\nValue: 417.847626\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"106\" [label = \"Leaf\nCover: 467\nValue: 360.79248\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"107\" [label = \"Leaf\nCover: 3705\nValue: 475.701813\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"108\" [label = \"Leaf\nCover: 157\nValue: 317.824921\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"109\" [label = \"Leaf\nCover: 259\nValue: 438.770233\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"110\" [label = \"Leaf\nCover: 2116\nValue: 560.356812\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"111\" [label = \"Leaf\nCover: 1063\nValue: 672.81073\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"112\" [label = \"Leaf\nCover: 1335\nValue: 415.017426\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"113\" [label = \"Leaf\nCover: 1142\nValue: 514.004089\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"114\" [label = \"Leaf\nCover: 3473\nValue: 559.297913\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"115\" [label = \"Leaf\nCover: 1233\nValue: 681.572144\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"116\" [label = \"Leaf\nCover: 2471\nValue: 664.716797\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"117\" [label = \"Leaf\nCover: 98\nValue: 919.400879\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"118\" [label = \"Leaf\nCover: 1350\nValue: 744.958252\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"119\" [label = \"Leaf\nCover: 738\nValue: 857.487305\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"120\" [label = \"Leaf\nCover: 754\nValue: 690.89447\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"121\" [label = \"Leaf\nCover: 1617\nValue: 865.4422\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"122\" [label = \"Leaf\nCover: 673\nValue: 890.764771\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"123\" [label = \"Leaf\nCover: 439\nValue: 1197.73669\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"124\" [label = \"Leaf\nCover: 863\nValue: 1058.70349\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"125\" [label = \"Leaf\nCover: 387\nValue: 1202.74414\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"126\" [label = \"Leaf\nCover: 426\nValue: 1218.77698\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n  \"127\" [label = \"Leaf\nCover: 416\nValue: 1447.46765\", fillcolor = \"Khaki\", shape = \"oval\", fontcolor = \"black\"] \n\"1\"->\"2\" [label = \"< 2042.50903\", style = \"bold\"] \n\"2\"->\"4\" [label = \"< 555.172485\", style = \"bold\"] \n\"3\"->\"6\" [label = \"< 5327.1582\", style = \"solid\"] \n\"4\"->\"8\" [label = \"< 155.294006\", style = \"bold\"] \n\"5\"->\"10\" [label = \"< 1322.8335\", style = \"bold\"] \n\"6\"->\"12\" [label = \"< 3753.84595\", style = \"bold\"] \n\"7\"->\"14\" [label = \"< 3575.5\", style = \"solid\"] \n\"8\"->\"16\" [label = \"< 2399.93359\", style = \"bold\"] \n\"9\"->\"18\" [label = \"< 382.002014\", style = \"bold\"] \n\"10\"->\"20\" [label = \"< 987.536987\", style = \"solid\"] \n\"11\"->\"22\" [label = \"< 2044.06848\", style = \"solid\"] \n\"12\"->\"24\" [label = \"< 2548.50732\", style = \"solid\"] \n\"13\"->\"26\" [label = \"< 5621.61621\", style = \"solid\"] \n\"14\"->\"28\" [label = \"< 6146.5\", style = \"bold\"] \n\"15\"->\"30\" [label = \"< 9857.25977\", style = \"bold\"] \n\"16\"->\"32\" [label = \"< 63.0014992\", style = \"bold\"] \n\"17\"->\"34\" [label = \"< 0.5\", style = \"solid\"] \n\"18\"->\"36\" [label = \"< 242.445496\", style = \"solid\"] \n\"19\"->\"38\" [label = \"< 597.119995\", style = \"solid\"] \n\"20\"->\"40\" [label = \"< 711.995972\", style = \"solid\"] \n\"21\"->\"42\" [label = \"< 1110.18298\", style = \"solid\"] \n\"22\"->\"44\" [label = \"< 1630.43945\", style = \"solid\"] \n\"23\"->\"46\" [label = \"< 2714.08496\", style = \"solid\"] \n\"24\"->\"48\" [label = \"< 2688.25293\", style = \"solid\"] \n\"25\"->\"50\" [label = \"< 3230.5\", style = \"solid\"] \n\"26\"->\"52\" [label = \"< 4670.13379\", style = \"solid\"] \n\"27\"->\"54\" [label = \"< 1527.5\", style = \"solid\"] \n\"28\"->\"56\" [label = \"< 3693\", style = \"bold\"] \n\"29\"->\"58\" [label = \"< 3055.5\", style = \"solid\"] \n\"30\"->\"60\" [label = \"< 9156.7334\", style = \"solid\"] \n\"31\"->\"62\" [label = \"< 10250.5\", style = \"solid\"] \n\"32\"->\"64\" [label = \"< 26.0410004\", style = \"bold\"] \n\"33\"->\"66\" [label = \"< 158.522003\", style = \"solid\"] \n\"34\"->\"68\" [label = \"< 8140.97461\", style = \"solid\"] \n\"35\"->\"70\" [label = \"< 28\", style = \"bold\"] \n\"36\"->\"72\" [label = \"< 167.656494\", style = \"solid\"] \n\"37\"->\"74\" [label = \"< 340.263\", style = \"solid\"] \n\"38\"->\"76\" [label = \"< 473.841003\", style = \"solid\"] \n\"39\"->\"78\" [label = \"< 810.153015\", style = \"solid\"] \n\"40\"->\"80\" [label = \"< 532.751465\", style = \"solid\"] \n\"41\"->\"82\" [label = \"< 960.906006\", style = \"bold\"] \n\"42\"->\"84\" [label = \"< 797.776001\", style = \"solid\"] \n\"43\"->\"86\" [label = \"< 1465.78442\", style = \"solid\"] \n\"44\"->\"88\" [label = \"< 1362.18042\", style = \"solid\"] \n\"45\"->\"90\" [label = \"< 1472.5\", style = \"solid\"] \n\"46\"->\"92\" [label = \"< 1493.12207\", style = \"solid\"] \n\"47\"->\"94\" [label = \"< 1515.75098\", style = \"solid\"] \n\"48\"->\"96\" [label = \"< 1688.99146\", style = \"solid\"] \n\"49\"->\"98\" [label = \"< 4400.40918\", style = \"solid\"] \n\"50\"->\"100\" [label = \"< 3030.36816\", style = \"bold\"] \n\"51\"->\"102\" [label = \"< 1449.5\", style = \"solid\"] \n\"52\"->\"104\" [label = \"< 3436.72559\", style = \"solid\"] \n\"53\"->\"106\" [label = \"< 1353.5\", style = \"solid\"] \n\"54\"->\"108\" [label = \"< 1290.5\", style = \"solid\"] \n\"55\"->\"110\" [label = \"< 7000.72266\", style = \"solid\"] \n\"56\"->\"112\" [label = \"< 4364.35693\", style = \"solid\"] \n\"57\"->\"114\" [label = \"< 7789.60693\", style = \"solid\"] \n\"58\"->\"116\" [label = \"< 119.5\", style = \"bold\"] \n\"59\"->\"118\" [label = \"< 8517.10352\", style = \"solid\"] \n\"60\"->\"120\" [label = \"< 6886.82422\", style = \"solid\"] \n\"61\"->\"122\" [label = \"< 4196.5\", style = \"solid\"] \n\"62\"->\"124\" [label = \"< 4721.5\", style = \"solid\"] \n\"63\"->\"126\" [label = \"< 4687.5\", style = \"solid\"] \n\"1\"->\"3\" [style = \"solid\", style = \"solid\"] \n\"2\"->\"5\" [style = \"solid\", style = \"solid\"] \n\"3\"->\"7\" [style = \"solid\", style = \"bold\"] \n\"4\"->\"9\" [style = \"bold\", style = \"solid\"] \n\"5\"->\"11\" [style = \"solid\", style = \"solid\"] \n\"6\"->\"13\" [style = \"solid\", style = \"solid\"] \n\"7\"->\"15\" [style = \"solid\", style = \"bold\"] \n\"8\"->\"17\" [style = \"bold\", style = \"solid\"] \n\"9\"->\"19\" [style = \"solid\", style = \"solid\"] \n\"10\"->\"21\" [style = \"solid\", style = \"bold\"] \n\"11\"->\"23\" [style = \"bold\", style = \"bold\"] \n\"12\"->\"25\" [style = \"bold\", style = \"bold\"] \n\"13\"->\"27\" [style = \"bold\", style = \"bold\"] \n\"14\"->\"29\" [style = \"bold\", style = \"solid\"] \n\"15\"->\"31\" [style = \"solid\", style = \"solid\"] \n\"16\"->\"33\" [style = \"solid\", style = \"solid\"] \n\"17\"->\"35\" [style = \"solid\", style = \"bold\"] \n\"18\"->\"37\" [style = \"bold\", style = \"bold\"] \n\"19\"->\"39\" [style = \"bold\", style = \"bold\"] \n\"20\"->\"41\" [style = \"bold\", style = \"bold\"] \n\"21\"->\"43\" [style = \"bold\", style = \"bold\"] \n\"22\"->\"45\" [style = \"bold\", style = \"bold\"] \n\"23\"->\"47\" [style = \"bold\", style = \"bold\"] \n\"24\"->\"49\" [style = \"bold\", style = \"bold\"] \n\"25\"->\"51\" [style = \"bold\", style = \"bold\"] \n\"26\"->\"53\" [style = \"bold\", style = \"bold\"] \n\"27\"->\"55\" [style = \"bold\", style = \"bold\"] \n\"28\"->\"57\" [style = \"bold\", style = \"solid\"] \n\"29\"->\"59\" [style = \"solid\", style = \"bold\"] \n\"30\"->\"61\" [style = \"bold\", style = \"bold\"] \n\"31\"->\"63\" [style = \"bold\", style = \"bold\"] \n\"32\"->\"65\" [style = \"bold\", style = \"solid\"] \n\"33\"->\"67\" [style = \"solid\", style = \"bold\"] \n\"34\"->\"69\" [style = \"bold\", style = \"bold\"] \n\"35\"->\"71\" [style = \"bold\", style = \"solid\"] \n\"36\"->\"73\" [style = \"solid\", style = \"bold\"] \n\"37\"->\"75\" [style = \"bold\", style = \"bold\"] \n\"38\"->\"77\" [style = \"bold\", style = \"bold\"] \n\"39\"->\"79\" [style = \"bold\", style = \"bold\"] \n\"40\"->\"81\" [style = \"bold\", style = \"bold\"] \n\"41\"->\"83\" [style = \"bold\", style = \"solid\"] \n\"42\"->\"85\" [style = \"solid\", style = \"bold\"] \n\"43\"->\"87\" [style = \"bold\", style = \"bold\"] \n\"44\"->\"89\" [style = \"bold\", style = \"bold\"] \n\"45\"->\"91\" [style = \"bold\", style = \"bold\"] \n\"46\"->\"93\" [style = \"bold\", style = \"bold\"] \n\"47\"->\"95\" [style = \"bold\", style = \"bold\"] \n\"48\"->\"97\" [style = \"bold\", style = \"bold\"] \n\"49\"->\"99\" [style = \"bold\", style = \"bold\"] \n\"50\"->\"101\" [style = \"bold\", style = \"solid\"] \n\"51\"->\"103\" [style = \"solid\", style = \"bold\"] \n\"52\"->\"105\" [style = \"bold\", style = \"bold\"] \n\"53\"->\"107\" [style = \"bold\", style = \"bold\"] \n\"54\"->\"109\" [style = \"bold\", style = \"bold\"] \n\"55\"->\"111\" [style = \"bold\", style = \"bold\"] \n\"56\"->\"113\" [style = \"bold\", style = \"bold\"] \n\"57\"->\"115\" [style = \"bold\", style = \"bold\"] \n\"58\"->\"117\" [style = \"bold\", style = \"solid\"] \n\"59\"->\"119\" [style = \"solid\", style = \"bold\"] \n\"60\"->\"121\" [style = \"bold\", style = \"bold\"] \n\"61\"->\"123\" [style = \"bold\", style = \"bold\"] \n\"62\"->\"125\" [style = \"bold\", style = \"bold\"] \n\"63\"->\"127\" [style = \"bold\", style = \"bold\"] \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <pre class="r"><code># Step 2: Dump Model Structure
 cat(&quot;Dumping the model structure for Native Handling Model...\n&quot;)</code></pre>
 <pre><code>## Dumping the model structure for Native Handling Model...</code></pre>
@@ -2128,50 +2109,50 @@ cat(&quot;Sample of Native Handling Model Structure:\n&quot;)</code></pre>
 <pre class="r"><code>native_model_dump &lt;- readLines(&quot;native_model_dump.txt&quot;)
 cat(head(native_model_dump, 20), sep = &quot;\n&quot;)</code></pre>
 <pre><code>## booster[0]
-## 0:[f1&lt;2167.74609] yes=1,no=2,missing=1,gain=1.09732456e+12,cover=1920691
-##  1:[f2&lt;663.744507] yes=3,no=4,missing=3,gain=1.95992584e+11,cover=1850832
-##      3:[f1&lt;267.617401] yes=7,no=8,missing=7,gain=2.87437455e+10,cover=1704145
-##          7:[f3&lt;91.0530014] yes=15,no=16,missing=15,gain=5.78654413e+09,cover=1547091
-##              15:[f5&lt;162] yes=31,no=32,missing=31,gain=1.54084787e+09,cover=1314304
-##                  31:[f2&lt;33.1544991] yes=63,no=64,missing=64,gain=823336512,cover=1314269
-##                      63:leaf=0.820228279,cover=1129823
-##                      64:leaf=8.02615833,cover=184446
-##                  32:[f4&lt;3907.1167] yes=65,no=66,missing=66,gain=271814144,cover=35
-##                      65:leaf=384.179169,cover=20
-##                      66:leaf=971.917419,cover=15
-##              16:[f4&lt;4561.65625] yes=33,no=34,missing=33,gain=2.16204339e+09,cover=232787
-##                  33:[f4&lt;430.309509] yes=67,no=68,missing=67,gain=951400960,cover=232686
-##                      67:leaf=17.2557869,cover=220591
-##                      68:leaf=46.0603333,cover=12095
-##                  34:[f3&lt;4052.08008] yes=69,no=70,missing=70,gain=557527296,cover=101
-##                      69:leaf=76.3822327,cover=26
-##                      70:leaf=616.07428,cover=75
-##          8:[f1&lt;719.015503] yes=17,no=18,missing=18,gain=5.65700608e+09,cover=157054</code></pre>
+## 0:[f1&lt;2172.58643] yes=1,no=2,missing=1,gain=1.09821408e+12,cover=1920691
+##  1:[f2&lt;663.744507] yes=3,no=4,missing=3,gain=1.96990026e+11,cover=1851023
+##      3:[f1&lt;274.080505] yes=7,no=8,missing=7,gain=2.87823217e+10,cover=1703983
+##          7:[f3&lt;92.0410004] yes=15,no=16,missing=15,gain=5.95827507e+09,cover=1551957
+##              15:[f5&lt;162] yes=31,no=32,missing=31,gain=1.45383578e+09,cover=1316581
+##                  31:[f2&lt;33.1569977] yes=63,no=64,missing=64,gain=833998336,cover=1316548
+##                      63:leaf=0.820440292,cover=1130145
+##                      64:leaf=8.03992939,cover=186403
+##                  32:[f4&lt;4053.61353] yes=65,no=66,missing=66,gain=220961152,cover=33
+##                      65:leaf=399.748596,cover=19
+##                      66:leaf=953.394714,cover=14
+##              16:[f4&lt;4279.61035] yes=33,no=34,missing=33,gain=1.98372557e+09,cover=235376
+##                  33:[f1&lt;188.808502] yes=67,no=68,missing=68,gain=960080384,cover=235276
+##                      67:leaf=13.3222151,cover=132606
+##                      68:leaf=26.2030926,cover=102670
+##                  34:[f3&lt;4110.70312] yes=69,no=70,missing=70,gain=699695616,cover=100
+##                      69:leaf=73.2847824,cover=32
+##                      70:leaf=641.537415,cover=68
+##          8:[f1&lt;723.078003] yes=17,no=18,missing=18,gain=5.4730711e+09,cover=152026</code></pre>
 <pre class="r"><code>cat(&quot;\nSample of Rolling Average Model Structure:\n&quot;)</code></pre>
 <pre><code>## 
 ## Sample of Rolling Average Model Structure:</code></pre>
 <pre class="r"><code>rolling_avg_model_dump &lt;- readLines(&quot;rolling_avg_model_dump.txt&quot;)
 cat(head(rolling_avg_model_dump, 20), sep = &quot;\n&quot;)</code></pre>
 <pre><code>## booster[0]
-## 0:[f0&lt;2042.00806] yes=1,no=2,missing=1,gain=1.21937212e+12,cover=1919665
-##  1:[f0&lt;554.788513] yes=3,no=4,missing=3,gain=1.54219626e+11,cover=1836195
-##      3:[f0&lt;155.378494] yes=7,no=8,missing=7,gain=1.83563346e+10,cover=1670411
-##          7:[f1&lt;2399.93359] yes=15,no=16,missing=15,gain=1.95592934e+09,cover=1408820
-##              15:[f1&lt;63.0014992] yes=31,no=32,missing=31,gain=1.63781184e+09,cover=1408362
-##                  31:[f0&lt;26.0345001] yes=63,no=64,missing=63,gain=270169440,cover=1265224
-##                      63:leaf=0.46226722,cover=1137013
-##                      64:leaf=5.30460405,cover=128211
-##                  32:[f1&lt;153.623993] yes=65,no=66,missing=66,gain=190741632,cover=143138
-##                      65:leaf=10.0574741,cover=105485
-##                      66:leaf=18.3486748,cover=37653
-##              16:[f0&lt;0.5] yes=33,no=34,missing=34,gain=1.87248486e+09,cover=458
-##                  33:[f1&lt;7623.67676] yes=67,no=68,missing=68,gain=1.45325466e+09,cover=231
-##                      67:leaf=308.205841,cover=201
-##                      68:leaf=1047.74158,cover=30
-##                  34:[f10&lt;47.6750031] yes=69,no=70,missing=70,gain=4088542,cover=227
-##                      69:leaf=66.8788376,cover=9
-##                      70:leaf=1.47848308,cover=218
-##          8:[f1&lt;382.729004] yes=17,no=18,missing=17,gain=2.91625574e+09,cover=261591</code></pre>
+## 0:[f0&lt;2042.50903] yes=1,no=2,missing=1,gain=1.21611682e+12,cover=1921090
+##  1:[f0&lt;555.172485] yes=3,no=4,missing=3,gain=1.54059571e+11,cover=1837564
+##      3:[f0&lt;155.294006] yes=7,no=8,missing=7,gain=1.83906365e+10,cover=1672057
+##          7:[f1&lt;2399.93359] yes=15,no=16,missing=15,gain=1.82160563e+09,cover=1409985
+##              15:[f1&lt;63.0014992] yes=31,no=32,missing=31,gain=1.62220774e+09,cover=1409508
+##                  31:[f0&lt;26.0410004] yes=63,no=64,missing=63,gain=268055696,cover=1266261
+##                      63:leaf=0.465043277,cover=1137804
+##                      64:leaf=5.28407812,cover=128457
+##                  32:[f1&lt;158.522003] yes=65,no=66,missing=66,gain=185348864,cover=143247
+##                      65:leaf=10.1663542,cover=109037
+##                      66:leaf=18.6033268,cover=34210
+##              16:[f0&lt;0.5] yes=33,no=34,missing=34,gain=1.84080576e+09,cover=477
+##                  33:[f3&lt;8140.97461] yes=67,no=68,missing=68,gain=1.2289431e+09,cover=235
+##                      67:leaf=312.223358,cover=209
+##                      68:leaf=1033.4823,cover=26
+##                  34:[f5&lt;28] yes=69,no=70,missing=69,gain=5206609,cover=242
+##                      69:leaf=2.19268632,cover=241
+##                      70:leaf=164.225006,cover=1
+##          8:[f1&lt;382.002014] yes=17,no=18,missing=17,gain=2.92819354e+09,cover=262072</code></pre>
 
 
 
