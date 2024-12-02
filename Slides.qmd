@@ -1,5 +1,7 @@
 ---
-title: "DSCI 445 Final Project Group - 3"
+title: "Store Sales - <br>Time Series Forecasting"
+subtitle: "DSCI 445 Final Project - Group 3"
+author: "Lauren Bair, Jillian Cook, Garrett Hayden, D'Andre Tafoya"
 format: revealjs
 editor: visual
 ---
@@ -13,11 +15,11 @@ library(forecast)
 library(readr)
 ```
 
-## Chosen Problem
+## Motivation: Kaggle Competition
 
 -   "Store Sales - Time Series Forecasting" From Kaggle
 
--   Goal: Test the capability of different models to accurately forecast store sales based on past yearly data.
+-   Goal: Test the capability of different models to accurately forecast store sales based on past yearly data
 
 -   Evaluation Metric for Competition: Root Mean Squared Logarithmic Error
 
@@ -25,7 +27,7 @@ library(readr)
 
 -   Competition Link: <https://www.kaggle.com/competitions/store-sales-time-series-forecasting>
 
-## Initial Data Analysis
+## Initial Exploratory Data Analysis
 
 ```{r}
 train <- read_csv("Data/final_train.csv")
@@ -98,4 +100,4 @@ graph_2
 
 -   Able to use lagged values of variables to better quantify autocorrelation within the data set
 
--   Autocorrelation: "The degree of correlation of the same variables between two successivetime intervals"
+-   Autocorrelation: "The degree of correlation of the same variables between two successive time intervals"
