@@ -10,8 +10,7 @@
 <link href="Slides_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.4.555">
 
-  <meta name="author" content="Lauren Bair, Jillian Cook, Garrett Hayden, D’Andre Tafoya">
-  <title>Store Sales -  Time Series Forecasting</title>
+  <title>DSCI 445 Final Project Group - 3</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -326,30 +325,49 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">Store Sales - <br>Time Series Forecasting</h1>
-  <p class="subtitle">DSCI 445 Final Project - Group 3</p>
+  <h1 class="title">DSCI 445 Final Project Group - 3</h1>
 
 <div class="quarto-title-authors">
-<div class="quarto-title-author">
-<div class="quarto-title-author-name">
-Lauren Bair, Jillian Cook, Garrett Hayden, D’Andre Tafoya 
-</div>
-</div>
 </div>
 
 </section>
-<section id="motivation-kaggle-competition" class="slide level2">
-<h2>Motivation: Kaggle Competition</h2>
+<section id="chosen-problem" class="slide level2">
+<h2>Chosen Problem</h2>
 <ul>
 <li><p>“Store Sales - Time Series Forecasting” From Kaggle</p></li>
-<li><p>Goal: Test the capability of different models to accurately forecast store sales based on past yearly data</p></li>
+<li><p>Goal: Test the capability of different models to accurately forecast store sales based on past yearly data.</p></li>
 <li><p>Evaluation Metric for Competition: Root Mean Squared Logarithmic Error</p>
 <p><img data-src="images/clipboard-1235366002.png" width="213" height="76"><img data-src="images/clipboard-765528567.png" width="231"></p></li>
 <li><p>Competition Link: <a href="https://www.kaggle.com/competitions/store-sales-time-series-forecasting" class="uri">https://www.kaggle.com/competitions/store-sales-time-series-forecasting</a></p></li>
 </ul>
 </section>
-<section id="initial-exploratory-data-analysis" class="slide level2">
-<h2>Initial Exploratory Data Analysis</h2>
+<section id="description-of-data" class="slide level2">
+<h2>Description of Data</h2>
+<ul>
+<li><p>Given Files: 1 train, 1 test, 4 additional datasets</p>
+<ul>
+<li><code>train.csv</code>, <code>test.csv</code></li>
+<li><code>stores.csv</code></li>
+<li><code>oil.csv</code></li>
+<li><code>transactions.csv</code></li>
+<li><code>holidays_events.csv</code></li>
+</ul></li>
+<li><p>Training Data: 3,000,888 rows, 16 columns (prior to cleaning &amp; transformations)</p></li>
+<li><p><strong>Target Feature</strong>: <code>sales</code></p></li>
+</ul>
+</section>
+<section id="time-series-considerations" class="slide level2">
+<h2>Time Series Considerations</h2>
+<ul>
+<li><strong>Lag Variable</strong>: Represents the value from a previous point in time
+<ul>
+<li>Captures time dependencies and relationships to past observations</li>
+</ul></li>
+<li>Engineered 7 lag features for <code>sales</code>: 1, 7, 30, 60, 90, 180, 365 days</li>
+</ul>
+</section>
+<section id="initial-data-analysis" class="slide level2">
+<h2>Initial Data Analysis</h2>
 
 <img data-src="Slides_files/figure-revealjs/unnamed-chunk-2-1.png" width="960" class="r-stretch"></section>
 <section>
@@ -368,6 +386,40 @@ Lauren Bair, Jillian Cook, Garrett Hayden, D’Andre Tafoya
 <li><p>Able to use lagged values of variables to better quantify autocorrelation within the data set</p></li>
 <li><p>Autocorrelation: “The degree of correlation of the same variables between two successive time intervals”</p></li>
 </ul>
+</section>
+<section class="slide level2">
+
+<h3 id="arima-base-parameters">ARIMA Base Parameters</h3>
+<ul>
+<li>Base Function Parameters (5,1,1):
+<ul>
+<li><p>5 - Number of past observations that are used to predict the current value</p></li>
+<li><p>1 - Number of times the current value is subtracted from previous value</p>
+<ul>
+<li>Ensures Stationary Data</li>
+</ul></li>
+<li><p>1 - Number of lagged forecast errors used to predict current value</p>
+<ul>
+<li>Uses most recent forecast error to adjust prediction</li>
+</ul></li>
+</ul></li>
+</ul>
+</section>
+<section class="slide level2">
+
+<h3 id="arima-seasonal-parameters">ARIMA Seasonal Parameters</h3>
+<ul>
+<li><p>Seasonal Function Parameters (2,1,2) and Frequency Term (7):</p>
+<ul>
+<li><p>7 - Number of days the seasonal parameters use when predicting</p></li>
+<li><p>2 - Number of past observations used to predict current value (7, 14 days prior)</p></li>
+<li><p>1 - Number of times current value is subtracted from value 7 days prior</p></li>
+<li><p>2 - Number of lagged forecast errors used to predict current values (7, 14 days prior)</p></li>
+</ul></li>
+</ul>
+</section>
+<section id="results" class="slide level2">
+<h2>Results</h2>
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
 
