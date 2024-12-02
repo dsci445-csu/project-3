@@ -32,6 +32,7 @@ library(doParallel)
 
 # Load data
 final_train_lags <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data//final_train_lags.csv")
+final_test_lags <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data//final_test_lags.csv")
 
 ```
 
@@ -40,15 +41,40 @@ final_train_lags <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3Fi
 
 # Perform Lasso
 
-cl <- makeCluster(100)
-registerDoParallel(cl)
+sapply(final_train_lags, function(x) sum(is.na(x)))
 
-lag_recipe <- recipe(sales ~ ., data = final_train_lags) %>%
-  step_dummy(all_nominal_predictors()) %>%
+final_train_lags <- final_train_lags %>% 
+  select(-date)
+
+final_train_lags
+
+closeAllConnections()
+showConnections(all = TRUE)
+
+num_cores <- 4
+cl <- makeCluster(num_cores)
+registerDoParallel(cl)
+registerDoSEQ()
+
+trial_data <- final_train_lags %>% 
+  sample_n(1000)
+
+trial_cv <- vfold_cv(trial_data, v = 10)
+
+lag_recipe <- recipe(sales ~ ., data = trial_data) %>%
+  step_dummy(all_nominal_predictors(), one_hot = TRUE) %>%
+  step_impute_median(all_numeric_predictors()) %>%
   step_normalize(all_numeric_predictors())
 
+prepared_data <- prep(lag_recipe, training = trial_data) %>%
+  bake(new_data = NULL)
+
+# Check the structure of the processed data
+str(prepared_data)
+
 cv <- vfold_cv(final_train_lags, v = 10)
-lambda_grid <- grid_regular(penalty(), levels = 50)
+#lambda_grid <- grid_regular(penalty(), levels = 50)
+lambda_grid <- grid_regular(penalty(range = c(-4, 0)), levels = 20)
 
 lasso_spec <- linear_reg(mixture = 1, penalty = tune()) %>%
   set_mode("regression") %>%
@@ -60,13 +86,14 @@ lasso_workflow <- workflow() %>%
 
 lasso_tune <- lasso_workflow %>%
   tune_grid(
-    resamples = cv,
+    resamples = trial_cv,
     grid = lambda_grid,
-    metrics = metric_set(rmse)
+    metrics = metric_set(rmse),
+    control = control_grid(verbose = TRUE, save_pred = TRUE)
   )
 
 lasso_final <- finalize_workflow(lasso_workflow, select_best(lasso_tune, metric = "rmse"))
-lasso_fin_fit <- fit(lasso_final, data = final_train_lags)
+lasso_fin_fit <- fit(lasso_final, data = trial_data)
 
 results <- collect_metrics(lasso_tune)
 results_rmse <- results %>% filter(.metric == "rmse")
@@ -81,12 +108,38 @@ best_lambda <- show_best(lasso_tune, metric = "rmse", n = 1)
 lasso_coef <- tidy(lasso_fin_fit)
 cor(final_train_lagged_sales %>% select(sales, starts_with("sales_lag_")))
 
+print(head(final_train_lags))
+
+non_numeric_cols <- trial_data %>% select(where(~ !is.numeric(.))) %>% colnames()
+print(non_numeric_cols)
+
+best_lambda
 lasso_coef
-
-final_test_lags <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data//final_test_lags.csv")
-
-last(final_test_lags)
 
 ```
 
+
+```{r}
+
+final_test_lags <- final_test_lags %>% 
+  select(-city_holiday, -national_holiday, -state_holiday, -date)
+
+pred_val <- 
+  lasso_fin_fit %>% 
+  augment(new_data = final_test_lags)
+
+pred_val_2 <- 
+  lasso_fin_fit %>% 
+  augment(new_data = trial_data)
+
+rmse_val <- 
+  pred_val_2 %>% 
+  rmse(truth = sales, estimate = .pred)
+
+predicted <- pred_val_2$.pred
+actual <- trial_data$sales
+adjusted_predictions <- ifelse(predicted < 0, 0, predicted)
+rmsle(actual, adjusted_predictions)
+
+```
 

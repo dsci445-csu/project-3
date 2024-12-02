@@ -59,7 +59,7 @@ sapply(oil, function(x) sum(is.na(x)))
 ```
 
 ```{r}
-# Don't trip bout me imma have it done tn-D'Andre
+
 ```
 
 
