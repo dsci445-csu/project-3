@@ -1,0 +1,202 @@
+---
+title: "Lauren and Jillian Random Forest"
+output: html_document
+date: "2024-11-14"
+---
+
+```{r setup, include=FALSE}
+rm(list = ls())
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# install packages and load libraries
+#install.packages("ranger")
+#install.packages("ModelMetrics")
+library(ModelMetrics)
+library(parallel)
+library(readr)
+library(dplyr)
+library(leaps)
+library(ggplot2)
+library(glmnet)
+library(ISLR)
+library(dials)
+library(tidymodels)
+library(randomForest)
+library(ranger)
+library(vip)
+library(parsnip)
+library(lubridate)
+```
+
+```{r}
+# load data
+final_train_lags <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data//final_train_lags.csv")
+
+final_test_lags <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/final_test_lags.csv")
+```
+
+
+```{r}
+# Prepare data to be processed in a random forest
+str(final_train_lags)
+
+final_train_lags <- final_train_lags %>%
+  mutate(national_holiday = ifelse(is.na(national_holiday), 0, national_holiday),
+         state_holiday = ifelse(is.na(state_holiday), 0, state_holiday),
+         city_holiday = ifelse(is.na(city_holiday), 0, city_holiday))
+
+final_train_lags <- final_train_lags %>%
+  mutate(store_nbr = factor(store_nbr), family = factor(family), city = factor(city), state = factor(state), type = factor(type)) %>%
+        dplyr::mutate(across(where(is.factor), as.integer))
+
+final_train_lags <- final_train_lags %>%
+  arrange(date) %>%
+  fill(dcoilwtico, .direction = "down")%>%
+  fill(dcoilwtico, .direction = "up")
+
+final_train_lags <- final_train_lags %>%
+  arrange(date) %>%
+  fill(transactions, .direction = "down")%>%
+  fill(transactions, .direction = "up")
+
+final_train_lags <- final_train_lags %>%
+  drop_na(sales_lag_1, sales_lag_7,sales_lag_30,sales_lag_60,sales_lag_90,sales_lag_180,sales_lag_365)
+
+final_train_lags <- final_train_lags %>%
+  mutate(
+    year = year(date),
+    month = month(date),
+    day = day(date),
+    weekday = wday(date),
+    is_weekend = if_else(wday(date) %in% c(1, 7), 1, 0)
+  ) %>%
+  select(-date)
+
+str(final_train_lags)
+
+```
+
+```{r}
+# Check to ensure there are no remaining NA values
+
+na_rows <- final_train_lags %>%
+  filter(if_any(everything(), is.na))
+
+print(na_rows)
+
+```
+
+```{r}
+# Test with subset
+set.seed(123) # Ensures reproducibility
+subset_data <- final_train_lags %>% sample_n(1000000)
+```
+
+
+```{r}
+rf_model <- ranger(
+  formula = sales ~ .,
+  data = train_data,
+  num.trees = 500,
+  mtry = 7,                  # Adjusted number of features
+  min.node.size = 10,        # Increased target node size
+  importance = "impurity",
+  num.threads = parallel::detectCores()
+)
+
+# Cross-validate
+cv_control <- trainControl(method = "cv", number = 5)
+cv_rf <- train(
+  sales ~ .,
+  data = train_data,
+  method = "ranger",
+  trControl = cv_control,
+  tuneGrid = expand.grid(mtry = c(5, 7, 9), min.node.size = c(5, 10, 15), splitrule = "variance")
+)
+
+# Print model summary
+print(rf_model)
+
+rf_pred <- predict(rf_model, data = final_train_lags)
+
+rmsle_val <- rmsle(final_train_lags$sales, rf_pred$predictions)
+print(rmsle_val)
+
+save(rf_model, file = "rf_model.rda")
+```
+
+```{r}
+# Prepare test data to be processed in a random forest
+str(final_test_lags)
+
+final_test_lags <- final_test_lags %>%
+  mutate(national_holiday = ifelse(is.na(national_holiday), 0, national_holiday),
+         state_holiday = ifelse(is.na(state_holiday), 0, state_holiday),
+         city_holiday = ifelse(is.na(city_holiday), 0, city_holiday))
+
+final_test_lags <- final_test_lags %>%
+  mutate(store_nbr = factor(store_nbr), family = factor(family), city = factor(city), state = factor(state), type = factor(type)) %>%
+        dplyr::mutate(across(where(is.factor), as.integer))
+
+final_test_lags <- final_test_lags %>%
+  arrange(date) %>%
+  fill(dcoilwtico, .direction = "down")%>%
+  fill(dcoilwtico, .direction = "up")
+
+final_test_lags <- final_test_lags %>%
+  arrange(date) %>%
+  fill(transactions, .direction = "down")%>%
+  fill(transactions, .direction = "up")
+
+final_test_lags <- final_test_lags %>%
+  mutate(
+    year = year(date),
+    month = month(date),
+    day = day(date),
+    weekday = wday(date),
+    is_weekend = if_else(wday(date) %in% c(1, 7), 1, 0)
+  ) %>%
+  select(-date)
+
+str(final_test_lags)
+
+```
+
+
+```{r}
+# Load my random forest
+load("rf_model.rda")
+predictions <- predict(rf_model, data = final_test_lags)
+
+pred_val <- cbind(final_test_lags, sales_pred = predictions)
+
+
+submission <- pred_val %>%
+  select(id, prediction) %>%
+  rename(sales = prediction)
+
+write.csv(submission, "RF_Model_Submission.csv", row.names = FALSE)
+```
+
+
+```{r}
+# Visualize importance of parameters
+vip(rf_model)
+
+```
+
+```{r}
+random_forest_pred_summarized_ <- pred_val %>% 
+  group_by(date) %>%
+  summarise(total_sales = sum(sales, na.rm = TRUE))
+```
+
+
+
+
+
+
+
+
