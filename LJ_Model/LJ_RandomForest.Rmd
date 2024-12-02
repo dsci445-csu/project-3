@@ -10,8 +10,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 # install packages and load libraries
-install.packages("ranger")
-install.packages("MLmetrics")
+#install.packages("ranger")
+#install.packages("MLmetrics")
 library(parallel)
 library(readr)
 library(dplyr)
@@ -38,6 +38,7 @@ final_test_lags <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3Fin
 
 
 ```{r}
+
 # include lasso or linear model to "beat"
 # gam or regression spline 
 # fit on families of product
@@ -64,7 +65,7 @@ num_cores = 256
 
 rf_model <- rand_forest(
   mtry = (ncol(final_train_lags) - 1),
-  min_n = tune()
+  min_n = 20
 ) %>%
   set_engine("ranger", num.threads = num_cores, max.depth = 10) %>%  # Limit tree depth
   set_mode("regression")
@@ -73,27 +74,9 @@ workflow <- workflow() %>%
   add_recipe(rf_recipe) %>% 
   add_model(rf_model)
 
-folds <- vfold_cv(final_train_lags, v = 3)
-
-grid <- grid_regular(
-  min_n(range = c(10, 30)),
-  levels = 3
-)
-
-tuned_model <- tune_grid(
-  workflow,
-  resamples = folds,
-  grid = grid,
-  metrics = metric_set(rmse, rsq)
-)
-
-best_params <- select_best(tuned_model, metric = "rmse")
-
-# Finalize Workflow with Best Parameters
-final_workflow <- finalize_workflow(workflow, best_params)
 
 # Fit the Model on Training Data
-final_model <- fit(final_workflow, data = final_train_lags)
+final_model <- fit(workflow, data = final_train_lags)
 
 # Predict on Train Data to get RMSLE
 train_predictions <- predict(final_model, new_data = final_train_lags)
@@ -105,5 +88,5 @@ train_metrics <- final_train_lags %>%
 
 # If you want to use RMSLE, you can compute it like so:
 train_rmsle <- rmsle(train_metrics$.pred,train_metrics$sales)
-
+print(train_rmsle)
 ```
