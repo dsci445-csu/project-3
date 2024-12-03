@@ -5,7 +5,8 @@ library(data.table)
 library(DiagrammeR)
 
 train_data <- fread("../Data/final_train_lags.csv")
-test_data <- fread("../Data/final_train.csv")
+test_data <- fread("../Data/Unprocessed/test.csv")
+
 # RMSLE Function
 compute_rmsle <- function(actual, predicted) {
   actual <- as.numeric(actual)
@@ -25,7 +26,7 @@ missing_test_cols <- setdiff(c(lagged_sales_cols, additional_cols), colnames(tes
 if (length(missing_test_cols) > 0) {
   cat("Adding missing columns to test_data:", paste(missing_test_cols, collapse = ", "), "\n")
   for (col in missing_test_cols) {
-    test_data[, (col) := NA]  # <-Add missing columns with NA values
+    test_data[, (col) := NA]  # Add missing columns with NA values
   }
 }
 
@@ -40,11 +41,7 @@ print(sapply(test_data[, c(lagged_sales_cols, additional_cols), with = FALSE], f
 set.seed(445)
 train_data[sample(.N, size = 0.1 * .N), sales_lag_7 := NA]
 
-<<<<<<< HEAD
-# Split Data into training and validation
-=======
 # Split Data for Cross-Validation
->>>>>>> 7b4a96e80dc2bba334b920887ab5b711a4dc5cd3
 set.seed(445)
 train_split <- train_data[1:(0.8 * .N)]
 valid_split <- train_data[(0.8 * .N + 1):.N]
@@ -62,16 +59,11 @@ valid_split[, transactions := ifelse(is.na(transactions),
                                      mean(transactions, na.rm = TRUE), 
                                      transactions), 
             by = store_nbr]
-<<<<<<< HEAD
-fwrite(train_split, "DAndre_XGboost_Final_Train.csv")
-=======
->>>>>>> 7b4a96e80dc2bba334b920887ab5b711a4dc5cd3
 ```
 
 ```{r}
 # Define features
-features <- c(lagged_sales_cols, "onpromotion", "national_holiday", "state_holiday", 
-              "city_holiday", "cluster", additional_cols)
+features <- c(lagged_sales_cols, additional_cols)
 train_features <- as.matrix(train_split[, ..features])
 train_labels <- train_split$sales
 valid_features <- as.matrix(valid_split[, ..features])
@@ -80,7 +72,6 @@ valid_labels <- valid_split$sales
 # DMatrix
 dtrain <- xgb.DMatrix(data = train_features, label = train_labels)
 dvalid <- xgb.DMatrix(data = valid_features, label = valid_labels)
-
 ```
 
 ```{r}
@@ -105,9 +96,8 @@ model_native <- xgb.train(
   verbose = 1
 )
 
-# Predict on Validation Set (Native Handling) and ensure non negative predictions
+# Predict on Validation Set (Native Handling) and ensure non-negative predictions
 valid_predictions_native <- predict(model_native, dvalid)
-
 valid_predictions_native <- pmax(valid_predictions_native, 0)
 
 # Calculate RMSLE
@@ -156,7 +146,6 @@ model_imputed <- xgb.train(
 
 # Predict and Ensure non-negative predictions
 valid_predictions_imputed <- predict(model_imputed, dvalid_imputed)
-
 valid_predictions_imputed <- pmax(valid_predictions_imputed, 0)
 
 rmsle_imputed <- compute_rmsle(valid_labels, valid_predictions_imputed)
@@ -189,7 +178,7 @@ xgb.plot.tree(
   render = TRUE
 )
 
-# Step 2: Dump Model Structure
+# Dump Model Structure
 cat("Dumping the model structure for Native Handling Model...\n")
 xgb.dump(
   model_native,
@@ -204,7 +193,7 @@ xgb.dump(
   with_stats = TRUE
 )
 
-# print a sample of the dumped file
+# Print a sample of the dumped file
 cat("Sample of Native Handling Model Structure:\n")
 native_model_dump <- readLines("native_model_dump.txt")
 cat(head(native_model_dump, 20), sep = "\n")
@@ -213,63 +202,7 @@ cat("\nSample of Rolling Average Model Structure:\n")
 rolling_avg_model_dump <- readLines("rolling_avg_model_dump.txt")
 cat(head(rolling_avg_model_dump, 20), sep = "\n")
 ```
-<<<<<<< HEAD
-```{r}
 
-```
-
-
-
-```{r}
-# Step 1: Aggregate Historical Data
-historical_sales <- train_data[, .(total_sales = sum(sales, na.rm = TRUE)), by = .(date)]
-historical_sales <- historical_sales[order(date)]
-
-# Ensure `date` column is of type Date
-historical_sales[, date := as.Date(date)]
-
-# Step 2: Prepare Future Dates
-future_dates <- seq(from = as.Date(max(historical_sales$date)) + 1,
-                    by = "day",
-                    length.out = 365 * 2) # Predict for the next 2 years
-future_data <- data.table(date = future_dates)
-
-# Add required columns for the prediction and leave them as NA (native handling will handle this)
-future_data[, c(lagged_sales_cols, "onpromotion", "national_holiday", "state_holiday", 
-                "city_holiday", "cluster", additional_cols) := NA]
-
-# Convert all columns in `future_data` to numeric (avoiding logical types)
-for (col in setdiff(names(future_data), "date")) {
-  future_data[, (col) := as.numeric(get(col))]
-}
-
-# Ensure `date` column in `future_data` is of type Date
-future_data[, date := as.Date(date)]
-
-# Ensure all required features exist for the Native Handling Model
-future_features <- as.matrix(future_data[, ..features])
-dfuture <- xgb.DMatrix(data = future_features)
-
-# Step 3: Generate Predictions Using Native Handling Model
-future_data[, predicted_sales := predict(model_native, dfuture)]
-
-# Step 4: Combine Historical and Predicted Data
-historical_sales[, source := "Historical"]
-future_data[, source := "Predicted"]
-future_data <- future_data[, .(date, total_sales = predicted_sales, source)]
-combined_data <- rbind(historical_sales, future_data) # rbind now works without errors
-
-# Step 5: Plot the Data
-library(ggplot2)
-
-ggplot(combined_data, aes(x = date, y = total_sales, color = source)) +
-  geom_line(size = 1) +
-  labs(title = "Sales Over Time: Historical and Predicted (Native Handling Model)",
-       x = "Date",
-       y = "Total Sales",
-       color = "Source") +
-  theme_minimal()
-```
 ```{r}
 # Predict Sales by Day Using Training Data
 cat("Generating Predicted Sales by Day for Training Data...\n")
@@ -291,6 +224,17 @@ predicted_sales_by_day_train <- train_split[, .(total_predicted_sales = sum(pred
 fwrite(predicted_sales_by_day_train, "Predicted_Sales_By_Day_Train.csv")
 
 ```
-=======
->>>>>>> 7b4a96e80dc2bba334b920887ab5b711a4dc5cd3
+
+```{r}
+# Visualize the Best Tree in Native Handling Model
+cat("Visualizing the best tree (iteration 95) from the Native Handling Model...\n")
+
+# Plot the best tree (iteration 95)
+xgb.plot.tree(
+  model = model_native,
+  feature_names = features,
+  trees = 95, # Specify the best tree from iteration 95
+  render = TRUE
+)
+```
 
