@@ -41,6 +41,6 @@ Group3FinalProject.Rproj
 FinalProject2.Rproj
 #Data File
 LJ_Model/*.rda
-LJ_Model/*.rds
-Dre_Model/*.csv
+LJ_Model/Lasso_Model.rds
+Dre_Model/DAndre_XGboost_Final_Train.csv
 
