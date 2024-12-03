@@ -41,4 +41,6 @@ Group3FinalProject.Rproj
 FinalProject2.Rproj
 #Data File
 LJ_Model/*.rda
+LJ_Model/*rds
+Dre_Model/*.csv
 
