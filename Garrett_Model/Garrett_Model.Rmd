@@ -112,6 +112,7 @@ checkresiduals(model)
 ```
 
 ```{r}
+test
 ```
 
 ```{r}

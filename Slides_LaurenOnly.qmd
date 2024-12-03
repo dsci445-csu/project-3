@@ -151,7 +151,7 @@ grid.raster(heatmap, width = unit(1, "npc"), height = unit(1, "npc"))
     -   Selects most important predictors for each split
     -   Measures predictor importance based on reduction of overall model error
 
--   **Model**: Number of trees: **500**, mtry = **7**, min.node.size = **10**
+-   **Model**: Number of trees: **500**, mtry = **7**, min.node.size = **5**
 
 -   $R^2$: **96.03%**
 

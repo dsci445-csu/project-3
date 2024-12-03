@@ -6,7 +6,6 @@ date: "2024-11-14"
 
 ```{r setup, include=FALSE}
 rm(list = ls()) 
-knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
@@ -18,8 +17,6 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
-install.packages("tseries")
-install.packages("corrplot")
 library(tseries)
 library(corrplot)
 ```
@@ -27,7 +24,7 @@ library(corrplot)
 
 ```{r}
 # load data
-final_train_lags <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data//final_train_lags.csv")
+final_train_lags <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/FinalProject2/Data//final_train_lags.csv")
 ```
 
 
@@ -77,8 +74,7 @@ final_train_lags <- final_train_lags %>%
     day = day(date),
     weekday = wday(date),
     is_weekend = if_else(wday(date) %in% c(1, 7), 1, 0)
-  ) %>%
-  select(-date)
+  ) %>% select(-date)
 
 # Check the structure of the final dataset to confirm the changes
 str(final_train_lags)
@@ -115,12 +111,13 @@ print(cardinality_ratio)
 
 ```{r, fig.width=10, fig.height=10}
 # Create correlation matrix and plot as a heat map
+png("heatmap.png", width = 3200, height = 3200, res = 300)
 
 # Create correlation matrix
 cor_matrix <- cor(final_train_lags, use = "complete.obs")
 
 # Plot the correlation matrix as a heatmap
-corrplot(
+heatmap <- corrplot(
   cor_matrix, 
   method = "color", 
   type = "full", 
@@ -141,19 +138,11 @@ final_train_lags[is.na(final_train_lags)] <- 0
 
 # Check the structure of the final dataset to confirm the changes
 str(final_train_lags)
+
+dev.off()
 ```
 
 
 
-```{r}
-# Create correlation matrix and plot as a heat map
-numeric_final_train_lags <- final_train_lags %>% select_if(is.numeric)
 
-# Create correlation matrix
-cor_matrix <- cor(numeric_final_train_lags, use = "complete.obs")
-
-# Plot the correlation matrix as a heatmap
-corrplot(cor_matrix, method = "color", type = "upper", tl.col = "black", tl.srt = 45, 
-         addCoef.col = "white", number.cex = 0.7, col = colorRampPalette(c("blue", "white", "red"))(200))
-```
 

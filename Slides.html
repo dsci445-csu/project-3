@@ -338,7 +338,7 @@
 <li><p>Goal: Test the capability of different models to accurately forecast store sales based on past yearly data.</p></li>
 <li><p>Evaluation Metric for Competition: Root Mean Squared Logarithmic Error</p>
 <p><img data-src="images/clipboard-1235366002.png" width="213" height="76"><img data-src="images/clipboard-765528567.png" width="231"></p></li>
-<li><p>Competition Link: <a href="https://www.kaggle.com/competitions/store-sales-time-series-forecasting" class="uri">https://www.kaggle.com/competitions/store-sales-time-series-forecasting</a></p></li>
+<li><p>Competition Link: &lt;https://www.kaggle.com/competitions/store-sales-time-series-forecasting&gt;</p></li>
 </ul>
 </section>
 <section id="description-of-data" class="slide level2">
@@ -363,18 +363,15 @@
 <ul>
 <li>Captures time dependencies and relationships to past observations</li>
 </ul></li>
-<li>Engineered 7 lag features for <code>sales</code>: 1, 7, 30, 60, 90, 180, 365 days</li>
+<li>Engineered 7 lag features for <code>sales</code>: 1, 7, 30, 60, 90, 180, 365 (units in days)</li>
 </ul>
 </section>
-<section id="initial-data-analysis" class="slide level2">
-<h2>Initial Data Analysis</h2>
+<section id="exploratory-data-analysis" class="slide level2">
+<h2>Exploratory Data Analysis</h2>
 
 <img data-src="Slides_files/figure-revealjs/unnamed-chunk-2-1.png" width="960" class="r-stretch"></section>
 <section class="slide level2">
 
-<section>
-<section id="section" class="title-slide slide level1 center">
-<h1></h1>
 
 <img data-src="Slides_files/figure-revealjs/unnamed-chunk-3-1.png" width="960" class="r-stretch"></section>
 <section id="autoregressive-integrated-moving-average-arima-model" class="slide level2">
@@ -391,16 +388,10 @@
 </section>
 <section class="slide level2">
 
-<<<<<<< HEAD
 <h3 id="arima-base-and-seasonal-parameters">ARIMA Base and Seasonal Parameters</h3>
 <div style="font-size: 0.75em;">
 <ul>
 <li><p>Base Function Parameters (5,1,1):</p>
-=======
-<h3 id="arima-base-parameters">ARIMA Base Parameters</h3>
-<ul>
-<li>Base Function Parameters (5,1,1):
->>>>>>> 7b4a96e80dc2bba334b920887ab5b711a4dc5cd3
 <ul>
 <li><p>5 - Number of past observations that are used to predict the current value</p></li>
 <li><p>1 - Number of times the current value is subtracted from previous value</p>
@@ -412,15 +403,6 @@
 <li>Uses most recent forecast error to adjust prediction</li>
 </ul></li>
 </ul></li>
-<<<<<<< HEAD
-=======
-</ul>
-</section>
-<section class="slide level2">
-
-<h3 id="arima-seasonal-parameters">ARIMA Seasonal Parameters</h3>
-<ul>
->>>>>>> 7b4a96e80dc2bba334b920887ab5b711a4dc5cd3
 <li><p>Seasonal Function Parameters (2,1,2) and Frequency Term (7):</p>
 <ul>
 <li><p>7 - Number of days the seasonal parameters use when predicting</p></li>
@@ -429,7 +411,6 @@
 <li><p>2 - Number of lagged forecast errors used to predict current values (7, 14 days prior)</p></li>
 </ul></li>
 </ul>
-<<<<<<< HEAD
 </div>
 </section>
 <section class="slide level2">
@@ -451,8 +432,6 @@
 </ul></li>
 </ul>
 </div>
-=======
->>>>>>> 7b4a96e80dc2bba334b920887ab5b711a4dc5cd3
 </section>
 <section id="results" class="slide level2">
 <h2>Results</h2>
@@ -461,11 +440,7 @@
 
 </div>
 </div>
-<<<<<<< HEAD
 </section>
-=======
-</section></section>
->>>>>>> 7b4a96e80dc2bba334b920887ab5b711a4dc5cd3
     </div>
   </div>
 
