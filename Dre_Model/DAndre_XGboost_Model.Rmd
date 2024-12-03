@@ -40,7 +40,11 @@ print(sapply(test_data[, c(lagged_sales_cols, additional_cols), with = FALSE], f
 set.seed(445)
 train_data[sample(.N, size = 0.1 * .N), sales_lag_7 := NA]
 
+<<<<<<< HEAD
 # Split Data into training and validation
+=======
+# Split Data for Cross-Validation
+>>>>>>> 7b4a96e80dc2bba334b920887ab5b711a4dc5cd3
 set.seed(445)
 train_split <- train_data[1:(0.8 * .N)]
 valid_split <- train_data[(0.8 * .N + 1):.N]
@@ -58,7 +62,10 @@ valid_split[, transactions := ifelse(is.na(transactions),
                                      mean(transactions, na.rm = TRUE), 
                                      transactions), 
             by = store_nbr]
+<<<<<<< HEAD
 fwrite(train_split, "DAndre_XGboost_Final_Train.csv")
+=======
+>>>>>>> 7b4a96e80dc2bba334b920887ab5b711a4dc5cd3
 ```
 
 ```{r}
@@ -206,6 +213,7 @@ cat("\nSample of Rolling Average Model Structure:\n")
 rolling_avg_model_dump <- readLines("rolling_avg_model_dump.txt")
 cat(head(rolling_avg_model_dump, 20), sep = "\n")
 ```
+<<<<<<< HEAD
 ```{r}
 
 ```
@@ -283,4 +291,6 @@ predicted_sales_by_day_train <- train_split[, .(total_predicted_sales = sum(pred
 fwrite(predicted_sales_by_day_train, "Predicted_Sales_By_Day_Train.csv")
 
 ```
+=======
+>>>>>>> 7b4a96e80dc2bba334b920887ab5b711a4dc5cd3
 

@@ -1,5 +1,9 @@
 ---
+<<<<<<< HEAD
 title: "Lasso Model"
+=======
+title: "Lauren and Jillian Random Forest Model"
+>>>>>>> 7b4a96e80dc2bba334b920887ab5b711a4dc5cd3
 output: html_document
 date: "2024-11-14"
 ---
@@ -29,8 +33,6 @@ library(doParallel)
 ```
 
 ```{r}
-
-# Load Data
 
 final_train_lags <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data//final_train_lags.csv")
 final_test_lags <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data//final_test_lags.csv")
@@ -78,7 +80,7 @@ final_train_lags <- final_train_lags %>%
 #closeAllConnections()
 #showConnections(all = TRUE)
 
-num_cores <- 100
+num_cores <- 4
 cl <- makeCluster(num_cores)
 registerDoParallel(cl)
 #registerDoSEQ()

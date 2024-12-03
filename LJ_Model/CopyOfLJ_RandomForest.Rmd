@@ -1,5 +1,5 @@
 ---
-title: "Lauren and Jillian Random Forest"
+title: "Lauren and Jillian EDA"
 output: html_document
 date: "2024-11-14"
 ---
@@ -71,12 +71,8 @@ final_train_lags <- final_train_lags %>%
     day = day(date),
     weekday = wday(date),
     is_weekend = if_else(wday(date) %in% c(1, 7), 1, 0)
-<<<<<<< HEAD
-  )
-=======
   ) %>%
   select(-date)
->>>>>>> 7b4a96e80dc2bba334b920887ab5b711a4dc5cd3
 
 str(final_train_lags)
 
@@ -95,50 +91,17 @@ print(na_rows)
 ```{r}
 # Test with subset
 set.seed(123) # Ensures reproducibility
-<<<<<<< HEAD
-#subset_data <- final_train_lags %>% sample_n(1000000)
-=======
 subset_data <- final_train_lags %>% sample_n(1000000)
->>>>>>> 7b4a96e80dc2bba334b920887ab5b711a4dc5cd3
 ```
 
 
 ```{r}
-<<<<<<< HEAD
-
 rf_model <- ranger(
-  formula = sales ~ .,
-  data = final_train_lags,
-=======
-rf_model <- ranger(
-  formula = sales ~ .,
-  data = train_data,
->>>>>>> 7b4a96e80dc2bba334b920887ab5b711a4dc5cd3
-  num.trees = 500,
-  mtry = 7,                  # Adjusted number of features
-  min.node.size = 10,        # Increased target node size
-  importance = "impurity",
-  num.threads = parallel::detectCores()
-)
-
-<<<<<<< HEAD
-  
-# Print model summary
-print(rf_model)
-
-#rf_pred <- predict(rf_model, data = final_train_lags)
-
-#rmsle_val <- rmsle(final_train_lags$sales, rf_pred$predictions)
-#print(rmsle_val)
-=======
-# Cross-validate
-cv_control <- trainControl(method = "cv", number = 5)
-cv_rf <- train(
-  sales ~ .,
-  data = train_data,
-  method = "ranger",
-  trControl = cv_control,
-  tuneGrid = expand.grid(mtry = c(5, 7, 9), min.node.size = c(5, 10, 15), splitrule = "variance")
+  formula = sales ~ .,                 # Specify the formula
+  data = final_train_lags,            # Use the subset data
+  num.trees = 500,                     # Set number of trees (adjust for speed vs. accuracy)
+  importance = 'impurity',             # Measure feature importance (optional)
+  num.threads = parallel::detectCores() # Use all available cores
 )
 
 # Print model summary
@@ -148,7 +111,6 @@ rf_pred <- predict(rf_model, data = final_train_lags)
 
 rmsle_val <- rmsle(final_train_lags$sales, rf_pred$predictions)
 print(rmsle_val)
->>>>>>> 7b4a96e80dc2bba334b920887ab5b711a4dc5cd3
 
 save(rf_model, file = "rf_model.rda")
 ```
@@ -183,25 +145,18 @@ final_test_lags <- final_test_lags %>%
     day = day(date),
     weekday = wday(date),
     is_weekend = if_else(wday(date) %in% c(1, 7), 1, 0)
-<<<<<<< HEAD
-  )
-=======
   ) %>%
   select(-date)
->>>>>>> 7b4a96e80dc2bba334b920887ab5b711a4dc5cd3
 
 str(final_test_lags)
 
 ```
-
-
 ```{r}
 # Load my random forest
-load("rf_model.rda")
-predictions <- predict(rf_model, data = final_test_lags)
+#load("rf_model.rda")
+#predictions <- predict(rf_model, data = final_test_lags)
 
 pred_val <- cbind(final_test_lags, sales_pred = predictions)
-
 
 submission <- pred_val %>%
   select(id, prediction) %>%
@@ -210,19 +165,10 @@ submission <- pred_val %>%
 write.csv(submission, "RF_Model_Submission.csv", row.names = FALSE)
 ```
 
-
 ```{r}
-# Visualize importance of parameters
 vip(rf_model)
 
 ```
-
-```{r}
-random_forest_pred_summarized_ <- pred_val %>% 
-  group_by(date) %>%
-  summarise(total_sales = sum(sales, na.rm = TRUE))
-```
-
 
 
 

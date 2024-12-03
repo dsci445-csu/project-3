@@ -1,0 +1,92 @@
+---
+title: "Lauren and Jillian EDA"
+output: html_document
+date: "2024-11-14"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# install packages and load libraries
+#install.packages("ranger")
+#install.packages("MLmetrics")
+library(parallel)
+library(readr)
+library(dplyr)
+library(leaps)
+library(ggplot2)
+library(glmnet)
+library(ISLR)
+library(dials)
+library(tidymodels)
+library(randomForest)
+library(ranger)
+library(vip)
+library(parsnip)
+
+#detectCores()
+```
+
+```{r}
+# load data
+final_train_lags <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data//final_train_lags.csv")
+
+final_test_lags <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/final_test_lags.csv")
+```
+
+
+```{r}
+
+# include lasso or linear model to "beat"
+# gam or regression spline 
+# fit on families of product
+# minimize the scope
+# scheme to randomly subsample within and over days
+# suggestions: 1. save model output anytime you run it, can't necessarily upload it to github
+# document collaboration using github
+# names of the commits
+# use the same data frame
+
+# "stochastic gradient descent" theory random subsets
+# multiple randomly selected subsets
+
+# set the number of cores (64) in parallel to a larger value
+
+# Step 4): Create random forest with all predictors and chosen lags
+
+
+# Set up random forest specification with tuning parameters
+rf_recipe <- recipe(sales ~ ., data = final_train_lags)
+
+# stopping criteria to reduce size of trees rather than # of trees
+num_cores = 256
+
+rf_model <- rand_forest(
+  mtry = (ncol(final_train_lags) - 1),
+  min_n = 20
+) %>%
+  set_engine("ranger", num.threads = num_cores, max.depth = 10) %>%  # Limit tree depth
+  set_mode("regression")
+
+workflow <- workflow() %>% 
+  add_recipe(rf_recipe) %>% 
+  add_model(rf_model)
+
+
+# Fit the Model on Training Data
+final_model <- fit(workflow, data = final_train_lags)
+
+# Predict on Train Data to get RMSLE
+train_predictions <- predict(final_model, new_data = final_train_lags)
+
+# Evaluate Predictions
+train_metrics <- final_train_lags %>%
+  bind_cols(train_predictions) %>%
+  metrics(truth = sales, estimate = .pred)
+
+# If you want to use RMSLE, you can compute it like so:
+train_rmsle <- rmsle(train_metrics$.pred,train_metrics$sales)
+print(train_rmsle)
+```

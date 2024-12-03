@@ -112,9 +112,6 @@ checkresiduals(model)
 ```
 
 ```{r}
-
-head(forecasted_sales)
-
 ```
 
 ```{r}

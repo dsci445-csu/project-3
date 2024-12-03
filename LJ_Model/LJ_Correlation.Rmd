@@ -12,6 +12,14 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 # install.packages("tseries")
 # install.packages("corrplot")
+
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+```{r}
+install.packages("tseries")
+install.packages("corrplot")
 library(tseries)
 library(corrplot)
 ```
@@ -122,5 +130,30 @@ corrplot(
   number.cex = 0.7, 
   col = colorRampPalette(c("blue", "white", "red"))(200)
 )
+# Convert 'family' factor to numeric
+final_train_lags$family <- as.numeric(as.factor(final_train_lags$family))  
+
+# Convert 'type' factor to numeric
+final_train_lags$type <- as.numeric(as.factor(final_train_lags$type))  
+
+# Replace NA values with 0 for all columns
+final_train_lags[is.na(final_train_lags)] <- 0
+
+# Check the structure of the final dataset to confirm the changes
+str(final_train_lags)
+```
+
+
+
+```{r}
+# Create correlation matrix and plot as a heat map
+numeric_final_train_lags <- final_train_lags %>% select_if(is.numeric)
+
+# Create correlation matrix
+cor_matrix <- cor(numeric_final_train_lags, use = "complete.obs")
+
+# Plot the correlation matrix as a heatmap
+corrplot(cor_matrix, method = "color", type = "upper", tl.col = "black", tl.srt = 45, 
+         addCoef.col = "white", number.cex = 0.7, col = colorRampPalette(c("blue", "white", "red"))(200))
 ```
 
