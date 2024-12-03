@@ -26,7 +26,7 @@ library(grid)
 
     ![](images/clipboard-1235366002.png){width="213" height="76"}![](images/clipboard-765528567.png){width="231"}
 
--   Competition Link: \<https://www.kaggle.com/competitions/store-sales-time-series-forecasting
+-   Competition Link: [Store Sales Time Series Forecasting](https://www.kaggle.com/competitions/store-sales-time-series-forecasting)
 
 ## Description of Data
 
@@ -173,38 +173,34 @@ grid.raster(vip_plot, width = unit(1, "npc"), height = unit(1, "npc"))
 ```
 
 ::: {style="font-size: 0.8em;"}
-
 ## Reasoning for XGBoost
 
-- XGBoost builds models iteratively, focusing on improving the performance of the previous model by learning from its errors.
-- Exceptional ability to handle large datasets.
-- Effectively manages complicated nonlinear relationships.
+-   XGBoost builds models iteratively, focusing on improving the performance of the previous model by learning from its errors.
+-   Exceptional ability to handle large datasets.
+-   Effectively manages complicated nonlinear relationships.
 
-1. **XGBoost's Native Handling**:
-    - Automatically recognizes and handles missing values during training.
-    - Utilizes a sparsity-aware algorithm to navigate missing data effectively.
-
-2. **Rolling Average Imputation**:
-    - Smoothens short-term fluctuations in lagged features.
-    - Calculates the mean over a specific window (e.g., 7 days) for imputation.
-    - Maintains temporal patterns in the data.
-
+1.  **XGBoost's Native Handling**:
+    -   Automatically recognizes and handles missing values during training.
+    -   Utilizes a sparsity-aware algorithm to navigate missing data effectively.
+2.  **Rolling Average Imputation**:
+    -   Smoothens short-term fluctuations in lagged features.
+    -   Calculates the mean over a specific window (e.g., 7 days) for imputation.
+    -   Maintains temporal patterns in the data.
 :::
 
 ## Training Native Handling Model
+
 ```{r fig.width = 12, fig.height = 10, out.align= "center"}
 
 code_chunk <- readPNG("/data/accounts/fa24/garretthayden/DSCI445/FinalProject2/Dre_Model/tree.png")
 
 # Display the image
-grid.raster(code_chunk, width = unit(1, "npc"), height = unit(1, "npc"))
+grid.raster(code_chunk)
 
 ```
-```
-
-
 
 ## XGBoost
+
 ```{r fig.width = 12, fig.height = 10, out.align= "center"}
 
 xgboost_tree <- readPNG("/data/accounts/fa24/garretthayden/DSCI445/FinalProject2/Dre_Model/image.png")
