@@ -1,0 +1,121 @@
+---
+title: "Store Sales - Time Series Forecasting"
+subtitle: "DSCI 445: Group 3"
+author: "Lauren Bair, Jillian Cook, Garrett Hayden, D'Andre Tafoya"
+output: pdf_document
+date: "2024-12-03"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Motivation
+
+### Kaggle Competition
+
+The goal of this competition is to use time-series forecasting to forecast store sales on data from Corporación Favorita, a large Ecuadorian-based grocery retailer. Specifically, we are tasked with building a model that accurately predicts the unit sales for thousands of items sold at different Favorita stores. It is an indefinite competition with a rolling leaderboard, meaning there is no incentive for prizes or points and it is just a space to collaborate and compete on machine learning problems. At the time of this project, there are 17,236 entrants and 3,103 submissions. Submissions are evaluated and ranked based on the Root Mean Squared Logarithmic Error (RMSLE).
+
+---
+
+# Description of Data
+
+With this being a Kaggle competition, we were given a starting set of structured data: a train dataset, a test dataset, and four additional datasets with supporting information. The datasets with the associated columns are as follows:
+
+#### Train Data
+- `store_nbr`: Store at which products are sold (<dbl>)
+- `family`: Type of product sold (<chr>)
+- `sales`: Total sales for a product family at a particular store on a given date (<dbl>, target feature)
+- `onpromotion`: Total number of items in a product family that were being promoted at a store on a given date (<dbl>)
+
+#### Test Data
+- `store_nbr` (<dbl>)
+- `family` (<chr>)
+- `onpromotion` (<dbl>)
+
+#### Additional Data
+- `stores.csv`: Contains store location details
+- `oil.csv`: Contains daily oil prices
+- `transactions.csv`: Contains store transaction counts
+- `holidays_events.csv`: Contains holiday and event details
+
+Overall, we are working with over 3,000,000 rows of data (train.csv alone contains 3,000,888 observations). Therefore, as one can see, this is a sufficient amount of multivariate data. The goal of the first stage, data preparation and cleaning, is to include as much information as possible in our training and test set, while also ensuring that columns are correctly and accurately transferred and merged between datasets. 
+
+Another important and complex component of this time-series competition is, of course, time and dates. The training data contains information between 2013-01-01 and 2017-08-15, while the test data contains information between 2017-08-16 and 2017-08-31. There is therefore no overlap in time between the training and test sets, and the goal is to forecast sales for the two week period following the final training set date. 
+
+---
+
+# Methodology
+
+## Data Preparation
+
+In order to build our models, we needed to ensure our testing and training datasets reflected the disparate datasets provided by Kaggle. We did a series of data merges during our cleaning process, using date as the common key in many cases. For our datasets containing store information, transactions, and holiday events, however, more complex merging procedures were required. In the case of holiday events, we had to incorporate geographical data (city, region, nation) to determine which stores were impacted. To reflect the effect of holidays on sales, we created a boolean flag to indicate the presence of a city, regional, or national event and merged it into our larger dataset on geographical marker and date. For store number and transactions, we used store information rather than dates to combine the datasets; critically, the order of these merges enabled more complex merges of remaining datasets. 
+
+---
+
+## Time Series Considerations (Lags)
+
+Because our data is time series, there is serial dependence between observations. This means that each observation is directly influenced by the preceding observations. Dependence in observations directly violates the assumption of independence in traditional regression methods. For this reason, we incorporated a series of lagged sales variables designed to model the influence of past observations on our response variable. We decided to include eight lag variables, each chosen to represent a period of time that could represent seasonal trends. For our analysis, we introduced lags at intervals of 1, 7, 14, 30, 60, 90, 180, and 365 days. 
+
+---
+
+## Model #1: Lasso
+
+The main purpose of our lasso model was for model comparison. With lasso being a linear model, it provides a qualified baseline to compare our other models, such as Random Forest and Extreme Gradient Boosting, against. In this type of model, the lasso shrinks the coefficient estimates towards zero, in a process more specifically known as regularization. This shrinkage, therefore, is lasso’s way of performing variable selection and producing a model with only a subset of variables. The amount of shrinkage that occurs, in other words the degree of regularization that occurs, depends on the penalty factor also known as $\lambda$. Ideally, and as in our case, $\lambda$ is chosen using cross validation, which helps us determine which value of lambda will produce the “best” model, evaluated by cross validation error.
+
+Now with the framework of a general lasso model in mind, we can move to the extension to our own lasso model for this project. One drawback of the lasso model is its inability to handle categorical and non-numeric variables. I had to transform city, state, and type to factor variables in the pre-processing stage, among other data pre-processing mutations. Another important step in a lasso model is normalizing all predictor variables, which occurs in the step_normalize() function in the lasso recipe. Tuning of the model then occurred using cross validation and a lambda grid, after which I was able to fit the final lasso model with the optimal value of lambda, evaluated on RMSE. Due to computational considerations, I built my lambda grid with a specified range and restricted the levels to 20. This is a moderately sized grid that was able to reduce computational complexity, which I was satisfied with knowing that this would not be a superior model for the data anyways. 
+
+After tuning, and fitting, I was finally able to extract the results. The optimal lambda value was 1e-04, and the amount of predictors was subset from 153 to 85. To note, the large amount of predictors in comparison to our original data is due to the as.factor() transformation of many predictors, forcing each factor level to become its own predictor. Although the value of lambda was relatively low, variable selection still occurred and reduced the predictor space by almost half. The test RMSLE was 1.778 and put be at 615/742 on the Kaggle leaderboard.
+
+---
+
+## Model #2: ARIMA
+
+The second model that we decided to use for this project was an ARIMA model, which is a model that we have not discussed in class but that we thought would provide a promising opportunity to work with the time series data. ARIMA stands for Autoregressive Integrated Moving Average and its main goal is to “use time series data to either better understand the data set or predict future trends” (Hayes). For us, this meant that an ARIMA model would hopefully be able to better handle the time series data that we were using and could then use its understanding of the data to make predictions if we set the parameters of the model to the correct values. It also meant that, since we had a consistent stream of sales data over multiple years for Corporación Favorita and could see trends, future sales would most likely be more correlated to past sales which is exactly what ARIMA models are used for. ARIMA models are also extremely valuable when it comes to autocorrelation, which is “the degree of correlation of the same variables between two successive time intervals” (Taylor). Essentially, this means that ARIMA models can use a lagged value of a variable and compare it to the original value to optimally find patterns in the data that are related to specific time periods. This was especially valuable when it came to this data set because we needed to identify whether weekly or yearly trends (or both) impacted the overall sales data. The structure of an ARIMA model comes down to the actual code itself and the different parameters that we included within the model to attempt to better capture the relationships in the data. In our model specifically, it can be seen that there are 3 integers next to the ARIMA residual plots in the form [5,1,1]. In this case the “ARIMA” function was taken from the “forecast” package, and 5, 1, and 1 are the main parameters of the model. The 5 specifies the number of past observations that are used to predict the current value it is tracking and is called the autoregressive term. The first 1 is used to make sure the time series is “differenced” (previous value subtracted from current value.) once so that the data then becomes stationary. It is extremely important for time series data to be stationary because this ensures that “mean, variance, and autocorrelation — remain unwavering over time. . . [ARIMA] models rely on the constancy of statistical properties like mean and variance over time. Non-stationary data can lead to unreliable model outputs and inaccurate predictions, just because the models aren’t expecting it” (Tate). For this specific model, we found that just one differencing of the data was enough to create a solid stationary base for the model to predict on. The second 1 in the model is the number of lagged forecast errors that are used to predict. With a value of one, this means that the model uses the most recent error to adjust its prediction, and a value of one also makes sure that overfitting is avoided. With this lagged forecast error set to 1 the model can better understand patterns outside of the scope of the first two parameters and can better predict values that are not accounted for by differencing or the autoregressive term. These components are the base of the ARIMA model in general, but for our specific project we also used a more advanced version of the model which implements seasonal parameters to further increase prediction accuracy and data understanding. The seasonal parameters follow the same patterns as the original model, with the the second set of parameters (2,1,2) being the seasonal terms and the [7] being the frequency term. The 7 is the driving factor for how the seasonal terms are used within the model, meaning the first 2 represents 2 lagged terms for 7 and 14 days respectively, the 1 once again represents a single difference for the current term minus the term from 7 days prior, and the second 2 represents two lagged forecast errors from 7 and 14 days prior. Using both the base ARIMA parameters as well as the seasonal capability of the ARIMA model within the forecast package allowed us to tweak the model in many different ways to help with our final predictions. This also allowed us to better capture autocorrelation and seasonal properties within the time series data and optimized our analysis process to better forecast these predictions and understand the nuances of the data. 
+Throughout the trial and error process of this model the most common issue that was difficult to overcome was the actual tweaking of the ARIMA parameters to reduce autocorrelation in residuals. Even with the seasonal 1 parameters allowing us to better capture the time series trends within the data, specific lags throughout each iteration of the model were experiencing significant residual autocorrelation that drastically fell beyond the bounds of the 95% confidence interval that was being used. This was an indication to us that the models that we were testing weren’t actually capturing the entirety of the time dependent patterns that were present in the data, and because of this our submissions to the competition were garnering an extremely high RMLSE. The first submission received a score of 10.27155, further confirming our need for the model to better understand the structure of the seasonal patterns through some other means of analysis. Our solution to this problem actually came from the prerequisite course that Kaggle recommends to users when engaging in this competition, the “Time Series” course. In that course the use of Fourier features is explained as “pairs of sine and cosine curves, one pair for each potential frequency in the season starting with the longest” (Holbrook). Essentially, for each Fourier feature in our model (K = 3), there is a sine and cosine pairing that then attempts to capture increasingly granular time series patterns within the specified frequency. In this case, with the frequency being 7 (days), the first pair of sine and cosine curves attempts to capture the most basic cyclic pattern within the 7 day cycle. The second feature then looks for the next pattern within a more constrained period such as a mid week pattern. Finally, the third feature goes even deeper into the data and looks for even finer patterns that could contribute to the overall model’s understanding of the data. While Fourier features are more commonly used for annual time series patterns, in our case, our base ARIMA model wasn’t able to capture all of the weekly patterns that were occurring throughout this period. After we added the K=3 Fourier features to the model, our overall RMLSE went down significantly to a value of 3.93254. This decrease in the error term of the model was almost entirely caused by the introduction of the Fourier terms, and proved that these features coupled with our base seasonal ARIMA model provided a strong understanding of the time series patterns within the data set. The other main issue that we encountered while trying to improve the model was the fact that we needed to train the model on the entirety of the sales data which spans two variables. The first being the store_nbr variable which was the sales for individual stores, and the second being the family variable which was the sales for different product categories. In order for us to simplify the analysis and training of the model, we aggregated these two variables to create a total sales metric that was the sum of the two variables by day. This allowed for the ARIMA model to fully capture the entirety of sales on each given day and then predict on that data. This greatly increased the simplicity of the model process, because we didn’t have to train multiple models on the different variables, but it also created an issue when trying to output the predicted values for submission. Since this sales data was now aggregated, we couldn’t just put these values back into our output to then turn into the competition. Instead, we had to disaggregate the data back into its original form so that there were individual predictions for each ID. Unfortunately, in order to do this, we had to then find a solution as to how we would represent the sales data for both the variables in the final submission. A more advanced solution could have been a Bayesian data structure that could have shared information about the entirety of the data set across two separate models, which would have then not required the aggregation of the data in the first place. However, this was not something that we had the knowledge to do, and would have been outside the scope of this class. Instead, we found that finding a general proportion of total sales for both the store_nbr and family variables and then using that proportion to estimate the percentage of daily total sales in our final submission would be the simplest option. By doing this, we could then have a standard factor of sales between the two variables which would reduce the skewing of total sales data by either one of the variables. This method is definitely not the most precise or efficient use of the ARIMA model, but it did allow us to try to reduce the overall bias that we had created by aggregating the data in the first place. Overall, these were our two main issues that came up throughout our analysis and model creation, and they were difficult issues to tackle as we had to find new solutions to a model that we had not worked with before. However, our understanding of the model itself and as well as our research on different solutions such as Fourier features allowed us to create a simple ARIMA model that predicted quite well given our limited knowledge of the subject. 
+
+---
+
+## Model #3: Random Forest
+
+The third model we decided to fit for our analysis was a Random Forest. We decided that this model would be appropriate because of its capacity to handle large amounts of data accurately despite potential missingness. Further, once we introduced our lag variables to account for dependency, the natural feature selection ability of the Random Forest enabled us to better understand the importance of lags in predicting our sales values. Although Random Forest is not specifically designed for time series analysis, by using lag variables as features, we could still leverage it effectively for this task. These lag variables allowed the model to learn from the past observations (e.g., sales values from the previous 1, 7, 14, etc., days) and understand how those past values influence the target (future sales). 
+
+A downside to this model with regards to our specific problem is the computational complexity that can come with building and tuning an appropriate number of trees. We experienced computational difficulties when initially attempting to fit the data as we were also attempting to tune hyperparameters for a more robust fit. Run times at this stage were upwards of 1 hour and yielded inaccuracies that caused us to return to a more elementary Random Forest model. In particular, we struggled when attempting to tune parameters like the optimal number of trees (n_estimators) and the maximum tree depth (max_depth). We decided to adapt our model so our number of trees could remain as high as possible (we stuck with the default value of 500) because the performance of Random Forest improves with a larger number of trees. We evaluated the model using metrics such as RMSLE and R^2, both of which indicated that the model was able to capture significant patterns in the data. 
+
+---
+
+## Model #4: Extreme Gradient Boosting
+
+We decided to make an Extreme Gradient Boosting (XGboost) model because of its exceptional ability to handle large datasets as well as its ability to handle complicated nonlinear relationships. These abilities stem from its gradient boosting framework. Another factor that helped us make our decision to use XGboost is its ability to find the features that are most important through decision trees. I utilized the training data that Lauren and Jillian created with lags to make the model work better with our seasonal times series data.
+	The training data was initially very messy. The columns were riddled with NA values. I created two XGboost models to handle the missing data.  The first model was the native handling contained within the XGboost package.  The second was a model that utilized imputations. I called this my Rolling Average model. The model that I am primarily focusing on is the Native handling model because my goal of my part of this project is to emphasize the capabilities of XGboost. The Rolling Average Model utilizes XGboost but it is much simpler and only contains imputations which I find boring. The columns that had the most missingness were the lag variables, transactions, and dcoilwtico. I did not include the variables city, holiday, and type because I was having problems implementing them into my D-Matrix. These columns also appeared the weakest in revealing trends. I kept dcoilwtico which represented oil price because oil prices can influence consumer spending and transportation costs. 
+	I used the native handling model because it leveraged XGboost’s built-in capability to handle missing values. Parameters such as max_depth and eta were used to balance the model’s complexity and help with predictive accuracy. The early stopping was utilized to prevent overfitting. The only variable I did not apply this native handling to was transactions. It was more appropriate to use a mean value imputation on this variable to prevent overfitting. The best iteration of this XGboost model produced a train-rmse: of 196.204 and validation-rmse of 309.543.  The RMSLE for the Native Handling Model was 0.711.
+	The Rolling Average model’s handling of missingness uses rolling averages for all columns. The results from this model were very surprising because they performed better than the Native Handling Model. The best iteration of this XGboost model produced a train rmse of 221.38 and a validation rmse of 307.092. The RMSLE for this model is 0.684. The primary drawback of this model that makes me question this approach is that we are “double smoothing” the data since we are computing a rolling average of our lags.
+	Overall the XGBoosting approach using lagged training data was effective and produced computational efficiency with predictive accuracy. Although the simple Rolling Average imputation model performed better, the Native Handling model showcased XGboost’s ability to manage missing data effectively. This analysis was very beneficial to further advance my understanding of XGboost and prediction methodologies with seasonal time series data.
+
+---
+
+# Results
+
+| Model                     | RMSLE | Ranking |
+|---------------------------|-------|---------|
+| ARIMA                     | 3.933 | 716     |
+| Lasso                     | 1.778 | 615     |
+| Random Forest             | 0.698 | 468     |
+| XGBoost (Native Handling) | 0.711 | N/A     |
+| XGBoost (Rolling Average) | 0.684 | N/A     |
+
+---
+
+# Conclusion
+
+As you can see, the success of our results evaluated based on test RMSLE are consistent based on our intuitions. Both the lasso and ARIMA models performed relatively poorly, due to their limitations in linearity and time series variables, respectively.
+
+---
+
+# References
+
+1. Hayes, Adam. “Autoregressive Integrated Moving Average (ARIMA) Prediction Model.” Investopedia.
+2. Taylor, Sebastian. “Autocorrelation.” Corporate Finance Institute.
+3. Tate, Andrew. “Understanding the Importance of Stationarity in Time Series.” Hex.
+4. Holbrook, Ryan. “Store Sales - Time Series Forecasting.” Kaggle.
+5. “XGBoost R Tutorial.” XGBoost Documentation.

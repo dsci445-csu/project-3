@@ -44,6 +44,8 @@ LJ_Model/*.rda
 LJ_Model/Lasso_Model.rds
 Dre_Model/DAndre_XGboost_Final_Train.csv
 LJ_Model/RF_Model_Submission.csv
+Dre_Model/DAndre_XGboost_Submission.csv
+LJ_Model/CopyOfRF_Model_Submission.csv
 # Slides
 Slides.qmd
 
