@@ -1,0 +1,188 @@
+---
+title: "Lasso Model"
+output: html_document
+date: "2024-11-14"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+
+# GIT COMMANDS
+# git add _____/
+# git commit -m "Message"
+# git push origin main
+
+library(readr)
+library(dplyr)
+library(leaps)
+library(ggplot2)
+library(glmnet)
+library(ISLR)
+library(dials)
+library(tidymodels)
+library(parallel)
+library(doParallel)
+
+```
+
+```{r}
+
+# Load Data
+
+final_train_lags <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data//final_train_lags.csv")
+final_test_lags <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data//final_test_lags.csv")
+
+```
+
+```{r}
+
+# Prepare Training Data
+
+final_train_lags <- final_train_lags %>%
+  mutate(national_holiday = ifelse(is.na(national_holiday), 0, national_holiday),
+         state_holiday = ifelse(is.na(state_holiday), 0, state_holiday),
+         city_holiday = ifelse(is.na(city_holiday), 0, city_holiday))
+
+final_train_lags <- final_train_lags %>%
+  mutate(store_nbr = factor(store_nbr), family = factor(family), city = factor(city), state = factor(state), type = factor(type))
+
+final_train_lags <- final_train_lags %>%
+  arrange(date) %>%
+  fill(dcoilwtico, .direction = "down")%>%
+  fill(dcoilwtico, .direction = "up")
+
+final_train_lags <- final_train_lags %>%
+  arrange(date) %>%
+  fill(transactions, .direction = "down")%>%
+  fill(transactions, .direction = "up")
+
+final_train_lags <- final_train_lags %>%
+  mutate(
+    year = year(date),
+    month = month(date),
+    day = day(date),
+    weekday = wday(date),
+    is_weekend = if_else(wday(date) %in% c(1, 7), 1, 0)
+  ) %>%
+  select(-date)
+
+```
+
+```{r}
+
+# Perform Lasso
+
+#closeAllConnections()
+#showConnections(all = TRUE)
+
+num_cores <- 100
+cl <- makeCluster(num_cores)
+registerDoParallel(cl)
+#registerDoSEQ()
+
+lag_recipe <- recipe(sales ~ ., data = final_train_lags) %>%
+  step_dummy(all_nominal_predictors(), one_hot = TRUE) %>%
+  step_impute_median(all_numeric_predictors()) %>%
+  step_normalize(all_numeric_predictors())
+
+cv <- vfold_cv(final_train_lags, v = 10)
+lambda_grid <- grid_regular(penalty(range = c(-4, 0)), levels = 20)
+
+lasso_spec <- linear_reg(mixture = 1, penalty = tune()) %>%
+  set_mode("regression") %>%
+  set_engine("glmnet")
+
+lasso_workflow <- workflow() %>%
+  add_model(lasso_spec) %>%
+  add_recipe(lag_recipe)
+
+lasso_tune <- lasso_workflow %>%
+  tune_grid(
+    resamples = cv,
+    grid = lambda_grid,
+    metrics = metric_set(rmse),
+    control = control_grid(verbose = TRUE, save_pred = TRUE)
+  )
+
+lasso_final <- finalize_workflow(lasso_workflow, select_best(lasso_tune, metric = "rmse"))
+lasso_fin_fit <- fit(lasso_final, data = final_train_lags)
+
+# Saving Model
+saveRDS(lasso_fin_fit, "Lasso_Model.rds")
+
+```
+
+```{r}
+
+# Collect Metrics
+
+results <- collect_metrics(lasso_tune)
+results_rmse <- results %>% filter(.metric == "rmse")
+
+ggplot(results_rmse, aes(x = penalty, y = mean)) +
+  geom_line() +
+  geom_point() +
+  scale_x_log10() +
+  labs(x = expression(lambda), y = "CV Error (Mean RMSE)", title = "CV Error vs. Lambda")
+
+best_lambda <- show_best(lasso_tune, metric = "rmse", n = 1)
+lasso_coef <- tidy(lasso_fin_fit)
+
+print(best_lambda)
+print(lasso_coef)
+
+```
+
+
+```{r}
+
+# Prepare Test Data
+
+final_test_lags <- final_test_lags %>%
+  mutate(national_holiday = ifelse(is.na(national_holiday), 0, national_holiday),
+         state_holiday = ifelse(is.na(state_holiday), 0, state_holiday),
+         city_holiday = ifelse(is.na(city_holiday), 0, city_holiday))
+
+final_test_lags <- final_test_lags %>%
+  mutate(store_nbr = factor(store_nbr), family = factor(family), city = factor(city), state = factor(state), type = factor(type))
+
+final_test_lags <- final_test_lags %>%
+  arrange(date) %>%
+  fill(dcoilwtico, .direction = "down")%>%
+  fill(dcoilwtico, .direction = "up")
+
+final_test_lags <- final_test_lags %>%
+  arrange(date) %>%
+  fill(transactions, .direction = "down")%>%
+  fill(transactions, .direction = "up")
+
+final_test_lags <- final_test_lags %>%
+  mutate(
+    year = year(date),
+    month = month(date),
+    day = day(date),
+    weekday = wday(date),
+    is_weekend = if_else(wday(date) %in% c(1, 7), 1, 0)
+  ) %>%
+  select(-date)
+
+```
+
+```{r}
+
+# Kaggle Submission
+
+pred_val <- 
+  lasso_fin_fit %>% 
+  augment(new_data = final_test_lags)
+
+submission <- pred_val %>% 
+  select(id, .pred) %>% 
+  rename(sales = .pred)
+
+write.csv(submission, file = "/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/LJ_Model/Lasso_Model_Submission.csv", row.names = FALSE)
+
+```

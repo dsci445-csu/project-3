@@ -1,0 +1,41 @@
+```{r}
+library(readr)
+library(dplyr)
+
+# Get preexisting sales values to compare to the forecasts
+
+final_train <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data//final_train.csv")
+
+# summarize sales by date
+final_train_summarized <- final_train %>% 
+  group_by(date) %>%
+  summarise(total_sales = sum(sales, na.rm = TRUE))
+
+# write to csv
+write.csv(final_train_summarized, "/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data/Forecast Data/train_summarized_sales.csv", row.names = FALSE)
+
+```
+```{r}
+# Lasso Test Sales Summarized by Date
+
+```
+
+
+```{r}
+# Random Forest Test Sales Summarized by Date
+
+```
+
+
+```{r}
+# XGBoost Test Sales Summarized by Date
+
+```
+
+```{r}
+# SARIMA Test Sales Summarized by Date
+
+```
+
+
+

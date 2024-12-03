@@ -1,0 +1,126 @@
+---
+title: "Lauren and Jillian EDA"
+output: html_document
+date: "2024-11-14"
+---
+
+```{r setup, include=FALSE}
+rm(list = ls()) 
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# install.packages("tseries")
+# install.packages("corrplot")
+library(tseries)
+library(corrplot)
+```
+
+
+```{r}
+# load data
+final_train_lags <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/Group3FinalProject/Data//final_train_lags.csv")
+```
+
+
+```{r}
+# dickey fuller test of stationarity of sales
+
+sales_ts <- final_train_lags$sales
+
+adf_result <- adf.test(sales_ts, alternative = "stationary")
+
+print(adf_result)
+```
+
+
+```{r}
+# Ensure predictors are numeric before creating a correlation matrix
+
+# Check structure of training dataset
+str(final_train_lags)
+
+final_train_lags <- final_train_lags %>%
+  mutate(national_holiday = ifelse(is.na(national_holiday), 0, national_holiday),
+         state_holiday = ifelse(is.na(state_holiday), 0, state_holiday),
+         city_holiday = ifelse(is.na(city_holiday), 0, city_holiday))
+
+final_train_lags <- final_train_lags %>%
+  mutate(store_nbr = factor(store_nbr), family = factor(family), city = factor(city), state = factor(state), type = factor(type)) %>%
+        dplyr::mutate(across(where(is.factor), as.integer))
+
+final_train_lags <- final_train_lags %>%
+  arrange(date) %>%
+  fill(dcoilwtico, .direction = "down")%>%
+  fill(dcoilwtico, .direction = "up")
+
+final_train_lags <- final_train_lags %>%
+  arrange(date) %>%
+  fill(transactions, .direction = "down")%>%
+  fill(transactions, .direction = "up")
+
+final_train_lags <- final_train_lags %>%
+  drop_na(sales_lag_1, sales_lag_7,sales_lag_30,sales_lag_60,sales_lag_90,sales_lag_180,sales_lag_365)
+
+final_train_lags <- final_train_lags %>%
+  mutate(
+    year = year(date),
+    month = month(date),
+    day = day(date),
+    weekday = wday(date),
+    is_weekend = if_else(wday(date) %in% c(1, 7), 1, 0)
+  ) %>%
+  select(-date)
+
+# Check the structure of the final dataset to confirm the changes
+str(final_train_lags)
+
+```
+
+```{r}
+# check for na values
+na_rows <- final_train_lags %>%
+  filter(if_any(everything(), is.na))
+
+print(na_rows)
+```
+
+
+```{r}
+# Check cardinality 
+categorical_columns <- select(final_train_lags, store_nbr, family, city, state, type)
+
+# Count unique values for each column
+cardinality <- sapply(categorical_columns, n_distinct)
+
+# Print cardinality
+print(cardinality)
+
+cardinality_ratio <- cardinality / nrow(final_train_lags)
+
+# Print ratio
+print(cardinality_ratio)
+```
+
+
+
+
+```{r, fig.width=10, fig.height=10}
+# Create correlation matrix and plot as a heat map
+
+# Create correlation matrix
+cor_matrix <- cor(final_train_lags, use = "complete.obs")
+
+# Plot the correlation matrix as a heatmap
+corrplot(
+  cor_matrix, 
+  method = "color", 
+  type = "full", 
+  tl.col = "black", 
+  tl.srt = 45, 
+  addCoef.col = "black", 
+  number.cex = 0.7, 
+  col = colorRampPalette(c("blue", "white", "red"))(200)
+)
+```
+
