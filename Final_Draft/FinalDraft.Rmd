@@ -55,7 +55,14 @@ In order to build our models, we needed to ensure our testing and training datas
 
 ## Time Series Considerations (Lags)
 
-Because our data is time series, there is serial dependence between observations. This means that each observation is directly influenced by the preceding observations. Dependence in observations directly violates the assumption of independence in traditional regression methods. For this reason, we incorporated a series of lagged sales variables designed to model the influence of past observations on our response variable. We decided to include eight lag variables, each chosen to represent a period of time that could represent seasonal trends. For our analysis, we introduced lags at intervals of 1, 7, 14, 30, 60, 90, 180, and 365 days. 
+Time series data inherently involves serial dependence, meaning each observation is directly influenced by the preceding observations. The serial dependence poses issues as it directly violates the assumption of independence in traditional regression methods. Our goal of this project was to maximize accuracy in our forecast of store sales across stores and departments in Ecuador over a period of 15 days. Given the time-sensitive nature of our problem, sales patterns are inherently tied to temporal trends. For this reason, we incorporated a series of lagged sales variables designed to model the influence of past observations on our response variable. We decided to engineer seven lag variables, each chosen to represent a period of time that could represent seasonal trends. For our analysis, we introduced lags at the following intervals:
+
+- **1 Day**: Captures the effect of previous day’s sales and potential spillover or momentum from one day to the next.
+- **7 Days**: Can capture weekly trends in sales. For instance, spending on the weekend might be consistently higher than on the weekdays.
+- **30, 60, and 90 Days**: Longer-term lags to capture monthly and quarterly trends which could indicate consumer behavioral patterns or seasonal product cycles.
+- **180 and 365 Days**: Longest lags that capture annual and biannual consumer spending patterns. For example, it is a common phenomenon in many retail sectors that sales spike during the December holiday season and drastically reduce during January.
+
+Our initial plan was to utilize a Lasso on our lag variables as a manner of feature selection before adding the most predictive lags to our training dataset. However, because many of our models inherently perform feature selection and we used a small number of logically determined lag features, we decided to retain each lag.
 
 ---
 
@@ -78,9 +85,10 @@ Throughout the trial and error process of this model the most common issue that 
 
 ## Model #3: Random Forest
 
-The third model we decided to fit for our analysis was a Random Forest. We decided that this model would be appropriate because of its capacity to handle large amounts of data accurately despite potential missingness. Further, once we introduced our lag variables to account for dependency, the natural feature selection ability of the Random Forest enabled us to better understand the importance of lags in predicting our sales values. Although Random Forest is not specifically designed for time series analysis, by using lag variables as features, we could still leverage it effectively for this task. These lag variables allowed the model to learn from the past observations (e.g., sales values from the previous 1, 7, 14, etc., days) and understand how those past values influence the target (future sales). 
-
+The third model we decided to fit for our analysis was a Random Forest. We decided that this model would be appropriate because of its capacity to handle large amounts of data accurately despite potential missingness. Further, once we introduced our lag variables to account for dependency, the natural feature selection ability of the Random Forest enabled us to better understand the importance of lags in predicting our sales values. Although Random Forest is not specifically designed for time series analysis, by using lag variables as features, we could still leverage its predictive power for this task. These lag variables allowed the model to learn from the past observations (e.g., sales values from the previous 1, 7, 14, etc., days) and understand how those past values influence the target (future sales). 
 A downside to this model with regards to our specific problem is the computational complexity that can come with building and tuning an appropriate number of trees. We experienced computational difficulties when initially attempting to fit the data as we were also attempting to tune hyperparameters for a more robust fit. Run times at this stage were upwards of 1 hour and yielded inaccuracies that caused us to return to a more elementary Random Forest model. In particular, we struggled when attempting to tune parameters like the optimal number of trees (n_estimators) and the maximum tree depth (max_depth). We decided to adapt our model so our number of trees could remain as high as possible (we stuck with the default value of 500) because the performance of Random Forest improves with a larger number of trees. We evaluated the model using metrics such as RMSLE and R^2, both of which indicated that the model was able to capture significant patterns in the data. 
+Our first model, with tuned hyperparameters, yielded a training RMSLE of approximately 16.16, indicating a poorly fit model. After returning to a simpler Random Forest, the training RMSLE was reduced to 0.34. Similar increases were seen in the R^2 values, with the variation accounted for by the model jumping from 0.63 in the first model to 0.96 in the final model.
+
 
 ---
 
