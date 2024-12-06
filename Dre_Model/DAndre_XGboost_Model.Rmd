@@ -162,7 +162,7 @@ cat("Rolling Average RMSLE:", rmsle_imputed, "\n")
 # Visualize Trees and Dump Model Structure
 
 # Visualize Trees
-cat("Visualizing the first tree for Native Handling Model...\n")
+cat("Visualizing the first tree for Native Handling Model\n")
 xgb.plot.tree(
   model = model_native,
   feature_names = features,
@@ -170,7 +170,7 @@ xgb.plot.tree(
   render = TRUE
 )
 
-cat("Visualizing the first tree for Rolling Average Model...\n")
+cat("Visualizing the first tree for Rolling Average Model\n")
 xgb.plot.tree(
   model = model_imputed,
   feature_names = features,
@@ -179,14 +179,14 @@ xgb.plot.tree(
 )
 
 # Dump Model Structure
-cat("Dumping the model structure for Native Handling Model...\n")
+cat("Dumping the model structure for Native Handling Model\n")
 xgb.dump(
   model_native,
   fname = "native_model_dump.txt",
   with_stats = TRUE
 )
 
-cat("Dumping the model structure for Rolling Average Model...\n")
+cat("Dumping the model structure for Rolling Average Model\n")
 xgb.dump(
   model_imputed,
   fname = "rolling_avg_model_dump.txt",
@@ -205,7 +205,7 @@ cat(head(rolling_avg_model_dump, 20), sep = "\n")
 
 ```{r}
 # Predict Sales by Day Using Training Data
-cat("Generating Predicted Sales by Day for Training Data...\n")
+cat("Generating Predicted Sales by Day for Training Data\n")
 
 # Create a feature matrix for the training data
 train_features <- as.matrix(train_split[, ..features])
@@ -226,15 +226,61 @@ fwrite(predicted_sales_by_day_train, "Predicted_Sales_By_Day_Train.csv")
 ```
 
 ```{r}
-# Visualize the Best Tree in Native Handling Model
-cat("Visualizing the best tree (iteration 95) from the Native Handling Model...\n")
+# Visualize the Best Tree
+cat("Visualizing the best tree (iteration 95) from the Native Handling Model\n")
 
-# Plot the best tree (iteration 95)
+#Best tree (iteration 95)
 xgb.plot.tree(
   model = model_native,
   feature_names = features,
   trees = 95, # Specify the best tree from iteration 95
   render = TRUE
 )
+```
+
+```{r}
+library(data.table)
+library(xgboost)
+
+test_data[, transactions := as.double(transactions)]
+test_data[, transactions := ifelse(is.na(transactions),
+                                   mean(transactions, na.rm = TRUE),
+                                   transactions), by = store_nbr]
+
+for (col in lagged_sales_cols) {
+  impute_with_rolling_avg(test_data, col, n = 7)
+}
+
+test_data[, dcoilwtico := ifelse(is.na(dcoilwtico),
+                                 frollmean(dcoilwtico, n = 7, fill = NA, align = "right"),
+                                 dcoilwtico)]
+
+features <- c(lagged_sales_cols, additional_cols)
+test_features <- as.matrix(test_data[, ..features])
+
+dtest <- xgb.DMatrix(data = test_features)
+
+native_predictions <- predict(model_native, dtest)
+native_predictions <- pmax(native_predictions, 0)  
+
+submission_native <- data.table(
+  id = test_data$id,
+  sales = native_predictions
+)
+
+fwrite(submission_native, "submission_native.csv")
+cat("Native Handling Model submission file saved as 'submission_native.csv'\n")
+
+imputed_predictions <- predict(model_imputed, dtest)
+imputed_predictions <- pmax(imputed_predictions, 0)  
+
+submission_imputed <- data.table(
+  id = test_data$id,  
+  sales = imputed_predictions
+)
+
+fwrite(submission_imputed, "submission_imputed.csv")
+cat("Rolling Average Imputation Model submission file saved as 'submission_imputed.csv'\n")
+
 ```
 
