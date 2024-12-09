@@ -43,13 +43,42 @@ Since the different models require different files and file structures, we will 
    - Run the `Lasso_Model_Metrics.Rmd` file found in the `LJ_Model` and `Lasso` folder
    - Since the data and model files are saved as .csv and .rds files, respectively, the `Lasso_Model_Metrics.Rmd` is the only file that needs to be run. To inspect the model construction, view `Lasso_Model_Create.Rmd`
 2. **Random Forest**
+
 3. **XGBOOST**
 4. **ARIMA**
    - Run the `Garrett_Model.Rmd` file found in the `Garrett_Model`folder
 
 __
 
+## Installation
+
+1. Clone the repository:
+```bash
+ git clone https://github.com/dsci445-csu/project-3
+```
+
+2. Install dependencies:
+```bash
+ npm install
+ ``
+-- 
+
 ## Dependencies
+
+**Data Cleaning**
+library(readr)
+library(dplyr)
+library(leaps)
+library(ggplot2)
+library(glmnet)
+library(ISLR)
+library(dials)
+library(tidymodels)
+library(lubridate)
+
+**Correlation Heatmap**
+library(tseries)
+library(corrplot)
 
 **Lasso**
 library(readr)
@@ -64,6 +93,17 @@ library(parallel)
 library(doParallel)
 
 **Random Forest**
+library(ModelMetrics)
+library(parallel)
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(tidymodels)
+library(randomForest)
+library(ranger)
+library(vip)
+library(parsnip)
+library(rsample)
 
 **XGBOOST**
 
@@ -75,9 +115,3 @@ library(lubridate)
 library(forecast)
 library(readr)
 
-#install.packages("ranger")
-#install.packages("ModelMetrics")
-#install.packages('rsample')
-#install.packages('lubridate')
-#install.packages("tseries")
-#install.packages("corrplot")
