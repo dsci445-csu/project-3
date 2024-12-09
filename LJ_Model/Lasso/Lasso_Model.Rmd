@@ -1,0 +1,89 @@
+---
+title: "Lasso Model - Creation"
+output: html_document
+date: "2024-11-14"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+
+# GIT COMMANDS
+# git add _____/
+# git commit -m "Message"
+# git push origin main
+
+library(readr)
+library(dplyr)
+library(leaps)
+library(ggplot2)
+library(glmnet)
+library(ISLR)
+library(dials)
+library(tidymodels)
+library(parallel)
+library(doParallel)
+
+```
+
+```{r}
+
+# Load in data w/ lags and correct cleaning/transformations
+
+final_train_lags_lasso_rf <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/FinalProject2/Data/final_train_lags_lasso_rf.csv")
+
+```
+
+```{r}
+
+# Perform Lasso
+
+#closeAllConnections()
+#showConnections(all = TRUE)
+
+num_cores <- 4
+cl <- makeCluster(num_cores)
+registerDoParallel(cl)
+#registerDoSEQ()
+
+lag_recipe <- recipe(sales ~ ., data = final_train_lags_lasso_rf) %>%
+  step_dummy(all_nominal_predictors(), one_hot = TRUE) %>%
+  step_impute_median(all_numeric_predictors()) %>%
+  step_normalize(all_numeric_predictors())
+
+cv <- vfold_cv(final_train_lags_lasso_rf, v = 10) # Use CV to find optimal lambda value
+lambda_grid <- grid_regular(penalty(range = c(-4, 0)), levels = 20)
+
+lasso_spec <- linear_reg(mixture = 1, penalty = tune()) %>%
+  set_mode("regression") %>%
+  set_engine("glmnet")
+
+lasso_workflow <- workflow() %>%
+  add_model(lasso_spec) %>%
+  add_recipe(lag_recipe)
+
+lasso_tune <- lasso_workflow %>%
+  tune_grid(
+    resamples = cv,
+    grid = lambda_grid,
+    metrics = metric_set(rmse),
+    control = control_grid(verbose = TRUE, save_pred = TRUE)
+  )
+
+lasso_final <- finalize_workflow(lasso_workflow, select_best(lasso_tune, metric = "rmse"))
+lasso_fin_fit <- fit(lasso_final, data = final_train_lags_lasso_rf)
+
+```
+
+```{r}
+
+# Saving Model Tune
+saveRDS(lasso_tune, "Lasso_Tuning_Results.rds")
+
+# Saving Model
+saveRDS(lasso_fin_fit, "Lasso_Model.rds")
+
+```
+

@@ -111,8 +111,9 @@ print(rf_model)
 # out of box error
 load("/data/accounts/fa24/garretthayden/DSCI445/FinalProject2/LJ_Model/rf_model.rda")
 
+rf_model
 oob_mse <- rf_model$err.rate[nrow(rf_model$err.rate), "OOB"]
-oob_rmse <- sqrt(oob_mse)
+#oob_rmse <- sqrt(oob_mse)
 
 print(paste("OOB MSE:", oob_mse))
 print(paste("OOB RMSE:", oob_rmse))
@@ -123,8 +124,12 @@ print(paste("OOB RMSE:", oob_rmse))
 # cross validate with subset
 set.seed(123) # Ensures reproducibility
 
-subset_train_data <- final_train_lags %>% sample_n(600000)
+subset_train_data <- final_train_lags %>% sample_n(300000)
 
+cv_split <- subset_train_data(final_train_lags, prop = 0.7)
+
+training_set <- training(cv_split)    # 70% of the data
+validation_set <- testing(cv_split)
 ```
 
 
@@ -140,7 +145,7 @@ subset_train_data <- final_train_lags %>% sample_n(600000)
 cv_control <- trainControl(method = "cv", number = 5) 
 cv_rf <- train(
   sales ~ .,
-  data = subset_train_data,
+  data = training_set,
   method = "ranger",    
   trControl = cv_control,
   tuneGrid = expand.grid(mtry = c(5, 7, 9), 
