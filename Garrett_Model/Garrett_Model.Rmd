@@ -14,7 +14,7 @@ library(readr)
 
 ```{r}
 train <- read_csv("../Data/final_train.csv")
-oil <- read_csv("../Data/Unprocessed/oil.csv")
+oil <- read_csv("../Data/Raw Data/oil.csv")
 ```
 
 ```{r}
@@ -78,7 +78,7 @@ graph_2
 Can see that higher oil prices in earlier years could have resulted in lower total sales because of factors such as transportation costs reducing overhead, and increased consumer spending because of higher disposable income values in the country.
 
 ```{r}
-test <- read_csv("../Data/Unprocessed/test.csv")
+test <- read_csv("../Data/final_test.csv")
 
 train$date <- as.Date(train$date)
 test$date <- as.Date(test$date)
@@ -109,10 +109,6 @@ forecasted_values <- forecast(
 forecasted_sales <- expm1(forecasted_values$mean)
 
 checkresiduals(model)
-```
-
-```{r}
-test
 ```
 
 ```{r}
