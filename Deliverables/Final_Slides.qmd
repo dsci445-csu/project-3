@@ -52,65 +52,22 @@ library(grid)
 
 ## Exploratory Data Analysis
 
-```{r}
-train <- read_csv("Data/final_train.csv")
-oil <- read_csv("Data/Unprocessed/oil.csv")
+```{r fig.width = 10, fig.height = 10, out.align= "center"}
 
-train <- train %>%
-  filter(!(date %in% as.Date(c("2013-01-01", "2014-01-01", "2015-01-01", "2016-01-01", "2017-01-01"))))
+sales_image_1 <- readPNG("/data/accounts/fa24/garretthayden/DSCI445/FinalProject2/Garrett_Model/graph_1.png")
 
-sales_by_year <- train %>%
-  mutate(date = as.Date(date)) %>%
-  group_by(date) %>%
-  summarise(total_sales = sum(sales)) %>%
-  mutate(year = format(date, "%Y"))
-  
-graph_1 <- ggplot(sales_by_year, aes(x = date, y = total_sales, color = year)) +
-  geom_line() +
-  labs(
-    title = "Store Sales Over Time By Year",
-    x = "Date",
-    y = "Total Sales",
-    color = "Year"
-  ) +
-  theme_minimal()
-
-graph_1
+# Display the image
+grid.raster(sales_image_1, width = unit(1, "npc"), height = unit(1, "npc"))
 ```
 
 ------------------------------------------------------------------------
 
-```{r}
-train <- train %>%
-  mutate(date = as.Date(date))
+```{r fig.width = 10, fig.height = 10, out.align= "center"}
 
-oil <- oil %>%
-  mutate(date = as.Date(date))
+sales_image_1 <- readPNG("/data/accounts/fa24/garretthayden/DSCI445/FinalProject2/Garrett_Model/graph_2.png")
 
-sales_oil_data <- train %>%
-  group_by(date) %>%
-  summarise(total_sales = sum(sales)) %>%
-  left_join(oil, by = "date") %>%
-  rename(oil_price = dcoilwtico)
-  
-graph_2 <- ggplot(sales_oil_data, aes(x = date)) +
-  geom_line(aes(y = total_sales, color = "Sales")) +
-  geom_line(aes(y = oil_price * 1000, color = "Oil Price (Scaled")) +
-  scale_y_continuous(
-    name = "Total Sales",
-    sec.axis = sec_axis(~ . / 1000, name = "Oil Price")
-  ) +
-  scale_color_manual(
-    name = "Legend",
-    values = c("Sales" = "blue", "Oil Price (Scaled)" = "red")
-  ) +
-  labs(
-    title = "Store Sales Over Time with Oil Price Overlay",
-    x = "Date"
-  ) +
-  theme_minimal()
-
-graph_2
+# Display the image
+grid.raster(sales_image_1, width = unit(1, "npc"), height = unit(1, "npc"))
 ```
 
 ------------------------------------------------------------------------
@@ -119,7 +76,7 @@ graph_2
 
 ```{r fig.width = 10, fig.height = 10, out.align= "center"}
 
-heatmap <- readPNG("/data/accounts/fa24/garretthayden/DSCI445/FinalProject2/LJ_Model/heatmap.png")
+heatmap <- readPNG("/data/accounts/fa24/garretthayden/DSCI445/FinalProject2/images/heatmap.png")
 
 # Display the image
 grid.raster(heatmap, width = unit(1, "npc"), height = unit(1, "npc"))
@@ -165,7 +122,7 @@ grid.raster(heatmap, width = unit(1, "npc"), height = unit(1, "npc"))
 ```{r fig.width = 12, fig.height = 10, out.align= "center"}
 # Correlation Heatmap
 
-vip_plot <- readPNG("/data/accounts/fa24/garretthayden/DSCI445/FinalProject2/LJ_Model/vip_plot.png")
+vip_plot <- readPNG("/data/accounts/fa24/garretthayden/DSCI445/FinalProject2/images/vip_plot.png")
 
 # Display the image
 grid.raster(vip_plot, width = unit(1, "npc"), height = unit(1, "npc"))

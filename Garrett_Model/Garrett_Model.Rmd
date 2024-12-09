@@ -10,6 +10,7 @@ library(tidyr)
 library(lubridate)
 library(forecast)
 library(readr)
+knitr::opts_chunk$set(fig.path = "/data/accounts/fa24/garretthayden/DSCI445/FinalProject2/Garrett_Model/")
 ```
 
 ```{r}
@@ -36,6 +37,13 @@ graph_1 <- ggplot(sales_by_year, aes(x = date, y = total_sales, color = year)) +
     color = "Year"
   ) +
   theme_minimal()
+
+ggsave(
+  filename = "/data/accounts/fa24/garretthayden/DSCI445/FinalProject2/Garrett_Model/graph_1.png",
+  plot = graph_1,
+  width = 8,
+  height = 6
+)
 
 graph_1
 ```
@@ -72,6 +80,13 @@ graph_2 <- ggplot(sales_oil_data, aes(x = date)) +
     x = "Date"
   ) +
   theme_minimal()
+
+ggsave(
+  filename = "/data/accounts/fa24/garretthayden/DSCI445/FinalProject2/Garrett_Model/graph_2.png",
+  plot = graph_2,
+  width = 8,
+  height = 6
+)
 
 graph_2
 ```
