@@ -51,3 +51,6 @@ Slides_LaurenOnly_files/*
 
 Notes/CornellUniNotes.pdf
 Dre_Model/DAndre_XGboost_Final_Train.csv
+Data/Raw Data/train.csv
+LJ_Model/Lasso/Lasso_Model.rds
+LJ_Model/Lasso/Lasso_Tuning_Results.rds
