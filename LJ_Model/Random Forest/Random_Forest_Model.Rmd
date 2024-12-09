@@ -1,0 +1,84 @@
+---
+title: "Lauren and Jillian - Random Forest Model Fit"
+output: html_document
+date: "2024-11-14"
+---
+
+```{r setup, include=FALSE}
+rm(list = ls())
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# install packages and load libraries
+library(ModelMetrics)
+library(parallel)
+library(readr)
+library(dplyr)
+library(leaps)
+library(ggplot2)
+library(glmnet)
+library(ISLR)
+library(dials)
+library(tidymodels)
+library(randomForest)
+library(ranger)
+library(vip)
+library(parsnip)
+library(rsample)
+```
+
+```{r}
+# load data
+final_train_lags <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/FinalProject2/Data/final_train_lags_lasso_rf.csv")
+
+final_test_lags <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/FinalProject2/Data/final_test_lags_lasso_rf.csv")
+```
+## Create training and validation subsets 
+
+```{r}
+# Optional test with subset
+set.seed(123) 
+
+split <- initial_split(final_train_lags, prop = 0.7)
+
+training_set <- training(split)    # 70% of the data
+validation_set <- testing(split)
+```
+
+## Fit the Random Forest
+
+```{r}
+# Fit random forest model
+rf_model <- ranger(
+  formula = sales ~ .,                 
+  data = training_set,
+  min.node.size = 10,
+  mtry = 7,
+  num.trees = 500,                 
+  importance = 'impurity',        
+  num.threads = parallel::detectCores(),
+  verbose = TRUE
+)
+
+# Print model summary
+print(rf_model)
+
+# Fit the model on the validation set
+rf_pred <- predict(rf_model, data = validation_set)
+
+# Output RMSLE on training set
+rmsle_val <- rmsle(validation_set$sales, rf_pred$predictions)
+print(rmsle_val)
+
+# Save model as a separate object
+save(rf_model, file = "rf_model.rda")
+```
+
+
+
+
+
+
+
+
