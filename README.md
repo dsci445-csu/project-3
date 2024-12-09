@@ -45,7 +45,7 @@ Since the different models require different files and file structures, we will 
 2. **Random Forest**
 3. **XGBOOST**
 4. **ARIMA**
-  - Run the 'Garrett_Model.RMD' file found in the 'Garrett_Model folder'.
+   - Run the `Garrett_Model.Rmd` file found in the `Garrett_Model`folder
 
 __
 
