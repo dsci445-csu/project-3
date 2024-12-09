@@ -11,7 +11,7 @@ https://www.kaggle.com/competitions/store-sales-time-series-forecasting
 - **Garrett Hayden** (GitHub: [@Ghayd4848](https://github.com/Ghayd4848))
 - **D'Andre Tafoya** (GitHub: [@DevDAndre](https://github.com/DevDAndre))
 
-A note on collaboration: As outlined in the challenges section of our people, we had many difficulties in version control between RStudio and GitHub. For that reason, Garrett had to perform most of our commits and as such our commit history does not reflect proper collaboration. We each have our individual model, however we joined efforts on many aspects of the project such as data pre-processing and even model building, and met in person multiple times in order to effectively work together.
+A note on collaboration: As outlined in the challenges section of our paper, we had many difficulties in version control between RStudio and GitHub. For that reason, Garrett had to perform most of our commits and as such our commit history does not reflect proper collaboration. We each have our individual model, however we joined efforts on many aspects of the project such as data pre-processing and even model building, and met in person multiple times in order to effectively work together.
 
 ---
 
@@ -45,6 +45,7 @@ Since the different models require different files and file structures, we will 
 2. **Random Forest**
 3. **XGBOOST**
 4. **ARIMA**
+  - Run the 'Garrett_Model.RMD' file found in the 'Garrett_Model folder'.
 
 __
 
@@ -67,6 +68,13 @@ library(doParallel)
 **XGBOOST**
 
 **ARIMA**
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(lubridate)
+library(forecast)
+library(readr)
+
 #install.packages("ranger")
 #install.packages("ModelMetrics")
 #install.packages('rsample')
