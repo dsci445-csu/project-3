@@ -1,0 +1,85 @@
+---
+title: "Lasso Model - Metrics"
+output: html_document
+date: "2024-11-14"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+
+# GIT COMMANDS
+# git add _____/
+# git commit -m "Message"
+# git push origin main
+
+library(readr)
+library(dplyr)
+library(leaps)
+library(ggplot2)
+library(glmnet)
+library(ISLR)
+library(dials)
+library(tidymodels)
+library(parallel)
+library(doParallel)
+
+```
+
+```{r}
+
+# Load in lasso model
+# You will not need this model fit to run the below code, but you can load it in to extract other metrics
+lasso_fin_fit <- readRDS("/data/accounts/fa24/garretthayden/DSCI445/FinalProject2/LJ_Model/Lasso/Lasso_Model.rds")
+
+# Load in tuning metrics
+lasso_tune <- readRDS("/data/accounts/fa24/garretthayden/DSCI445/FinalProject2/LJ_Model/Lasso/Lasso_Tuning_Results.rds")
+
+# Load in test data
+final_test_lags_lasso_rf <- read_csv("/data/accounts/fa24/garretthayden/DSCI445/FinalProject2/Data/final_test_lags_lasso_rf.csv")
+
+
+```
+
+
+
+```{r}
+
+# Collect Metrics
+
+results <- collect_metrics(lasso_tune)
+results_rmse <- results %>% filter(.metric == "rmse")
+
+ggplot(results_rmse, aes(x = penalty, y = mean)) +
+  geom_line() +
+  geom_point() +
+  scale_x_log10() +
+  labs(x = expression(lambda), y = "CV Error (Mean RMSE)", title = "CV Error vs. Lambda")
+
+best_lambda <- show_best(lasso_tune, metric = "rmse", n = 1)
+lasso_coef <- tidy(lasso_fin_fit)
+
+print(best_lambda)
+print(lasso_coef)
+
+```
+
+```{r}
+
+# Kaggle Submission
+
+pred_val <- 
+  lasso_fin_fit %>% 
+  augment(new_data = final_test_lags_lasso_rf)
+
+submission <- pred_val %>% 
+  select(id, .pred) %>% 
+  rename(sales = .pred)
+
+write.csv(submission, file = "/data/accounts/fa24/garretthayden/DSCI445/FinalProject2/LJ_Model/Lasso/Lasso_Model_Submission.csv", row.names = FALSE)
+
+```
+
+
