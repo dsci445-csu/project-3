@@ -66,12 +66,12 @@ Note: Before running the Lasso, Random Forest, or XGboost models, download the d
 
 ## Data Preparation
 
-# Download Instructions
+**Download Instructions**
 
 Download the dataset from the Kaggle competition:
 [Store Sales - Time Series Forecasting Kaggle Competition](https://www.kaggle.com/competitions/store-sales-time-series-forecasting/data)
 
-Manual Download Steps
+**Manual Download Steps**
 
 1. Create a Kaggle account (if you don't have one)
 2. Navigate to the competition data page
@@ -100,9 +100,9 @@ project-3/
 
 ## Dependencies
 
-# Run the following code to install required packages
+**Run the following code to install required packages**
 
-# Core Data Manipulation and Visualization
+**Core Data Manipulation and Visualization**
 core_packages <- c(
   "readr",      # Reading data files
   "dplyr",      # Data manipulation
@@ -110,7 +110,7 @@ core_packages <- c(
   "lubridate"   # Date and time manipulation
 )
 
-# Statistical Modeling and Machine Learning
+**Statistical Modeling and Machine Learning**
 modeling_packages <- c(
   "leaps",      # Regression subset selection
   "glmnet",     # Lasso and Ridge Regression
@@ -119,14 +119,14 @@ modeling_packages <- c(
   "dials"       # Hyperparameter tuning
 )
 
-# Time Series Analysis
+**Time Series Analysis**
 time_series_packages <- c(
   "tseries",    # Time series analysis
   "forecast",   # Time series forecasting
   "tidyr"       # Data tidying
 )
 
-# Random Forest Specific
+**Random Forest Specific**
 random_forest_packages <- c(
   "ModelMetrics", # Model evaluation metrics
   "randomForest", # Traditional Random Forest
@@ -136,18 +136,18 @@ random_forest_packages <- c(
   "rsample"       # Sampling and resampling
 )
 
-# Parallel Processing
+**Parallel Processing**
 parallel_packages <- c(
   "parallel",     # Parallel computing
   "doParallel"    # Parallel backend for foreach
 )
 
-# Correlation and Visualization
+**Correlation and Visualization**
 correlation_packages <- c(
   "corrplot"      # Correlation matrix visualization
 )
 
-# Combine all packages
+**Combine all packages**
 all_packages <- c(
   core_packages,
   modeling_packages,
@@ -157,7 +157,7 @@ all_packages <- c(
   correlation_packages
 )
 
-# Install packages
+**Install packages**
 install.packages(all_packages, dependencies = TRUE)
 
 ---
