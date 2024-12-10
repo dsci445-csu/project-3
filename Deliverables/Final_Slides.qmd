@@ -54,7 +54,7 @@ library(grid)
 
 ```{r fig.width = 10, fig.height = 10, out.align= "center"}
 
-sales_image_1 <- readPNG("/data/accounts/fa24/garretthayden/DSCI445/FinalProject2/Garrett_Model/graph_1.png")
+sales_image_1 <- readPNG("../Garrett_Model/graph_1.png")
 
 # Display the image
 grid.raster(sales_image_1, width = unit(1, "npc"), height = unit(1, "npc"))
@@ -64,7 +64,7 @@ grid.raster(sales_image_1, width = unit(1, "npc"), height = unit(1, "npc"))
 
 ```{r fig.width = 10, fig.height = 10, out.align= "center"}
 
-sales_image_1 <- readPNG("/data/accounts/fa24/garretthayden/DSCI445/FinalProject2/Garrett_Model/graph_2.png")
+sales_image_1 <- readPNG("../Garrett_Model/graph_2.png")
 
 # Display the image
 grid.raster(sales_image_1, width = unit(1, "npc"), height = unit(1, "npc"))
@@ -76,7 +76,7 @@ grid.raster(sales_image_1, width = unit(1, "npc"), height = unit(1, "npc"))
 
 ```{r fig.width = 10, fig.height = 10, out.align= "center"}
 
-heatmap <- readPNG("/data/accounts/fa24/garretthayden/DSCI445/FinalProject2/images/heatmap.png")
+heatmap <- readPNG("../images/heatmap.png")
 
 # Display the image
 grid.raster(heatmap, width = unit(1, "npc"), height = unit(1, "npc"))
@@ -122,7 +122,7 @@ grid.raster(heatmap, width = unit(1, "npc"), height = unit(1, "npc"))
 ```{r fig.width = 12, fig.height = 10, out.align= "center"}
 # Correlation Heatmap
 
-vip_plot <- readPNG("/data/accounts/fa24/garretthayden/DSCI445/FinalProject2/images/vip_plot.png")
+vip_plot <- readPNG("../images/vip_plot.png")
 
 # Display the image
 grid.raster(vip_plot, width = unit(1, "npc"), height = unit(1, "npc"))
@@ -149,7 +149,7 @@ grid.raster(vip_plot, width = unit(1, "npc"), height = unit(1, "npc"))
 
 ```{r fig.width = 12, fig.height = 10, out.align= "center"}
 
-code_chunk <- readPNG("/data/accounts/fa24/garretthayden/DSCI445/FinalProject2/Dre_Model/tree.png")
+code_chunk <- readPNG("../Dre_Model/tree.png")
 
 # Display the image
 grid.raster(code_chunk)
@@ -160,7 +160,7 @@ grid.raster(code_chunk)
 
 ```{r fig.width = 12, fig.height = 10, out.align= "center"}
 
-xgboost_tree <- readPNG("/data/accounts/fa24/garretthayden/DSCI445/FinalProject2/Dre_Model/image.png")
+xgboost_tree <- readPNG("../Dre_Model/image.png")
 
 # Display the image
 grid.raster(xgboost_tree, width = unit(1, "npc"), height = unit(1, "npc"))
