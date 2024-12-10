@@ -1,0 +1,52 @@
+---
+title: "Random Forest Predictions"
+output: html_document
+date: "2024-11-14"
+---
+
+```{r}
+# install packages and load libraries
+library(ModelMetrics)
+library(parallel)
+library(readr)
+library(dplyr)
+library(leaps)
+library(ggplot2)
+library(glmnet)
+library(ISLR)
+library(dials)
+library(tidymodels)
+library(randomForest)
+library(ranger)
+library(vip)
+library(parsnip)
+library(rsample)
+```
+
+## Finalize Random Forest predictions and save to .csv
+
+```{r}
+# Load random forest model object if necessary
+
+# load("rf_model.rda")
+
+predictions <- predict(rf_model, data = final_test_lags)
+
+pred_val <- cbind(final_test_lags, sales_pred = predictions)
+
+submission <- pred_val %>%
+  select(id, prediction) %>%
+  rename(sales = prediction)
+
+write.csv(submission, "RF_Model_Submission.csv", row.names = FALSE)
+```
+
+## Importance Plot
+
+```{r}
+# Chech which predictors were most significant
+
+vip(rf_model)
+ggsave("vip_plot.png", plot = importance_plot, width = 8, height = 6)
+
+```

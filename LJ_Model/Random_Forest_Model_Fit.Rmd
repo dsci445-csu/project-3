@@ -1,11 +1,10 @@
 ---
-title: "Lauren and Jillian - Random Forest"
+title: "Random Forest Model Fit"
 output: html_document
 date: "2024-11-14"
 ---
 
 ```{r setup, include=FALSE}
-rm(list = ls())
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -74,32 +73,7 @@ print(rmsle_val)
 # Save model as a separate object
 save(rf_model, file = "rf_model.rda")
 ```
-## Finalize Random Forest predictions and save to .csv
 
-```{r}
-# Load random forest model object if necessary
-
-# load("rf_model.rda")
-
-predictions <- predict(rf_model, data = final_test_lags)
-
-pred_val <- cbind(final_test_lags, sales_pred = predictions)
-
-submission <- pred_val %>%
-  select(id, prediction) %>%
-  rename(sales = prediction)
-
-write.csv(submission, "RF_Model_Submission.csv", row.names = FALSE)
-```
-
-## Importance Plot
-
-```{r}
-# Chech which predictors were most significant
-
-vip(rf_model)
-
-```
 
 
 
