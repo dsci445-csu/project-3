@@ -1,0 +1,6 @@
+---
+title: "Working script"
+output: pdf_document
+date: "2025-11-04"
+---
+
