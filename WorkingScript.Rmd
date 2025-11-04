@@ -4,3 +4,8 @@ output: pdf_document
 date: "2025-11-04"
 ---
 
+```{r}
+data_2025 <- read.csv("Data/2025baseballdata.csv")
+head(data_2025)
+```
+
