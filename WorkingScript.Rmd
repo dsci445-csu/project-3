@@ -9,7 +9,4 @@ data_2025 <- read.csv("Data/2025baseballdata.csv")
 head(data_2025)
 ```
 
-```{r}
-#I LOVE GITHUB!!!!!!
-```
 
