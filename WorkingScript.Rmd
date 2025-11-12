@@ -5,9 +5,16 @@ date: "2025-11-04"
 ---
 
 ```{r}
+# For testing
 data_2025 <- read.csv("Data/2025baseballdata.csv")
-head(data_2025)
-tail(data_2025)
+
+# For training
+data_2024 <- read.csv("Data/2024bbdata.csv")
+data_2023 <- read.csv("Data/2023bbdata.csv")
+data_2022 <- read.csv("Data/2022bbdata.csv")
+data_2021 <- read.csv("Data/2021bbdata.csv")
+data_2020 <- read.csv("Data/2020bbdata.csv")
+
 ```
 
 
