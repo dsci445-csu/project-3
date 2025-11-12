@@ -10,6 +10,7 @@ date: "2025-11-04"
 library(dplyr)
 library(glmnet)
 library(Metrics)
+library(tidymodels)
 
 # For testing
 data_2025 <- read.csv("Data/2025baseballdata.csv")
@@ -22,6 +23,10 @@ data_2021 <- read.csv("Data/2021bbdata.csv")
 data_2020 <- read.csv("Data/2020bbdata.csv")
 
 data_2020 <- data_2020 |> select(-c("Awards", "Pos") )
+data_2021 <- data_2021 |> select(-c("Awards", "Pos") )
+data_2022 <- data_2022 |> select(-c("Awards", "Pos") )
+data_2023 <- data_2023 |> select(-c("Awards", "Pos") )
+data_2024 <- data_2024 |> select(-c("Awards", "Pos") )
 
 training_data <- rbind(data_2024, data_2023, data_2022, data_2021, data_2020)
 
