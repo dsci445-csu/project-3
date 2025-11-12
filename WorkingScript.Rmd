@@ -15,6 +15,7 @@ data_2022 <- read.csv("Data/2022bbdata.csv")
 data_2021 <- read.csv("Data/2021bbdata.csv")
 data_2020 <- read.csv("Data/2020bbdata.csv")
 
+training_data <- rbind(data_2024, data_2023, data_2022, data_2021, data_2020)
 ```
 
 
