@@ -28,9 +28,17 @@ data_2022 <- data_2022 |> select(-c("Awards", "Pos") )
 data_2023 <- data_2023 |> select(-c("Awards", "Pos") )
 data_2024 <- data_2024 |> select(-c("Awards", "Pos") )
 
-training_data <- rbind(data_2024, data_2023, data_2022, data_2021, data_2020)
+data_2020$year <- 2020
+data_2021$year <- 2021
+data_2022$year <- 2022
+data_2023$year <- 2023
+data_2024$year <- 2024
 
+training_data <- rbind(data_2024, data_2023, data_2022, data_2021, data_2020)
 
 ```
 
+```{r}
+
+```
 
