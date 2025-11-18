@@ -36,8 +36,24 @@ data_2024$year <- 2024
 
 training_data <- rbind(data_2024, data_2023, data_2022, data_2021, data_2020)
 
-#testing 
-#change
+training_data <- training_data |> 
+  arrange(Player, year ) |>
+  group_by(Player) |>
+  mutate(WAR_next = lead(WAR, 1)) |>
+  ungroup()
+
+training_data <- training_data |> filter(!is.na(WAR_next))
+
+training_data_clean <- training_data |>
+  select(-Player, -year)
+
+ols_spec <- linear_reg() |>
+  set_engine("lm")
+
+ols_fit <- ols_spec |>
+  fit(WAR_next ~ ., data = training_data_clean)
+
+summary(ols_fit$fit)
 ```
 
 ```{r}
