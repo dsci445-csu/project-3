@@ -36,6 +36,8 @@ data_2024$year <- 2024
 
 training_data <- rbind(data_2024, data_2023, data_2022, data_2021, data_2020)
 
+#using Data from 2020-2024 to predict war data in 2025 using boosting and LM models
+
 ```
 
 ```{r}
