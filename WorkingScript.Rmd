@@ -36,10 +36,16 @@ data_2024$year <- 2024
 
 training_data <- rbind(data_2024, data_2023, data_2022, data_2021, data_2020)
 
+<<<<<<< HEAD
 #testing 
 ```
 
 ```{r}
+=======
+>>>>>>> 09ce01a1fad1c3b6a7b7b94004c6318c096eb32a
 
 ```
+
+
+
 
