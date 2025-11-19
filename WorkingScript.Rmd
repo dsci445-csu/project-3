@@ -51,7 +51,7 @@ ols_spec <- linear_reg() |>
   set_engine("lm")
 
 ols_fit <- ols_spec |>
-  fit(WAR_next ~ ., data = training_data_clean)
+  fit(WAR ~ ., data = training_data_clean)
 
 summary(ols_fit$fit)
 
@@ -61,7 +61,7 @@ train <- training(data_split)
 test <- testing(data_split)
 
 ols_fit <- ols_spec |>
-  fit(WAR_next ~., data = train)
+  fit(WAR ~., data = train)
 
 preds <- predict(ols_fit, test) |> bind_cols(test)
 
