@@ -44,8 +44,7 @@ training_data <- training_data |>
 
 training_data <- training_data |> filter(!is.na(WAR_next))
 
-training_data_clean <- training_data |>
-  select(-Player, -year)
+training_clean <- training_data |> select(-c("Player", "year", "Team", "Lg", "WAR_next"))
 
 ols_spec <- linear_reg() |>
   set_engine("lm")
@@ -70,8 +69,55 @@ mae(preds, truth = WAR_next, estimate = .pred)
 ```
 
 ```{r}
+training_data <- training_data |>
+  arrange(Player, year) |>
+  group_by(Player) |>
+  mutate(WAR_next = lead(WAR,1),
+         WAR_next = ifelse(is.na(WAR_next), mean(WAR), WAR_next) ) |>
+  ungroup()
+
+# LASSO
+lasso_spec <- linear_reg(mixture = 1, penalty = tune() ) |> set_mode("regression") |> set_engine("glmnet")
+
+lasso_kfold <- vfold_cv(train, v = 10)
+
+lambda_grid <- tibble(penalty = 10^seq(-2, 10, length.out = 100) )
+
+lasso_recipe <- recipe(WAR ~ ., data = train)
+
+lasso_flow <- workflow() |>
+  add_model(lasso_spec) |>
+  add_recipe(lasso_recipe) 
+
+lasso_fit <- lasso_flow |>
+  tune_grid(resamples = lasso_kfold, grid = lambda_grid)
+
+best_lasso <- select_best(lasso_fit, metric = "rmse")
+
+lasso_final <- finalize_workflow(lasso_flow, best_lasso)
+
+lasso_final_fit <- lasso_final |> fit(train)
+
+lasso_preds_train <- lasso_final_fit |> augment(train)
+lasso_preds_test <- lasso_final_fit |> augment(test)
+
 ```
 
+```{r}
+lasso_rmse_train <- rmse(lasso_preds_train, truth = WAR, estimate = .pred)$.estimate
+lasso_mae_train <- mae(lasso_preds_train, truth = WAR, estimate = .pred)$.estimate
+
+lasso_rmse_test <- rmse(lasso_preds_test, truth = WAR, estimate = .pred)$.estimate
+lasso_mae_test <- mae(lasso_preds_test, truth = WAR, estimate = .pred)$.estimate
+
+non_zero <- lasso_final_fit |> extract_fit_parsnip()|> tidy() |> filter(term != "(Intercept)" & estimate != 0) |> nrow()
+zero <- lasso_final_fit |> extract_fit_parsnip()|> tidy() |> filter(term != "(Intercept)" & estimate == 0) |> nrow()
+
+lasso_metrics <- data.frame(train_rmse = lasso_rmse_train ,test_rmse = lasso_rmse, 
+                            train_mae = lasso_mae_train, test_mae = lasso_mae_test, 
+                            non_zero = non_zero, shrunk_coefs = zero) 
+lasso_metrics
+```
 
 
 
