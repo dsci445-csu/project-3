@@ -14,6 +14,7 @@ library(tidymodels)
 
 # For testing
 data_2025 <- read.csv("Data/2025baseballdata.csv")
+data_2025 <- data_2025 |> select(-c("Awards", "Pos", "Team", "Lg"))
 
 # For training
 data_2024 <- read.csv("Data/2024bbdata.csv")
@@ -36,16 +37,21 @@ data_2024$year <- 2024
 
 training_data <- rbind(data_2024, data_2023, data_2022, data_2021, data_2020)
 
-training_data <- training_data |> 
-  arrange(Player, year ) |>
+training_data <- training_data |>
+  arrange(Player, year) |>
   group_by(Player) |>
-  mutate(WAR_next = lead(WAR, 1)) |>
+  mutate(WAR_next = lead(WAR,1),
+         WAR_next = ifelse(is.na(WAR_next), mean(WAR), WAR_next) ) |>
   ungroup()
 
 training_data <- training_data |> filter(!is.na(WAR_next))
 
 training_clean <- training_data |> select(-c("Player", "year", "WAR_next"))
 
+```
+
+
+```{r}
 ols_spec <- linear_reg() |>
   set_engine("lm")
 
@@ -69,12 +75,6 @@ mae(preds, truth = WAR, estimate = .pred)
 ```
 
 ```{r}
-training_data <- training_data |>
-  arrange(Player, year) |>
-  group_by(Player) |>
-  mutate(WAR_next = lead(WAR,1),
-         WAR_next = ifelse(is.na(WAR_next), mean(WAR), WAR_next) ) |>
-  ungroup()
 
 # LASSO
 lasso_spec <- linear_reg(mixture = 1, penalty = tune() ) |> set_mode("regression") |> set_engine("glmnet")
