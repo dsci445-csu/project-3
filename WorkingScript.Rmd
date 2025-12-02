@@ -50,12 +50,12 @@ ols_spec <- linear_reg() |>
   set_engine("lm")
 
 ols_fit <- ols_spec |>
-  fit(WAR ~ ., data = training_data_clean)
+  fit(WAR ~ ., data = training_clean)
 
 summary(ols_fit$fit)
 
 set.seed(445)
-data_split <- initial_split(training_data_clean, prop = 0.8)
+data_split <- initial_split(training_clean, prop = 0.8)
 train <- training(data_split)
 test <- testing(data_split)
 
@@ -64,8 +64,8 @@ ols_fit <- ols_spec |>
 
 preds <- predict(ols_fit, test) |> bind_cols(test)
 
-rmse(preds, truth = WAR_next, estimate = .pred)
-mae(preds, truth = WAR_next, estimate = .pred)
+rmse(preds, truth = WAR, estimate = .pred)
+mae(preds, truth = WAR, estimate = .pred)
 ```
 
 ```{r}
