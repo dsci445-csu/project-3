@@ -44,7 +44,7 @@ training_data <- training_data |>
 
 training_data <- training_data |> filter(!is.na(WAR_next))
 
-training_clean <- training_data |> select(-c("Player", "year", "Team", "Lg", "WAR_next"))
+training_clean <- training_data |> select(-c("Player", "year", "WAR_next"))
 
 ols_spec <- linear_reg() |>
   set_engine("lm")
@@ -116,7 +116,7 @@ zero <- lasso_final_fit |> extract_fit_parsnip()|> tidy() |> filter(term != "(In
 lasso_metrics <- data.frame(train_rmse = lasso_rmse_train ,test_rmse = lasso_rmse, 
                             train_mae = lasso_mae_train, test_mae = lasso_mae_test, 
                             non_zero = non_zero, shrunk_coefs = zero) 
-lasso_metrics
+
 ```
 
 
