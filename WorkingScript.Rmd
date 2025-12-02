@@ -113,10 +113,10 @@ lasso_mae_test <- mae(lasso_preds_test, truth = WAR, estimate = .pred)$.estimate
 non_zero <- lasso_final_fit |> extract_fit_parsnip()|> tidy() |> filter(term != "(Intercept)" & estimate != 0) |> nrow()
 zero <- lasso_final_fit |> extract_fit_parsnip()|> tidy() |> filter(term != "(Intercept)" & estimate == 0) |> nrow()
 
-lasso_metrics <- data.frame(train_rmse = lasso_rmse_train ,test_rmse = lasso_rmse, 
+lasso_metrics <- data.frame(train_rmse = lasso_rmse_train ,test_rmse = lasso_rmse_test, 
                             train_mae = lasso_mae_train, test_mae = lasso_mae_test, 
                             non_zero = non_zero, shrunk_coefs = zero) 
-
+lasso_metrics
 ```
 
 
