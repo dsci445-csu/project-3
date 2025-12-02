@@ -121,3 +121,81 @@ lasso_metrics
 
 
 
+
+```{r}
+library(xgboost)
+library(tidymodels)
+
+set.seed(445)
+
+boost_folds <- vfold_cv(train, v = 10)
+
+boost_recipe <- recipe(WAR ~ ., data = train)
+
+boost_spec <- boost_tree(
+  trees          = 500,
+  tree_depth     = tune(),
+  learn_rate     = tune(),
+  min_n          = tune(),
+  loss_reduction = 0,
+  sample_size    = 1
+) |>
+  set_mode("regression") |>
+  set_engine("xgboost")
+
+
+boost_grid <- grid_random(
+  tree_depth(),
+  learn_rate(),
+  min_n(),
+  size = 20
+)
+
+
+boost_flow <- workflow() |> add_model(boost_spec) |> add_recipe(boost_recipe)
+```
+
+```{r}
+boost_tuned <- boost_flow |>
+tune_grid(
+resamples = boost_folds,
+grid = boost_grid,
+metrics = metric_set(rmse, mae)
+)
+
+
+best_boost <- select_best(boost_tuned, metric = "rmse")
+best_boost
+
+```
+
+```{r}
+boost_final <- finalize_workflow(boost_flow, best_boost)
+
+boost_final_fit <- boost_final |> fit(data = train)
+
+boost_preds_train <- augment(boost_final_fit, train)
+boost_preds_test <- augment(boost_final_fit, test)
+
+head(boost_preds_test)
+```
+
+```{r}
+
+boost_rmse_train <- rmse(boost_preds_train, truth = WAR, estimate = .pred)$.estimate
+boost_mae_train <- mae(boost_preds_train, truth = WAR, estimate = .pred)$.estimate
+
+
+boost_rmse_test <- rmse(boost_preds_test, truth = WAR, estimate = .pred)$.estimate
+boost_mae_test <- mae(boost_preds_test, truth = WAR, estimate = .pred)$.estimate
+
+boost_metrics <- data.frame(
+train_rmse = boost_rmse_train,
+test_rmse = boost_rmse_test,
+train_mae = boost_mae_train,
+test_mae = boost_mae_test
+)
+
+boost_metrics
+```
+
