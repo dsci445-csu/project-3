@@ -235,32 +235,184 @@ boost_preds_test <- augment(boost_final_fit, data_2025)
 ```
 
 
+```{r}
+library(ggplot2)
+
+ggplot(boost_preds_2025, aes(x = WAR, y = .pred)) +
+  geom_point(alpha = 0.6, color = "#59A14F", size = 3) +
+  geom_abline(slope = 1, intercept = 0, 
+              color = "red", linetype = "dashed", linewidth = 1) +
+  labs(
+    title = "Boosting Model: Actual vs Predicted WAR (2025 Data)",
+    x = "Actual WAR",
+    y = "Predicted WAR"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(face = "bold", hjust = 0.5),
+    panel.grid.minor = element_blank()
+  )
+
+```
+
+```{r}
+library(ggplot2)
+
+ggplot(ols_preds_2025, aes(x = WAR, y = .pred)) +
+  geom_point(alpha = 0.6, color = "4E79A7" , size = 3)+
+  geom_abline(slope = 1, interecpt = 0, 
+              color = "red" , linetype = "dashed" , linewidth = 1) +
+  labs(
+    title =  "OLS Model: Actual vs Predicted WAR (2025 Data)" , 
+    x = "Actual WAR" ,
+    y = "Predicted WAR"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(face = "bold" , hjust = 0.5),
+    panel.grid.minor = element_blank()
+  )
+```
+```{r}
+ggplot(lasso_preds_2025, aes(x = WAR, y = .pred)) +
+  geom_point(alpha = 0.6, color = "#F28E2B", size = 3) +
+  geom_abline(slope = 1, intercept = 0,
+              color = "red", linetype = "dashed", linewidth = 1) +
+  labs(
+    title = "LASSO Model: Actual vs Predicted WAR (2025 Data)",
+    x = "Actual WAR",
+    y = "Predicted WAR"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(face = "bold", hjust = 0.5),
+    panel.grid.minor = element_blank()
+  )
+```
+
+```{r}
+library(yardstick)
+#Computing RMSE and MAE 2025 data 
+# OLS
+ols_rmse_2025 <- rmse(ols_preds_2025, truth = WAR, estimate = .pred)$.estimate
+ols_mae_2025  <- mae(ols_preds_2025,  truth = WAR, estimate = .pred)$.estimate
+
+# LASSO
+lasso_rmse_2025 <- rmse(lasso_preds_2025, truth = WAR, estimate = .pred)$.estimate
+lasso_mae_2025  <- mae(lasso_preds_2025,  truth = WAR, estimate = .pred)$.estimate
+
+# BOOSTING
+boost_rmse_2025 <- rmse(boost_preds_2025, truth = WAR, estimate = .pred)$.estimate
+boost_mae_2025  <- mae(boost_preds_2025,  truth = WAR, estimate = .pred)$.estimate
+
+```
+
 
 
 ```{r}
-
 library(dplyr)
 library(ggplot2)
 
-model_results <- tibble(
+rmse_results_2025 <- tibble(
   model = c("OLS", "LASSO", "Boosting"),
-  rmse  = c(ols_metrics$test_rmse,
-            lasso_metrics$test_rmse,
-            boost_metrics$test_rmse),
-  mae   = c(ols_metrics$test_mae,
-            lasso_metrics$test_mae,
-            boost_metrics$test_mae)
+  rmse  = c(ols_rmse_2025,
+            lasso_rmse_2025,
+            boost_rmse_2025)
 )
 
-# RMSE Comparison Bar Chart
-ggplot(model_results, aes(x = model, y = rmse, fill = model)) +
+ggplot(rmse_results_2025, aes(x = model, y = rmse, fill = model)) +
   geom_col(width = 0.6) +
+  geom_text(aes(label = round(rmse, 3)),
+            vjust = -0.5,
+            size = 5) +
+  expand_limits(y = max(rmse_results_2025$rmse) + 0.1) +
   labs(
-    title = "Model Comparison: Test RMSE",
+    title = "Model Comparison on 2025 Data: RMSE",
     x = "Model",
-    y = "RMSE"
+    y = "Root Mean Squared Error (RMSE)"
   ) +
   theme_minimal(base_size = 14) +
-  theme(legend.position = "none")
+  theme(legend.position = "none") +
+  scale_fill_manual(values = c(
+    "OLS" = "#4E79A7",
+    "LASSO" = "#F28E2B",
+    "Boosting" = "#59A14F"
+  ))
+
+
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+
+mae_results_2025 <- tibble(
+  model = c("OLS", "LASSO", "Boosting"),
+  mae   = c(ols_mae_2025,
+            lasso_mae_2025,
+            boost_mae_2025)
+)
+
+ggplot(mae_results_2025, aes(x = model, y = mae, fill = model)) +
+  geom_col(width = 0.6) +
+  geom_text(aes(label = round(mae, 3)), 
+            vjust = -0.5, size = 5) +
+  expand_limits(y = max(mae_results_2025$mae) + 0.1) +
+  labs(
+    title = "Model Comparison on 2025 Data: MAE",
+    x = "Model",
+    y = "Mean Absolute Error (MAE)"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "none") +
+  scale_fill_manual(values = c(
+    "OLS" = "#4E79A7",
+    "LASSO" = "#F28E2B",
+    "Boosting" = "#59A14F"
+  ))
+
+
+```
+
+```{r}
+library(yardstick)
+
+# OLS
+ols_r2_2025 <- rsq(ols_preds_2025, truth = WAR, estimate = .pred)$.estimate
+
+# LASSO
+lasso_r2_2025 <- rsq(lasso_preds_2025, truth = WAR, estimate = .pred)$.estimate
+
+# BOOSTING
+boost_r2_2025 <- rsq(boost_preds_2025, truth = WAR, estimate = .pred)$.estimate
+
+```
+
+```{r}
+r2_results_2025 <- tibble(
+  model = c("OLS", "LASSO", "Boosting"),
+  r2    = c(ols_r2_2025,
+            lasso_r2_2025,
+            boost_r2_2025)
+)
+
+
+ggplot(r2_results_2025, aes(x = model, y = r2, fill = model)) +
+  geom_col(width = 0.6) +
+  geom_text(aes(label = round(r2, 3)),
+            vjust = -0.5, size = 5) +
+  expand_limits(y = max(r2_results_2025$r2) + 0.05) +
+  labs(
+    title = "Model Comparison on 2025 Data: R²",
+    x = "Model",
+    y = "R-Squared (R²)"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "none") +
+  scale_fill_manual(values = c(
+    "OLS" = "#4E79A7",
+    "LASSO" = "#F28E2B",
+    "Boosting" = "#59A14F"
+  ))
 ```
 
