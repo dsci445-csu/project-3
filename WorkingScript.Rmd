@@ -232,7 +232,35 @@ lasso_preds_test <- lasso_final_fit |> augment(data_2025)
 #BOOSTING
 boost_preds_test <- augment(boost_final_fit, data_2025)
 
+```
 
 
+
+
+```{r}
+
+library(dplyr)
+library(ggplot2)
+
+model_results <- tibble(
+  model = c("OLS", "LASSO", "Boosting"),
+  rmse  = c(ols_metrics$test_rmse,
+            lasso_metrics$test_rmse,
+            boost_metrics$test_rmse),
+  mae   = c(ols_metrics$test_mae,
+            lasso_metrics$test_mae,
+            boost_metrics$test_mae)
+)
+
+# RMSE Comparison Bar Chart
+ggplot(model_results, aes(x = model, y = rmse, fill = model)) +
+  geom_col(width = 0.6) +
+  labs(
+    title = "Model Comparison: Test RMSE",
+    x = "Model",
+    y = "RMSE"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "none")
 ```
 
