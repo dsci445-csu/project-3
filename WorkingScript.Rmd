@@ -72,6 +72,27 @@ preds <- predict(ols_fit, test) |> bind_cols(test)
 
 rmse(preds, truth = WAR, estimate = .pred)
 mae(preds, truth = WAR, estimate = .pred)
+
+```
+
+```{r}
+ols_preds_train <- predict(ols_fit, train) |> bind_cols(train)
+ols_preds_test <- preds
+
+ols_rmse_train <- rmse(ols_preds_train, truth = WAR, estimate = .pred)$.estimate
+ols_mae_train  <- mae(ols_preds_train,  truth = WAR, estimate = .pred)$.estimate
+
+ols_rmse_test <- rmse(ols_preds_test, truth = WAR, estimate = .pred)$.estimate
+ols_mae_test  <- mae(ols_preds_test,  truth = WAR, estimate = .pred)$.estimate
+
+ols_metrics <- data.frame(
+  train_rmse = ols_rmse_train,
+  test_rmse = ols_rmse_test,
+  train_mae = ols_mae_train,
+  test_mae = ols_mae_test
+)
+
+ols_metrics
 ```
 
 ```{r}
@@ -203,110 +224,15 @@ boost_metrics
 #TESTING
 
 #OLS
-ols_spec <- linear_reg() |>
-  set_engine("lm")
-
-ols_fit <- ols_spec |>
-  fit(WAR ~ ., data = data_2025)
-
-summary(ols_fit$fit)
-
-set.seed(445)
-data_split <- initial_split(data_2025, prop = 0.8)
-train <- training(data_split)
-test <- testing(data_split)
-
-ols_fit <- ols_spec |>
-  fit(WAR ~., data = train)
-
-preds <- predict(ols_fit, test) |> bind_cols(test)
-
-rmse(preds, truth = WAR, estimate = .pred)
-mae(preds, truth = WAR, estimate = .pred)
-
+preds <- predict(ols_fit, data_2025) |> bind_cols(data_2025)
 
 #LASSO
-lasso_spec <- linear_reg(mixture = 1, penalty = tune() ) |> set_mode("regression") |> set_engine("glmnet")
-
-lasso_kfold <- vfold_cv(train, v = 10)
-
-lambda_grid <- tibble(penalty = 10^seq(-2, 10, length.out = 100) )
-
-lasso_recipe <- recipe(WAR ~ ., data = data_2025)
-
-lasso_flow <- workflow() |>
-  add_model(lasso_spec) |>
-  add_recipe(lasso_recipe) 
-
-lasso_fit <- lasso_flow |>
-  tune_grid(resamples = lasso_kfold, grid = lambda_grid)
-
-best_lasso <- select_best(lasso_fit, metric = "rmse")
-
-lasso_final <- finalize_workflow(lasso_flow, best_lasso)
-
-lasso_final_fit <- lasso_final |> fit(data_2025)
-
-lasso_preds_train <- lasso_final_fit |> augment(data_2025)
 lasso_preds_test <- lasso_final_fit |> augment(data_2025)
 
-
-```
-```{r}
-set.seed(445)
-
-boost_folds <- vfold_cv(data_2025, v = 10)
-
-boost_recipe <- recipe(WAR ~ ., data = data_2025)
-
-boost_spec <- boost_tree(
-  trees          = 500,
-  tree_depth     = tune(),
-  learn_rate     = tune(),
-  min_n          = tune(), #min number of decision trees
-  loss_reduction = 0,
-  sample_size    = 1
-) |>
-  set_mode("regression") |>
-  set_engine("xgboost")
+#BOOSTING
+boost_preds_test <- augment(boost_final_fit, data_2025)
 
 
-boost_grid <- grid_random(
-  tree_depth(),
-  learn_rate(),
-  min_n(),
-  size = 20
-)
 
-
-boost_flow <- workflow() |> add_model(boost_spec) |> add_recipe(boost_recipe)
-
-boost_tuned <- boost_flow |>
-tune_grid(
-resamples = boost_folds,
-grid = boost_grid,
-metrics = metric_set(rmse, mae)
-)
-
-
-best_boost <- select_best(boost_tuned, metric = "rmse")
-best_boost
-
-boost_final <- finalize_workflow(boost_flow, best_boost)
-
-boost_final_fit <- boost_final |> fit(data = data_2025)
-
-boost_preds <- augment(boost_final_fit, data_2025)
-
-boost_rsme <- rsme(boost_preds, truth = WAR, estimate =.pred)$.estimate
-boost_mae <- mae(boost_preds, truth = WAR, estimate =.pred)$.estimate
-
-
-boost_metrics <- data.frame(
-rmse = boost_rsme,
-mae = boost_mae
-)
-
-boost_metrics
 ```
 
