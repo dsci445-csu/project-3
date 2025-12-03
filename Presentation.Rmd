@@ -1,8 +1,9 @@
 ---
-title: "Presentation"
+title: "Group 3: Predicting WAR"
+author: "Gioia Bonannno-Garcia, Ari Crumley, Vincent West"
 output:
-  powerpoint_presentation: default
   beamer_presentation: default
+  powerpoint_presentation: default
 date: "2025-12-03"
 ---
 
@@ -10,11 +11,8 @@ date: "2025-12-03"
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-## R Markdown
-
-This is an R Markdown presentation. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document.
+## Overview
+For our project, we wanted to create a model that was able to predict an important baseball statistic, WAR. WAR estimates a player's total contribution to their team in comparison to a replacement level player. In simpler terms, it measures how many more wins a team would have with one player, compared to another.
 
 ## Slide with Bullets
 
@@ -30,22 +28,6 @@ summary(cars)
 
 ## Slide with Plot
 
-```{r echo=FALSE}
-library(ggplot2)
-library(Metrics)
-lasso_rmse_train <- rmse(lasso_preds_train, truth = WAR, estimate = .pred)$.estimate
-lasso_mae_train <- mae(lasso_preds_train, truth = WAR, estimate = .pred)$.estimate
 
-lasso_rmse_test <- rmse(lasso_preds_test, truth = WAR, estimate = .pred)$.estimate
-lasso_mae_test <- mae(lasso_preds_test, truth = WAR, estimate = .pred)$.estimate
-lasso_metrics <- data.frame(train_rmse = lasso_rmse_train ,test_rmse = lasso_rmse, 
-                            train_mae = lasso_mae_train, test_mae = lasso_mae_test, 
-                            non_zero = non_zero, shrunk_coefs = zero) 
-
-lasso_metrics|>
-  ggplot() +
-  geom_bar(aes(x = test_rmse)) +
-  theme_bw()
-```
 
 ## Predicting WAR 
