@@ -28,21 +28,107 @@ knitr::opts_chunk$set(echo = FALSE)
 </div>
 </div>
 
----
+## Models used 
+
+<div class="columns">
+<div class="column" width = "33.3%">
+
+-OLS
+  - Simple regression analysis
+
+</div>
+<div class="column" width = "33.3%">
+
+- LASSO
+  - Feature selection
+
+</div>
+<div class="column" width = "33.3%">
+
+- Boosting
+  - Tree based method
+  
+</div>
+</div>
+
+
+## OLS Models
+- OLS identifies and measures the relationship between a response variable and predictor variables.
+- Finds a best-fitting line through a set of data points
+- Pros: Convenient, accurate regression results for linearly related data
+- Cons: May be too simplistic for real world examples, assumptions of Linear Regression
+
+## OLS Metrics Plot
+
+- I need a drink 
+
+## LASSO Models
+- LASSO models perform regularization (L1), which shrinks some coefficients to exactly zero 
+  - Essentially feature selection 
+- Pros: Produces a more interpretative model, prevents over fitting
+- Cons: 
+
 ## LASSO metrics plot
 
 <div class="columns">
-<div class="column">
+<div class="column" width = "40%">
 
-- We love R
-
-</div>
-<div class="column">
-
-![LASSO plot](Pictures/LASSO_PLOT.png)
+- Metrics ran on split training data
+- Good performance? dawg idk 
 
 </div>
+<div class="column" width = "60%">
+
+```{r}
+library(ggplot2)
+
+lasso_plot_pres <- data.frame(metrics = c("RMSE", "MAE"), values = c(0.7329, 0.5594))
+
+LASSO_plot <- lasso_plot_pres |>
+  ggplot(aes(x = metrics, y = values)) +
+  geom_col(fill = "blue") +
+  theme_bw() +
+  geom_text(aes(label = round(values, digits = 4)), color =  "white", vjust = 5) +
+  labs( x = "Metrics", y = "Values", title = "Test MAE and RMSE for LASSO Model ")
+
+LASSO_plot
+```
+
+
+
+</div>
 </div>
 
+## Boosting Models 
+- Boosting grows trees sequentially using information from previously grown trees
+  - Each tree fit on a modified version of the original data set 
 
-## Predicting WAR 
+## Boosting metrics plot
+
+<div class="columns">
+<div class="column" width = "40%">
+
+- Metrics ran on split training data
+
+</div>
+<div class="column" width = "60%">
+
+```{r}
+library(ggplot2)
+
+boost_plot_pres <- data.frame(metrics = c("RMSE", "MAE"), values = c(0.7301, 0.537))
+
+BOOST_plot <- boost_plot_pres |>
+  ggplot(aes(x = metrics, y = values)) +
+  geom_col(fill = "orange") +
+  theme_bw() +
+  geom_text(aes(label = round(values, digits = 4)), color =  "white", vjust = 5) +
+  labs( x = "Metrics", y = "Values", title = "Test MAE and RMSE for Boosting Model ")
+
+BOOST_plot
+```
+
+
+
+</div>
+</div>
