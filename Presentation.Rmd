@@ -5,6 +5,7 @@ output:
   beamer_presentation: default
   powerpoint_presentation: default
 date: "2025-12-03"
+classoption: "t"
 ---
 
 ```{r setup, include=FALSE}
@@ -12,6 +13,8 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ## Overview
+
+\vspace{0.5cm}
 
 <div class="columns">
 <div class="column">
@@ -29,6 +32,8 @@ knitr::opts_chunk$set(echo = FALSE)
 </div>
 
 ## Models used 
+
+\vspace{0.5cm}
 
 <div class="columns">
 <div class="column" width = "33.3%">
@@ -53,6 +58,9 @@ knitr::opts_chunk$set(echo = FALSE)
 
 
 ## OLS Models
+
+\vspace{0.5cm}
+
 - OLS identifies and measures the relationship between a response variable and predictor variables.
 - Finds a best-fitting line through a set of data points
 - Pros: Convenient, accurate regression results for linearly related data
@@ -60,15 +68,22 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## OLS Metrics Plot
 
+\vspace{0.5cm}
+
 - I need a drink 
 
 ## LASSO Models
+
+\vspace{0.5cm}
+
 - LASSO models perform regularization (L1), which shrinks some coefficients to exactly zero 
   - Essentially feature selection 
 - Pros: Produces a more interpretative model, prevents over fitting
 - Cons: 
 
 ## LASSO metrics plot
+
+\vspace{0.5cm}
 
 <div class="columns">
 <div class="column" width = "40%">
@@ -100,10 +115,16 @@ LASSO_plot
 </div>
 
 ## Boosting Models 
+
+\vspace{0.5cm}
+
 - Boosting grows trees sequentially using information from previously grown trees
   - Each tree fit on a modified version of the original data set 
 
 ## Boosting metrics plot
+
+\vspace{0.5cm}
+
 
 <div class="columns">
 <div class="column" width = "40%">
