@@ -12,52 +12,37 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ## Overview
-## Overview
 
 <div class="columns">
 <div class="column">
 
-For our project, we wanted to create a model that was able to predict an important baseball statistic, WAR. WAR estimates a player's total contribution to their team in comparison to a replacement level player. In simpler terms, it measures how many more wins a team would have with one player, compared to another.
+- Goal: build a model to predict WAR (Wins Above Replacement)
+- WAR measures a player’s total contribution compared to a replacement-level player
+- Interpreted as the number of additional wins a player adds to a team
 
 </div>
 <div class="column">
 
-![placeholder](war-rating-chart.webp)
+![War Ratings Chart](Pictures/war-rating-chart.jpg)
 
 </div>
 </div>
 
+---
+## LASSO metrics plot
 
-## OLS Model Background
+<div class="columns">
+<div class="column">
 
+- We love R
 
+</div>
+<div class="column">
 
-## Slide with R Output
+![LASSO plot](Pictures/LASSO_PLOT.png)
 
-```{r cars, echo = TRUE}
-summary(cars)
-```
-
-## OLS metrics plot
-
-### LASSO model background
-
-### pros cons
-
-### LASSO metrics plot
-
-```{r}
-lasso_plot_pres <- data.frame(metrics = c("RMSE", "MAE"), values = c(0.7329, 0.5594))
-
-lasso_plot_pres |>
-  ggplot(aes(x = metrics, y = values)) +
-  geom_col(fill = "blue") +
-  theme_bw() +
-  geom_text(aes(label = round(values, digits = 4)), color =  "white", vjust = 5) +
-  labs( x = "Metrics", y = "Values", title = "Test MAE and RMSE for LASSO Model ")
-```
-
-
+</div>
+</div>
 
 
 ## Predicting WAR 
