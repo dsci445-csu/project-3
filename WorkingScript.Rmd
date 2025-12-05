@@ -142,41 +142,6 @@ lasso_metrics
 ```
 
 
-
-
-```{r}
-library(xgboost)
-library(tidymodels)
-
-set.seed(445)
-
-boost_folds <- vfold_cv(train, v = 10)
-
-boost_recipe <- recipe(WAR ~ ., data = train)
-
-boost_spec <- boost_tree(
-  trees          = 500,
-  tree_depth     = tune(),
-  learn_rate     = tune(),
-  min_n          = tune(), #min number of decision trees
-  loss_reduction = 0,
-  sample_size    = 1
-) |>
-  set_mode("regression") |>
-  set_engine("xgboost")
-
-
-boost_grid <- grid_random(
-  tree_depth(),
-  learn_rate(),
-  min_n(),
-  size = 20
-)
-
-
-boost_flow <- workflow() |> add_model(boost_spec) |> add_recipe(boost_recipe)
-```
-
 ```{r}
 boost_tuned <- boost_flow |>
 tune_grid(
@@ -455,5 +420,94 @@ ggplot(ols_metrics_long, aes(x = dataset, y = Value, fill = Metric)) +
            fill = "Metric"
          ) +
          theme_minimal()
+```
+```{r}
+lasso_metrics_pres <- data.frame(
+  dataset = c("Train", "Test", "2025"),
+  RMSE = c(lasso_rmse_train, lasso_rmse_test, lasso_rmse_2025),
+  MAE = c(lasso_mae_train, lasso_mae_test, lasso_mae_2025)
+)
+
+lasso_metrics_long <- lasso_metrics_pres |>
+  pivot_longer(cols = c(RMSE, MAE),
+               names_to = "Metric",
+               values_to = "Value")
+
+
+ggplot(lasso_metrics_long, aes(x = dataset, y = Value, fill = Metric)) +
+       geom_col(position = "dodge") + 
+       geom_text(aes(label = round(Value, digits = 3)), color =  "black", vjust = 5,
+                 size = 6, position = position_dodge(width = 0.9)) +
+         labs(
+           title = "LASSO Model Error Comparison",
+           x = "Dataset",
+           y = "Value",
+           fill = "Metric"
+         ) +
+  scale_fill_manual(values = c("RMSE" = "lightblue", "MAE" = "forestgreen")) +
+  theme_minimal()
+ 
+
+
+```
+```{r}
+boost_metrics_pres <- data.frame(
+  dataset = c("Train", "Test", "2025"),
+  RMSE = c(boost_rmse_train, boost_rmse_test, boost_rmse_2025),
+  MAE = c(boost_mae_train, boost_mae_test, boost_mae_2025)
+)
+
+boost_metrics_long <- boost_metrics_pres |>
+  pivot_longer(cols = c(RMSE, MAE),
+               names_to = "Metric",
+               values_to = "Value")
+
+
+ggplot(boost_metrics_long, aes(x = dataset, y = Value, fill = Metric)) +
+       geom_col(position = "dodge") + 
+       geom_text(aes(label = round(Value, digits = 3)), color =  "darkgray", vjust = 5,
+                 size = 6, position = position_dodge(width = 0.9)) +
+         labs(
+           title = "Boosting Model Error Comparison",
+           x = "Dataset",
+           y = "Value",
+           fill = "Metric"
+         ) +
+  scale_fill_manual(values = c("RMSE" = "navy", "MAE" = "#556B2E")) +
+  theme_minimal()
+ 
+```
+```{r}
+players_2025 <- read.csv("Data/2025baseballdata.csv")
+players <- players_2025 |> select(c("Rk", "Player"))
+
+
+judge <- data_2025 |> filter(WAR == 9.7 & PA == 679)
+goodman <- data_2025 |> filter(WAR == 3.7 & PA == 579)
+toglia <- data_2025 |> filter(WAR == -1.7 & PA == 337)
+witt <- data_2025 |> filter(WAR == 7.1 & PA == 687)
+
+
+#players |> filter(Player == "Bobby Witt Jr.")
+#tail(players_2025 |> arrange(desc(WAR)))
+
+judge_preds <- augment(ols_fit, judge) 
+judge_preds <- judge_preds |> select(c(".pred", "WAR"))
+
+goodman_preds <- augment(ols_fit, goodman) 
+goodman_preds <- goodman_preds |> select(c(".pred", "WAR"))
+
+toglia_preds <- augment(ols_fit, toglia) 
+toglia_preds <- toglia_preds |> select(c(".pred", "WAR"))
+
+witt_preds <- augment(ols_fit, witt) 
+witt_preds <- witt_preds |> select(c(".pred", "WAR"))
+
+example_preds <- data.frame("Player" = c("Aaron Judge", "Hunter Goodman", "Michael Toglia", "Bobby Witt Jr."),
+                            "Prediction" = c(judge_preds$.pred, goodman_preds$.pred, toglia_preds$.pred, witt_preds$.pred),
+                            "Actual WAR" = c(judge_preds$WAR, goodman_preds$WAR, toglia_preds$WAR, witt_preds$WAR ))
+
+
+
 ```
 
