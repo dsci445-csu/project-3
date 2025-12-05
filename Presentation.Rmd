@@ -1,6 +1,6 @@
 ---
 title: "Group 3: Predicting WAR"
-author: "Gioia Bonannno-Garcia, Ari Crumley, Vincent West"
+author: "Gioia Bonanno-Garcia, Ari Crumley, Vincent West"
 output:
   beamer_presentation: default
   powerpoint_presentation: default
