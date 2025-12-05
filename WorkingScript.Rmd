@@ -419,5 +419,30 @@ ggplot(r2_results_2025, aes(x = model, y = r2, fill = model)) +
 ```{r}
 ols_preds_2025 <- predict(ols_fit, data_2025) |> bind_cols(data_2025)
 ols_rmse_2025 <- rmse(ols_preds_2025, truth = WAR, estimate = .pred)$.estimate
+
+ols_rmse_2025
+ols_mae_2025
+
+ols_metrics <- data.frame(
+  dataset = c("Train", "Test", "2025"),
+  RMSE = c(ols_rmse_train, ols_rmse_test, ols_rmse_2025),
+  MAE = c(ols_mae_train, ols_mae_test, ols_mae_2025)
+)
+
+ols_metrics_long <- ols_metrics |>
+  pivot_longer(cols = c(RMSE, MAE),
+               names_to = "Metric",
+               values_to = "Value")
+
+
+ggplot(ols_metrics_long, aes(x = dataset, y = Value, fill = Metric)) +
+       geom_col(position = "dodge") + 
+         labs(
+           title = "OLS Model Error Comparison",
+           x = "Dataset",
+           y = "Value",
+           fill = "Metric"
+         ) +
+         theme_minimal()
 ```
 
