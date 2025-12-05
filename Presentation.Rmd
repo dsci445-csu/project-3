@@ -8,11 +8,9 @@ date: "2025-12-03"
 classoption: "t"
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
-```
 
-## Overview
+
+
 
 \vspace{0.5cm}
 
@@ -149,9 +147,15 @@ BOOST_plot <- boost_plot_pres |>
 BOOST_plot
 ```
 
-## Boosting Model: Actual vs Predicted WAR (2025)
+
+
 ```{r boost-actual-vs-pred, fig.width=7, fig.height=5}
 library(ggplot2)
+
+predict(boost_final_fit, new_data = data_2025)
+
+boost_preds_2025 <- predict(boost_final_fit, new_data = data_2025) |>
+  dplyr::bind_cols(data_2025)
 
 ggplot(boost_preds_2025, aes(x = WAR, y = .pred)) +
   geom_point(alpha = 0.6, color = "#59A14F", size = 3) +
