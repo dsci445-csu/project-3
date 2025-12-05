@@ -9,7 +9,7 @@ classoption: "t"
 ---
 
 
-
+## Overview
 
 
 \vspace{0.5cm}
@@ -28,6 +28,10 @@ classoption: "t"
 
 </div>
 </div>
+
+## Data used 
+-we love baseball 
+
 
 ## Models used 
 
@@ -163,6 +167,7 @@ knitr::include_graphics(c(
 
 \includegraphics[height=0.23\textheight]{Pictures/Model_Comparison_R2_cropped.png}
 
+## Player Examples
 
-
+![](Pictures/examples.png)
 

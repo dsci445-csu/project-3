@@ -505,9 +505,9 @@ witt_preds <- witt_preds |> select(c(".pred", "WAR"))
 
 example_preds <- data.frame("Player" = c("Aaron Judge", "Hunter Goodman", "Michael Toglia", "Bobby Witt Jr."),
                             "Prediction" = c(judge_preds$.pred, goodman_preds$.pred, toglia_preds$.pred, witt_preds$.pred),
-                            "Actual WAR" = c(judge_preds$WAR, goodman_preds$WAR, toglia_preds$WAR, witt_preds$WAR ))
+                            "Actual" = c(judge_preds$WAR, goodman_preds$WAR, toglia_preds$WAR, witt_preds$WAR ))
+example_preds_nice <- example_preds |> kable()
 
-
-
+example_preds_nice
 ```
 
