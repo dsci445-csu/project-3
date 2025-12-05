@@ -44,7 +44,7 @@ training_data <- training_data |>
          WAR_next = ifelse(is.na(WAR_next), mean(WAR), WAR_next) ) |>
   ungroup()
 
-training_data <- training_data |> filter(!is.na(WAR_next))
+training_data <- training_data |> dplyr::filter(!is.na(WAR_next))
 
 training_clean <- training_data |> select(-c("Player", "year", "WAR_next"))
 
@@ -70,8 +70,9 @@ ols_fit <- ols_spec |>
 
 preds <- predict(ols_fit, test) |> bind_cols(test)
 
-rmse(preds, truth = WAR, estimate = .pred)
-mae(preds, truth = WAR, estimate = .pred)
+yardstick::rmse(preds, truth = WAR, estimate = .pred)
+yardstick::mae(preds, truth = WAR, estimate = .pred)
+
 
 ```
 
@@ -79,11 +80,11 @@ mae(preds, truth = WAR, estimate = .pred)
 ols_preds_train <- predict(ols_fit, train) |> bind_cols(train)
 ols_preds_test <- preds
 
-ols_rmse_train <- rmse(ols_preds_train, truth = WAR, estimate = .pred)$.estimate
-ols_mae_train  <- mae(ols_preds_train,  truth = WAR, estimate = .pred)$.estimate
+ols_rmse_train <- yardstick::rmse(ols_preds_train, truth = WAR, estimate = .pred)$.estimate
+ols_mae_train  <- yardstick::mae(ols_preds_train,  truth = WAR, estimate = .pred)$.estimate
 
-ols_rmse_test <- rmse(ols_preds_test, truth = WAR, estimate = .pred)$.estimate
-ols_mae_test  <- mae(ols_preds_test,  truth = WAR, estimate = .pred)$.estimate
+ols_rmse_test <- yardstick::rmse(ols_preds_test, truth = WAR, estimate = .pred)$.estimate
+ols_mae_test  <- yardstick::mae(ols_preds_test,  truth = WAR, estimate = .pred)$.estimate
 
 ols_metrics <- data.frame(
   train_rmse = ols_rmse_train,
@@ -125,11 +126,11 @@ lasso_preds_test <- lasso_final_fit |> augment(test)
 ```
 
 ```{r}
-lasso_rmse_train <- rmse(lasso_preds_train, truth = WAR, estimate = .pred)$.estimate
-lasso_mae_train <- mae(lasso_preds_train, truth = WAR, estimate = .pred)$.estimate
+lasso_rmse_train <- yardstick::rmse(lasso_preds_train, truth = WAR, estimate = .pred)$.estimate
+lasso_mae_train <- yardstick::mae(lasso_preds_train, truth = WAR, estimate = .pred)$.estimate
 
-lasso_rmse_test <- rmse(lasso_preds_test, truth = WAR, estimate = .pred)$.estimate
-lasso_mae_test <- mae(lasso_preds_test, truth = WAR, estimate = .pred)$.estimate
+lasso_rmse_test <- yardstick::rmse(lasso_preds_test, truth = WAR, estimate = .pred)$.estimate
+lasso_mae_test <- yardstick::mae(lasso_preds_test, truth = WAR, estimate = .pred)$.estimate
 
 non_zero <- lasso_final_fit |> extract_fit_parsnip()|> tidy() |> filter(term != "(Intercept)" & estimate != 0) |> nrow()
 zero <- lasso_final_fit |> extract_fit_parsnip()|> tidy() |> filter(term != "(Intercept)" & estimate == 0) |> nrow()
@@ -181,7 +182,13 @@ boost_tuned <- boost_flow |>
 tune_grid(
 resamples = boost_folds,
 grid = boost_grid,
-metrics = metric_set(rmse, mae)
+boost_tuned <- boost_flow |>
+  tune_grid(
+    resamples = boost_folds,
+    grid      = boost_grid,
+    metrics   = metric_set(yardstick::rmse, yardstick::mae)
+  )
+
 )
 
 
