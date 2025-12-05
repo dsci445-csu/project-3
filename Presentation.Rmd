@@ -70,7 +70,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 \vspace{0.5cm}
 
-- I need a drink 
+- 
 
 ## LASSO Models
 
@@ -89,7 +89,7 @@ knitr::opts_chunk$set(echo = FALSE)
 <div class="column" width = "40%">
 
 - Metrics ran on split training data
-- Good performance? dawg idk 
+- Good performance?
 
 </div>
 <div class="column" width = "60%">
