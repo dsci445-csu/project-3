@@ -231,13 +231,13 @@ boost_metrics
 #TESTING
 
 #OLS
-preds <- predict(ols_fit, data_2025) |> bind_cols(data_2025)
+ols_preds_2025 <- predict(ols_fit, data_2025) |> bind_cols(data_2025)
 
 #LASSO
-lasso_preds_test <- lasso_final_fit |> augment(data_2025)
+lasso_preds_2025 <- lasso_final_fit |> augment(data_2025)
 
 #BOOSTING
-boost_preds_test <- augment(boost_final_fit, data_2025)
+boost_preds_2025 <- augment(boost_final_fit, data_2025)
 
 ```
 
