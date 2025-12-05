@@ -147,6 +147,11 @@ BOOST_plot <- boost_plot_pres |>
 BOOST_plot
 ```
 
+
+</div>
+</div>
+
+
 ## Model Comparison: OLS, LASSO, and Boosting
 
 ```{r compare-plots, echo=FALSE, fig.align="center", out.width="33%"}
@@ -156,6 +161,3 @@ knitr::include_graphics(c(
   "Pictures/Boosting Actual vs Predicted 2025.png"
 ))
 ```
-
-</div>
-</div>
