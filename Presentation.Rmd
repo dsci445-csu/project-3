@@ -24,13 +24,24 @@ classoption: "t"
 </div>
 <div class="column">
 
-![War Ratings Chart](Pictures/war-rating-chart.jpg)
+![](Pictures/war-rating-chart.jpg)
 
 </div>
 </div>
 
 ## Data used 
--we love baseball 
+
+\vspace{0.7em}
+
+- Our data came from baseball-reference.com
+
+- We used standard batting data from 2020-2025 to built our model (500 obs each year)
+  - 2020-2024 was used for training
+  - 2025 was out test data set 
+  
+- Variables: 
+  - WAR, games played, plate appearances, at bats, runs scored, hits, doubles, triples, home runs, RBIs, stolen bases, caught stealing, walks, strike outs, batting average, on base percentage, slugging percentage, OPS percentage, OPS+, rOBA, 
+Rbat+, total bases, double plays grounded into, hit by pitch, sacrifice hits, sacrfice flies, intentional walks
 
 
 ## Models used 
@@ -64,8 +75,11 @@ classoption: "t"
 \vspace{0.5cm}
 
 - OLS identifies and measures the relationship between a response variable and predictor variables.
+
 - Finds a best-fitting line through a set of data points
+
 - Pros: Convenient, accurate regression results for linearly related data
+
 - Cons: May be too simplistic for real world examples, assumptions of Linear Regression
 
 ## OLS Metrics Plot
@@ -78,8 +92,11 @@ classoption: "t"
 \vspace{0.5cm}
 
 - LASSO models perform regularization (L1), which shrinks some coefficients to exactly zero 
+
   - Essentially feature selection 
+  
 - Pros: Produces a more interpretative model, prevents over fitting
+
 - Cons: LASSO performs poorly when predictors are highly correlated
 
 ## LASSO metrics plot
@@ -90,7 +107,9 @@ classoption: "t"
 <div class="column" width = "40%">
 
 - Metrics ran on split training data
-- Good performance?
+- Shrunk terms:
+  - Plate appearances, home runs, RBIs, batting average, on base percentage, OPS+, rOBA
+  
 
 </div>
 <div class="column" width = "60%">
@@ -109,6 +128,7 @@ knitr::include_graphics("Pictures/LASSO_comp_plot.png")
 \vspace{0.5cm}
 
 - Boosting grows trees sequentially using information from previously grown trees  
+
   - Each tree fit on a modified version of the original data set  
 
 \vspace{0.4cm}
@@ -169,5 +189,7 @@ knitr::include_graphics(c(
 
 ## Player Examples
 
-![](Pictures/examples.png)
+\vspace{0.7em}
+
+![fit on OLS model](Pictures/examples.png)
 
