@@ -92,7 +92,7 @@ classoption: "t"
 </div>
 <div class="column" width = "60%">
 
-```{r}
+```{r echo=FALSE}
 library(ggplot2)
 
 lasso_plot_pres <- data.frame(metrics = c("RMSE", "MAE"), values = c(0.7329, 0.5594))
@@ -132,7 +132,7 @@ LASSO_plot
 </div>
 <div class="column" width = "60%">
 
-```{r}
+```{r echo = FALSE}
 library(ggplot2)
 
 boost_plot_pres <- data.frame(metrics = c("RMSE", "MAE"), values = c(0.7301, 0.537))
