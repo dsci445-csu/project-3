@@ -416,3 +416,8 @@ ggplot(r2_results_2025, aes(x = model, y = r2, fill = model)) +
   ))
 ```
 
+```{r}
+ols_preds_2025 <- predict(ols_fit, data_2025) |> bind_cols(data_2025)
+ols_rmse_2025 <- rmse(ols_preds_2025, truth = WAR, estimate = .pred)$.estimate
+```
+
