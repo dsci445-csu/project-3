@@ -210,12 +210,12 @@ head(boost_preds_test)
 
 ```{r}
 
-boost_rmse_train <- rmse(boost_preds_train, truth = WAR, estimate = .pred)$.estimate
-boost_mae_train <- mae(boost_preds_train, truth = WAR, estimate = .pred)$.estimate
+boost_rmse_train <- yardstick::rmse(boost_preds_train, truth = WAR, estimate = .pred)$.estimate
+boost_mae_train <- yardstick::mae(boost_preds_train, truth = WAR, estimate = .pred)$.estimate
 
 
-boost_rmse_test <- rmse(boost_preds_test, truth = WAR, estimate = .pred)$.estimate
-boost_mae_test <- mae(boost_preds_test, truth = WAR, estimate = .pred)$.estimate
+boost_rmse_test <- yardstick::rmse(boost_preds_test, truth = WAR, estimate = .pred)$.estimate
+boost_mae_test <- yardstick::mae(boost_preds_test, truth = WAR, estimate = .pred)$.estimate
 
 boost_metrics <- data.frame(
 train_rmse = boost_rmse_train,
@@ -301,16 +301,16 @@ ggplot(lasso_preds_2025, aes(x = WAR, y = .pred)) +
 library(yardstick)
 #Computing RMSE and MAE 2025 data 
 # OLS
-ols_rmse_2025 <- rmse(ols_preds_2025, truth = WAR, estimate = .pred)$.estimate
-ols_mae_2025  <- mae(ols_preds_2025,  truth = WAR, estimate = .pred)$.estimate
+ols_rmse_2025 <- yardstick::rmse(ols_preds_2025, truth = WAR, estimate = .pred)$.estimate
+ols_mae_2025  <- yardstick::mae(ols_preds_2025,  truth = WAR, estimate = .pred)$.estimate
 
 # LASSO
-lasso_rmse_2025 <- rmse(lasso_preds_2025, truth = WAR, estimate = .pred)$.estimate
-lasso_mae_2025  <- mae(lasso_preds_2025,  truth = WAR, estimate = .pred)$.estimate
+lasso_rmse_2025 <- yardstick::rmse(lasso_preds_2025, truth = WAR, estimate = .pred)$.estimate
+lasso_mae_2025  <- yardstick::mae(lasso_preds_2025,  truth = WAR, estimate = .pred)$.estimate
 
 # BOOSTING
-boost_rmse_2025 <- rmse(boost_preds_2025, truth = WAR, estimate = .pred)$.estimate
-boost_mae_2025  <- mae(boost_preds_2025,  truth = WAR, estimate = .pred)$.estimate
+boost_rmse_2025 <- yardstick::rmse(boost_preds_2025, truth = WAR, estimate = .pred)$.estimate
+boost_mae_2025  <- yardstick::mae(boost_preds_2025,  truth = WAR, estimate = .pred)$.estimate
 
 ```
 
@@ -425,7 +425,11 @@ ggplot(r2_results_2025, aes(x = model, y = r2, fill = model)) +
 
 ```{r}
 ols_preds_2025 <- predict(ols_fit, data_2025) |> bind_cols(data_2025)
-ols_rmse_2025 <- rmse(ols_preds_2025, truth = WAR, estimate = .pred)$.estimate
+ols_rmse_2025 <- yardstick::rmse(ols_preds_2025, truth = WAR, estimate = .pred)$.estimate
+
+
+ols_rmse_2025 <- yardstick::rmse(ols_preds_2025, truth = WAR, estimate = .pred)$.estimate
+ols_mae_2025  <- yardstick::mae(ols_preds_2025,  truth = WAR, estimate = .pred)$.estimate
 
 ols_rmse_2025
 ols_mae_2025
