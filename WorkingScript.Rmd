@@ -23,11 +23,11 @@ data_2022 <- read.csv("Data/2022bbdata.csv")
 data_2021 <- read.csv("Data/2021bbdata.csv")
 data_2020 <- read.csv("Data/2020bbdata.csv")
 
-data_2020 <- data_2020 |> select(-c("Awards", "Pos", "Team", "Lg") )
-data_2021 <- data_2021 |> select(-c("Awards", "Pos", "Team", "Lg") )
-data_2022 <- data_2022 |> select(-c("Awards", "Pos", "Team", "Lg") )
-data_2023 <- data_2023 |> select(-c("Awards", "Pos", "Team", "Lg") )
-data_2024 <- data_2024 |> select(-c("Awards", "Pos", "Team", "Lg") )
+data_2020 <- data_2020 |> select(-c("Awards", "Pos", "Team", "Lg","Rk") )
+data_2021 <- data_2021 |> select(-c("Awards", "Pos", "Team", "Lg","Rk") )
+data_2022 <- data_2022 |> select(-c("Awards", "Pos", "Team", "Lg","Rk") )
+data_2023 <- data_2023 |> select(-c("Awards", "Pos", "Team", "Lg","Rk") )
+data_2024 <- data_2024 |> select(-c("Awards", "Pos", "Team", "Lg","Rk") )
 
 data_2020$year <- 2020
 data_2021$year <- 2021
