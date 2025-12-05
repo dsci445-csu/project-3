@@ -68,7 +68,6 @@ classoption: "t"
 
 \vspace{0.5cm}
 
-- 
 
 ## LASSO Models
 
@@ -77,7 +76,7 @@ classoption: "t"
 - LASSO models perform regularization (L1), which shrinks some coefficients to exactly zero 
   - Essentially feature selection 
 - Pros: Produces a more interpretative model, prevents over fitting
-- Cons: 
+- Cons: LASSO performs poorly when predictors are highly correlated
 
 ## LASSO metrics plot
 
@@ -92,19 +91,8 @@ classoption: "t"
 </div>
 <div class="column" width = "60%">
 
-```{r echo=FALSE}
-library(ggplot2)
-
-lasso_plot_pres <- data.frame(metrics = c("RMSE", "MAE"), values = c(0.7329, 0.5594))
-
-LASSO_plot <- lasso_plot_pres |>
-  ggplot(aes(x = metrics, y = values)) +
-  geom_col(fill = "blue") +
-  theme_bw() +
-  geom_text(aes(label = round(values, digits = 4)), color =  "white", vjust = 5) +
-  labs( x = "Metrics", y = "Values", title = "Test MAE and RMSE for LASSO Model ")
-
-LASSO_plot
+```{r lasso-comp-plot, echo=FALSE, fig.align="center", out.width="90%"}
+knitr::include_graphics("Pictures/LASSO_comp_plot.png")
 ```
 
 
@@ -116,8 +104,14 @@ LASSO_plot
 
 \vspace{0.5cm}
 
-- Boosting grows trees sequentially using information from previously grown trees
-  - Each tree fit on a modified version of the original data set 
+- Boosting grows trees sequentially using information from previously grown trees  
+  - Each tree fit on a modified version of the original data set  
+
+\vspace{0.4cm}
+
+- Pros: High predictive accuracy and captures complex, nonlinear relationships automatically.
+
+- Cons: Prone to overfitting and requires careful tuning of hyperparameters to perform well.
 
 ## Boosting metrics plot
 
@@ -132,19 +126,8 @@ LASSO_plot
 </div>
 <div class="column" width = "60%">
 
-```{r echo = FALSE}
-library(ggplot2)
-
-boost_plot_pres <- data.frame(metrics = c("RMSE", "MAE"), values = c(0.7301, 0.537))
-
-BOOST_plot <- boost_plot_pres |>
-  ggplot(aes(x = metrics, y = values)) +
-  geom_col(fill = "orange") +
-  theme_bw() +
-  geom_text(aes(label = round(values, digits = 4)), color =  "white", vjust = 5) +
-  labs( x = "Metrics", y = "Values", title = "Test MAE and RMSE for Boosting Model ")
-
-BOOST_plot
+```{r boost-comp-plot, echo=FALSE, fig.align="center", out.width="90%"}
+knitr::include_graphics("Pictures/boost_comp_plot.png")
 ```
 
 
@@ -168,12 +151,18 @@ knitr::include_graphics(c(
 
 ## Model Comparison: RMSE, MAE, and R²
 
-```{r model-comparison-all, echo=FALSE, fig.align="center", out.width="0.75\\linewidth"}
-knitr::include_graphics("Pictures/Model Comparison RMSE.png")
+\centering
 
-knitr::include_graphics("Pictures/Model Comparison MAE.png")
+\includegraphics[height=0.23\textheight]{Pictures/Model_Comparison_RMSE_cropped.png}
 
-knitr::include_graphics("Pictures/Model Comparison R2.png")
+\vspace{0.7em}
 
-```
+\includegraphics[height=0.23\textheight]{Pictures/Model_Comparison_MAE_cropped.png}
+
+\vspace{0.7em}
+
+\includegraphics[height=0.23\textheight]{Pictures/Model_Comparison_R2_cropped.png}
+
+
+
 
