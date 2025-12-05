@@ -147,7 +147,10 @@ BOOST_plot <- boost_plot_pres |>
 BOOST_plot
 ```
 
+</div>
+</div>
 
+## fill in 
 
 ```{r boost-actual-vs-pred, fig.width=7, fig.height=5}
 library(ggplot2)
@@ -173,6 +176,3 @@ ggplot(boost_preds_2025, aes(x = WAR, y = .pred)) +
   )
 ```
 
-
-</div>
-</div>
