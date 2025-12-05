@@ -149,6 +149,25 @@ BOOST_plot <- boost_plot_pres |>
 BOOST_plot
 ```
 
+## Boosting Model: Actual vs Predicted WAR (2025)
+```{r boost-actual-vs-pred, fig.width=7, fig.height=5}
+library(ggplot2)
+
+ggplot(boost_preds_2025, aes(x = WAR, y = .pred)) +
+  geom_point(alpha = 0.6, color = "#59A14F", size = 3) +
+  geom_abline(slope = 1, intercept = 0,
+              color = "red", linetype = "dashed", linewidth = 1) +
+  labs(
+    title = "Boosting Model: Actual vs Predicted WAR (2025 Data)",
+    x = "Actual WAR",
+    y = "Predicted WAR"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(face = "bold", hjust = 0.5),
+    panel.grid.minor = element_blank()
+  )
+```
 
 
 </div>
