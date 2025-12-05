@@ -161,3 +161,19 @@ knitr::include_graphics(c(
   "Pictures/Boosting Actual vs Predicted 2025.png"
 ))
 ```
+
+</div>
+</div>
+
+
+## Model Comparison: RMSE, MAE, and R²
+
+```{r model-comparison-all, echo=FALSE, fig.align="center"}
+
+knitr::include_graphics("Pictures/Model Comparison RMSE.png")
+
+knitr::include_graphics("Pictures/Model Comparison MAE.png")
+
+knitr::include_graphics("Pictures/Model Comparison R2.png")
+```
+
