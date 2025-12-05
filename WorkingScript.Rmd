@@ -14,7 +14,7 @@ library(tidymodels)
 
 # For testing
 data_2025 <- read.csv("Data/2025baseballdata.csv")
-data_2025 <- data_2025 |> select(-c("Awards", "Pos", "Team", "Lg", "Player"))
+data_2025 <- data_2025 |> select(-c("Awards", "Pos", "Team", "Lg", "Player","Rk"))
 
 # For training
 data_2024 <- read.csv("Data/2024bbdata.csv")
