@@ -168,12 +168,12 @@ knitr::include_graphics(c(
 
 ## Model Comparison: RMSE, MAE, and R²
 
-```{r model-comparison-all, echo=FALSE, fig.align="center"}
-
+```{r model-comparison-all, echo=FALSE, fig.align="center", out.width="0.75\\linewidth"}
 knitr::include_graphics("Pictures/Model Comparison RMSE.png")
 
 knitr::include_graphics("Pictures/Model Comparison MAE.png")
 
 knitr::include_graphics("Pictures/Model Comparison R2.png")
+
 ```
 
