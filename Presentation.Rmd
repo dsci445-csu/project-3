@@ -35,16 +35,16 @@ classoption: "t"
 
 - Our data came from baseball-reference.com
 
-- We used standard batting data from 2020-2025 to built our model (500 obs each year)
+- We used standard batting data from 2020-2025 to build our models (500 obs each year)
   - 2020-2024 was used for training
-  - 2025 was out test data set 
+  - 2025 was our test data set 
   
 - Variables: 
-  - WAR, games played, plate appearances, at bats, runs scored, hits, doubles, triples, home runs, RBIs, stolen bases, caught stealing, walks, strike outs, batting average, on base percentage, slugging percentage, OPS percentage, OPS+, rOBA, 
+  - WAR, age, games played, plate appearances, at bats, runs scored, hits, doubles, triples, home runs, RBIs, stolen bases, caught stealing, walks, strike outs, batting average, on base percentage, slugging percentage, OPS percentage, OPS+, rOBA, 
 Rbat+, total bases, double plays grounded into, hit by pitch, sacrifice hits, sacrfice flies, intentional walks
 
 
-## Models used 
+## Models Used 
 
 \vspace{0.5cm}
 
@@ -52,19 +52,22 @@ Rbat+, total bases, double plays grounded into, hit by pitch, sacrifice hits, sa
 <div class="column" width = "33.3%">
 
 - OLS
-  - Simplest model used
+  - Baseline linear model
+  - Benchmark for comparing models
   
 </div>
 <div class="column" width = "33.3%">
 
 - LASSO
-  - Feature selection
+  - Feature selection through L1 regularization 
 
 </div>
 <div class="column" width = "33.3%">
 
 - Boosting
   - Tree based method
+  - Good at capturing non-linear patterns
+  
   
 </div>
 </div>
@@ -76,7 +79,7 @@ Rbat+, total bases, double plays grounded into, hit by pitch, sacrifice hits, sa
 
 - OLS identifies and measures the relationship between a response variable and predictor variables.
 
-- Finds a best-fitting line through a set of data points
+  - Finds a best-fitting line through a set of data points
 
 - Pros: Convenient, accurate regression results for linearly related data
 
@@ -85,6 +88,23 @@ Rbat+, total bases, double plays grounded into, hit by pitch, sacrifice hits, sa
 ## OLS Metrics Plot
 
 \vspace{0.5cm}
+
+<div class="columns">
+<div class="column" width = "40%">
+
+- Error metrics for both final testing data set (2025) and the training data split into training and testing sets
+- Significant terms:
+  - age, games played, plate appearances, at bats, runs, hits, doubles, triples, home runs, stolen bases, caught stealing,
+  walks, strikeouts, OPS+
+
+</div>
+<div class="column" width = "60%">
+
+
+
+
+</div>
+</div>
 
 
 ## LASSO Models
@@ -99,14 +119,14 @@ Rbat+, total bases, double plays grounded into, hit by pitch, sacrifice hits, sa
 
 - Cons: LASSO performs poorly when predictors are highly correlated
 
-## LASSO metrics plot
+## LASSO Metrics Plot
 
 \vspace{0.5cm}
 
 <div class="columns">
 <div class="column" width = "40%">
 
-- Metrics ran on split training data
+- Error metrics for both final testing data set (2025) and the training data split into training and testing sets
 - Shrunk terms:
   - Plate appearances, home runs, RBIs, batting average, on base percentage, OPS+, rOBA
   
@@ -137,7 +157,7 @@ knitr::include_graphics("Pictures/LASSO_comp_plot.png")
 
 - Cons: Prone to overfitting and requires careful tuning of hyperparameters to perform well.
 
-## Boosting metrics plot
+## Boosting Metrics Plot
 
 \vspace{0.5cm}
 
@@ -145,7 +165,7 @@ knitr::include_graphics("Pictures/LASSO_comp_plot.png")
 <div class="columns">
 <div class="column" width = "40%">
 
-- Metrics ran on split training data
+- Error metrics for both final testing data set (2025) and the training data split into training and testing sets
 
 </div>
 <div class="column" width = "60%">
@@ -187,9 +207,10 @@ knitr::include_graphics(c(
 
 \includegraphics[height=0.23\textheight]{Pictures/Model_Comparison_R2_cropped.png}
 
-## Player Examples
+## Player Examples Using OLS model
 
 \vspace{0.7em}
 
-![fit on OLS model](Pictures/examples.png)
+![](Pictures/examples.png)
 
+## Questions?
