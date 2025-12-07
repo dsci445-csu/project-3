@@ -1,6 +1,69 @@
 ---
-title: "Paper"
-output: html_document
+title: "Evaluating Statistical Models for Predicting Next-Season Wins Above Replacement"
+author: "Group 3"
+date: "2025-12-05"
+output:
+  pdf_document: default
+  html_document: default
 ---
 
-Hello world!
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=TRUE)
+```
+ 
+```{r}
+library(knitr)
+library(ggplot2)
+```
+ 
+ 
+##Introduction
+ 
+##Background and Motivation
+ Wins Above Placement (WAR) is one of the most widely used metrics in modern baseball analytics. It estimates the total number of wins a player contributes to their team compared to a player who could be readily called up from the minor league, or signed for a low cost. Since WAR combines many aspects of performance: hitting, defense, positional value, and baserunning, it is viewed as a comprehensive measure of a player's overall value.
+ 
+ 
+##Purpose
+ 
+##Data Cleaning
+ 
+ 
+ ....
+ 
+ 
+##Methods
+ 
+##OLS
+ 
+ The Ordinary Least Squares ...explain the method...
+ 
+Our OLS model outputs an $R^2$ value of 0.8219. Meaning that it explains about 82% of the variation in WAR using batting statistics. 
+
+It also outputted a Residual Standard Error of 0.73, confirming the model's predictions are consistently within about 0.7-0.8 WAR of the true value
+
+
+
+##LASSO
+ 
+ Least Absolute Shrinkage and Selection Operator... explain
+ 
+ Our LASSO model performs both regulariztion and feature selction of the data 
+ #BOOSTING
+
+
+##GRAPHS
+ 
+##OLS Scatterplot
+ 
+##LASSO Scatterplot
+ 
+##BOOSTING Scatterplot
+ 
+ 
+##Comparison BAR graphs
+
+
+ 
+
+ 
+##CONCLUSION
