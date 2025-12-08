@@ -245,13 +245,6 @@ ggplot(ols_preds_2025, aes(x = WAR, y = .pred)) +
     panel.grid.minor = element_blank()
   )
 
-ggsave(
-  filename = "Pictures/OLS_comp_plot.png",
-  plot = last_plot(),
-  width = 8,
-  height = 5,
-  dpi = 300
-)
 ```
 
 ```{r}
@@ -429,6 +422,7 @@ ggplot(ols_metrics_long, aes(x = dataset, y = Value, fill = Metric)) +
            fill = "Metric"
          ) +
          theme_minimal()
+
 ```
 ```{r}
 lasso_metrics_pres <- data.frame(
