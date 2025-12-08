@@ -244,7 +244,16 @@ ggplot(ols_preds_2025, aes(x = WAR, y = .pred)) +
     plot.title = element_text(face = "bold" , hjust = 0.5),
     panel.grid.minor = element_blank()
   )
+
+ggsave(
+  filename = "Pictures/OLS_comp_plot.png",
+  plot = last_plot(),
+  width = 8,
+  height = 5,
+  dpi = 300
+)
 ```
+
 ```{r}
 ggplot(lasso_preds_2025, aes(x = WAR, y = .pred)) +
   geom_point(alpha = 0.6, color = "#F28E2B", size = 3) +
