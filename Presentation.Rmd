@@ -231,6 +231,7 @@ knitr::include_graphics(c(
 \vspace{0.7em}
 
 ![](Pictures/examples.png)
+
 ## Key Findings
 \vspace{0.5cm}
 
