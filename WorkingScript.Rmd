@@ -391,6 +391,8 @@ ggplot(r2_results_2025, aes(x = model, y = r2, fill = model)) +
 ```
 
 ```{r}
+#OLS comparison plot
+
 ols_preds_2025 <- predict(ols_fit, data_2025) |> bind_cols(data_2025)
 ols_rmse_2025 <- yardstick::rmse(ols_preds_2025, truth = WAR, estimate = .pred)$.estimate
 
@@ -424,7 +426,11 @@ ggplot(ols_metrics_long, aes(x = dataset, y = Value, fill = Metric)) +
          theme_minimal()
 
 ```
+
+
 ```{r}
+#LASSO comparison plot
+
 lasso_metrics_pres <- data.frame(
   dataset = c("Train", "Test", "2025"),
   RMSE = c(lasso_rmse_train, lasso_rmse_test, lasso_rmse_2025),
@@ -453,7 +459,12 @@ ggplot(lasso_metrics_long, aes(x = dataset, y = Value, fill = Metric)) +
 
 
 ```
+
+
+
 ```{r}
+#Boosting comparison plot
+
 boost_metrics_pres <- data.frame(
   dataset = c("Train", "Test", "2025"),
   RMSE = c(boost_rmse_train, boost_rmse_test, boost_rmse_2025),
@@ -480,6 +491,9 @@ ggplot(boost_metrics_long, aes(x = dataset, y = Value, fill = Metric)) +
   theme_minimal()
  
 ```
+
+
+
 ```{r}
 players_2025 <- read.csv("Data/2025baseballdata.csv")
 players <- players_2025 |> select(c("Rk", "Player"))
@@ -489,7 +503,7 @@ judge <- data_2025 |> filter(WAR == 9.7 & PA == 679)
 goodman <- data_2025 |> filter(WAR == 3.7 & PA == 579)
 toglia <- data_2025 |> filter(WAR == -1.7 & PA == 337)
 witt <- data_2025 |> filter(WAR == 7.1 & PA == 687)
-
+ohtani <- data_2025 |> filter(WAR == 6.6 & PA == 727)
 
 #players |> filter(Player == "Bobby Witt Jr.")
 #tail(players_2025 |> arrange(desc(WAR)))
@@ -506,11 +520,15 @@ toglia_preds <- toglia_preds |> select(c(".pred", "WAR"))
 witt_preds <- augment(ols_fit, witt) 
 witt_preds <- witt_preds |> select(c(".pred", "WAR"))
 
-example_preds <- data.frame("Player" = c("Aaron Judge", "Hunter Goodman", "Michael Toglia", "Bobby Witt Jr."),
-                            "Prediction" = c(judge_preds$.pred, goodman_preds$.pred, toglia_preds$.pred, witt_preds$.pred),
-                            "Actual" = c(judge_preds$WAR, goodman_preds$WAR, toglia_preds$WAR, witt_preds$WAR ))
+ohtani_preds <- augment(ols_fit, ohtani) 
+ohtani_preds <- ohtani_preds |> select(c(".pred", "WAR"))
+
+example_preds <- data.frame("Player" = c("Aaron Judge", "Hunter Goodman", "Michael Toglia", "Bobby Witt Jr.", "Shohei Ohtani"),
+                            "Prediction" = c(judge_preds$.pred, goodman_preds$.pred, toglia_preds$.pred, witt_preds$.pred,ohtani_preds$.pred ),
+                            "Actual" = c(judge_preds$WAR, goodman_preds$WAR, toglia_preds$WAR, witt_preds$WAR, ohtani_preds$WAR))
 example_preds_nice <- example_preds |> kable()
 
 example_preds_nice
+ohtani_preds
 ```
 

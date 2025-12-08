@@ -63,7 +63,7 @@ classoption: "t"
   - 2025 was our test data set 
   
 - Variables: 
-  - WAR, age, games played, plate appearances, at bats, runs scored, hits, doubles, triples, home runs, RBIs, stolen bases, caught stealing, walks, strikeouts, batting average, on base percentage, slugging percentage, OPS percentage, OPS+, rOBA, 
+  - WAR, age, **games played**, plate appearances, at bats, runs scored, **hits**, doubles, triples, **home runs**, RBIs, stolen bases, caught stealing, walks, strikeouts, **batting average**, on base percentage, slugging percentage, OPS percentage, OPS+, rOBA, 
 Rbat+, total bases, double plays grounded into, hit by pitch, sacrifice hits, sacrifice flies, intentional walks
 
 
@@ -77,44 +77,29 @@ Rbat+, total bases, double plays grounded into, hit by pitch, sacrifice hits, sa
 
 \vspace*{\fill}
 
-```{r baseball-player, echo=FALSE, fig.align="center", out.width="90%"}
+```{r baseball-player-1, echo=FALSE, fig.align="center", out.width="90%"}
 knitr::include_graphics("Pictures/baseball_player.jpeg")
 ```
 
 <!--
 ## Models Used 
 
-\vspace{0.5cm}
 
-<div class="columns">
-<div class="column" width = "33.3%">
 
 - OLS
   - Baseline linear model
   - Benchmark for comparing models
   
-</div>
-<div class="column" width = "33.3%">
 
-- LASSO
-  - Feature selection through L1 regularization 
-
-</div>
-<div class="column" width = "33.3%">
-
-- Boosting
-  - Tree based method
-  - Good at capturing non-linear patterns
-  
-  
-</div>
-</div>
 
 -->
 
 ## OLS Models
 
 \vspace{0.5cm}
+
+<div class="rows">
+<div class="row">
 
 - OLS identifies and measures the relationship between a response variable and predictor variables.
 
@@ -123,6 +108,20 @@ knitr::include_graphics("Pictures/baseball_player.jpeg")
 - Pros: Convenient, accurate regression results for linearly related data
 
 - Cons: May be too simplistic for real world examples, assumptions of Linear Regression
+
+</div>
+<div class="row" style="text-align: center;">
+
+
+
+```{r ols_fun, echo=FALSE, fig.align="center", out.width="58%"}
+knitr::include_graphics("Pictures/ols_fun.jpeg")
+```
+
+
+</div>
+</div>
+
 
 ## OLS Metrics Plot
 
@@ -149,6 +148,9 @@ knitr::include_graphics("Pictures/ols_comp_plot.png")
 
 \vspace{0.5cm}
 
+<div class="rows">
+<div class="row">
+
 - LASSO models perform regularization (L1), which shrinks some coefficients to exactly zero 
 
   - Essentially feature selection 
@@ -156,6 +158,16 @@ knitr::include_graphics("Pictures/ols_comp_plot.png")
 - Pros: Produces a more interpretative model, prevents over fitting
 
 - Cons: LASSO performs poorly when predictors are highly correlated
+
+</div>
+<div class="row" style="text-align: center;">
+
+```{r lasso_fun, echo=FALSE, fig.align="center", out.width="58%"}
+knitr::include_graphics("Pictures/lasso_fun.png")
+```
+
+</div>
+</div>
 
 ## LASSO Metrics Plot
 
@@ -183,17 +195,29 @@ knitr::include_graphics("Pictures/LASSO_comp_plot.png")
 
 ## Boosting Models 
 
-\vspace{0.5cm}
+\vspace{0.3cm}
+
+<div class="rows">
+<div class="row">
 
 - Boosting grows trees sequentially using information from previously grown trees  
 
-  - Each tree fit on a modified version of the original data set  
-
-\vspace{0.4cm}
+  - Each tree fit on a modified version of the original data set
+  - Good at capturing non-linear patterns
 
 - Pros: High predictive accuracy and captures complex, nonlinear relationships automatically.
 
-- Cons: Prone to overfitting and requires careful tuning of hyperparameters to perform well.
+- Cons: Prone to over fitting and requires careful tuning of hyper parameters to perform well.
+
+</div>
+<div class="row" style="text-align: center;">
+
+```{r boosting_fun, echo=FALSE, fig.align="center", out.width="58%"}
+knitr::include_graphics("Pictures/boosting_fun.png")
+```
+
+</div>
+</div>
 
 ## Boosting Metrics Plot
 
@@ -246,9 +270,9 @@ knitr::include_graphics(c(
 
 ## Player Examples Using OLS model
 
-\vspace{0.7em}
+\vspace{0.10cm}
 
-![](Pictures/examples.png)
+![](Pictures/war_examples.png)
 
 ## Key Findings
 \vspace{0.5cm}
@@ -257,10 +281,10 @@ knitr::include_graphics(c(
   - Lowest prediction error
   - Highest explained variance
 - LASSO selected a subset of meaningful predictors, making it easier to understand which player stats drive WAR
-- Variables with a strong predictive value: plate apperances, home runs, hits, OPS+, walks, and strikouts
+- Variables with a strong predictive value: plate appearances, home runs, hits, OPS+, walks, and strikouts
 - WAR prediction is challenging
   - some components are hard to obtain from batting-only statistics
-  - player injuries, playing time, or other extrnal factors produce noise
+  - player injuries, playing time, or other external factors produce noise
 
 
 ## Questions?
