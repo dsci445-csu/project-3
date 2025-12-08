@@ -18,8 +18,10 @@ classoption: "t"
 <div class="column">
 
 - Goal: build a model to predict WAR (Wins Above Replacement)
-- WAR measures a player’s total contribution compared to a replacement-level player
-- Interpreted as the number of additional wins a player adds to a team
+- \textbf{WAR measures a player’s total contribution} compared to a replacement-level player
+  - It combines multiple aspects of performance: hitting, baserunning, defensive value, positional difficulty, and their playing time, and puts it into a single number.
+  - Interpreted as the number of additional wins a player adds to a team
+  - Since it provides a single encompassing measure of a player's value, WAR is greatly relied on by MLB front offices
 
 </div>
 <div class="column">
@@ -28,6 +30,26 @@ classoption: "t"
 
 </div>
 </div>
+
+
+## Motivation
+
+\vspace{0.5cm}
+
+- Can a player's current-season performance statistics be used to predict their next season Wins Above Replacement (WAR)?
+
+- Major League Baseball teams rely heavily on WAR to evaluate a players value, make contract decisions, and project roster needs. 
+- It provide a competitive advantage for a team by:
+  - Helps identify declining players
+  - Allows for budgeting and contract planning
+  - Encourages player development and roster optimization 
+  
+
+- Our goal is, by using statistical and machine learning models, we will:
+  - Identify which player statistics best predict future WAR
+  - Compare the performance of three different statistical learning models: OLS, LASSO, and BOOSTING
+  - Build a model that maintains high predictive accuracy
+
 
 ## Data used 
 
@@ -40,8 +62,8 @@ classoption: "t"
   - 2025 was our test data set 
   
 - Variables: 
-  - WAR, age, games played, plate appearances, at bats, runs scored, hits, doubles, triples, home runs, RBIs, stolen bases, caught stealing, walks, strike outs, batting average, on base percentage, slugging percentage, OPS percentage, OPS+, rOBA, 
-Rbat+, total bases, double plays grounded into, hit by pitch, sacrifice hits, sacrfice flies, intentional walks
+  - WAR, age, games played, plate appearances, at bats, runs scored, hits, doubles, triples, home runs, RBIs, stolen bases, caught stealing, walks, strikeouts, batting average, on base percentage, slugging percentage, OPS percentage, OPS+, rOBA, 
+Rbat+, total bases, double plays grounded into, hit by pitch, sacrifice hits, sacrifice flies, intentional walks
 
 
 ## Models Used 
@@ -101,11 +123,9 @@ Rbat+, total bases, double plays grounded into, hit by pitch, sacrifice hits, sa
 <div class="column" width = "60%">
 
 
-
-
-</div>
-</div>
-
+```{r ols-comp-plot, echo=FALSE, fig.align="center", out.width="90%"}
+knitr::include_graphics("Pictures/OLS_comp_plot.png")
+```
 
 ## LASSO Models
 
@@ -212,5 +232,17 @@ knitr::include_graphics(c(
 \vspace{0.7em}
 
 ![](Pictures/examples.png)
+## Key Findings
+\vspace{0.5cm}
+
+- OLS performed the best overall
+  - Lowest prediction error
+  - Highest explained variance
+- LASSO selected a subset of meaningful predictors, making it easier to understand which player stats drive WAR
+- Variables with a strong predictive value: plate apperances, home runs, hits, OPS+, walks, and strikouts
+- WAR prediction is challenging
+  - some components are hard to obtain from batting-only statistics
+  - player injuries, playing time, or other extrnal factors produce noise
+
 
 ## Questions?
