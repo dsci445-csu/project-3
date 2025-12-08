@@ -67,6 +67,21 @@ classoption: "t"
 Rbat+, total bases, double plays grounded into, hit by pitch, sacrifice hits, sacrifice flies, intentional walks
 
 
+
+##
+\vspace*{\fill}
+
+\begin{center}
+{\color{structure} \bfseries \fontsize{36}{40}\selectfont Models Used}
+\end{center}
+
+\vspace*{\fill}
+
+```{r baseball-player, echo=FALSE, fig.align="center", out.width="90%"}
+knitr::include_graphics("Pictures/baseball_player.jpeg")
+```
+
+<!--
 ## Models Used 
 
 \vspace{0.5cm}
@@ -95,6 +110,7 @@ Rbat+, total bases, double plays grounded into, hit by pitch, sacrifice hits, sa
 </div>
 </div>
 
+-->
 
 ## OLS Models
 
