@@ -18,7 +18,7 @@ classoption: "t"
 <div class="column">
 
 - Goal: build a model to predict WAR (Wins Above Replacement)
-- \textbf{WAR measures a player’s total contribution} compared to a replacement-level player
+- WAR measures a player’s total contribution compared to a replacement-level player
   - It combines multiple aspects of performance: hitting, baserunning, defensive value, positional difficulty, and their playing time, and puts it into a single number.
   - Interpreted as the number of additional wins a player adds to a team
   - Since it provides a single encompassing measure of a player's value, WAR is greatly relied on by MLB front offices
@@ -35,7 +35,6 @@ classoption: "t"
 ## Motivation
 
 \vspace{0.5cm}
-
 - Can a player's current-season performance statistics be used to predict their next season Wins Above Replacement (WAR)?
 
 - Major League Baseball teams rely heavily on WAR to evaluate a players value, make contract decisions, and project roster needs. 
@@ -123,8 +122,10 @@ Rbat+, total bases, double plays grounded into, hit by pitch, sacrifice hits, sa
 <div class="column" width = "60%">
 
 ```{r ols-comp-plot, echo=FALSE, fig.align="center", out.width="90%"}
-knitr::include_graphics("Pictures/OLS_comp_plot.png")
+knitr::include_graphics("Pictures/ols_comp_plot.png")
 ```
+</div>
+</div>
 
 ## LASSO Models
 
@@ -208,7 +209,6 @@ knitr::include_graphics(c(
 ))
 ```
 
-</div>
 </div>
 
 
