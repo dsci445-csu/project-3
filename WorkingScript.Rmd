@@ -524,7 +524,7 @@ ohtani_preds <- augment(ols_fit, ohtani)
 ohtani_preds <- ohtani_preds |> select(c(".pred", "WAR"))
 
 example_preds <- data.frame("Player" = c("Aaron Judge", "Hunter Goodman", "Michael Toglia", "Bobby Witt Jr.", "Shohei Ohtani"),
-                            "Prediction" = c(judge_preds$.pred, goodman_preds$.pred, toglia_preds$.pred, witt_preds$.pred,ohtani_preds$.pred ),
+                            "Prediction" = round(c(judge_preds$.pred, goodman_preds$.pred, toglia_preds$.pred, witt_preds$.pred,ohtani_preds$.pred ), digits = 1),
                             "Actual" = c(judge_preds$WAR, goodman_preds$WAR, toglia_preds$WAR, witt_preds$WAR, ohtani_preds$WAR))
 example_preds_nice <- example_preds |> kable()
 
