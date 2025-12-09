@@ -417,7 +417,7 @@ ols_metrics_long <- ols_metrics |>
 
 ggplot(ols_metrics_long, aes(x = dataset, y = Value, fill = Metric)) +
        geom_col(position = "dodge") + 
-  geom_text(aes(label = round(Value, digits = 3)), color ="black", just = 5,
+  geom_text(aes(label = round(Value, digits = 3)), color ="black", vjust = 1.5,
     size = 6, position = position_dodge(width = 0.9)) +
          labs(
            title = "OLS Model Error Comparison",

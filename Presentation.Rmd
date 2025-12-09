@@ -140,7 +140,7 @@ knitr::include_graphics("Pictures/ols_fun.jpeg")
 <div class="column" width = "60%">
 
 ```{r ols-comp-plot, echo=FALSE, fig.align="center", out.width="90%"}
-knitr::include_graphics("Pictures/ols_comp_plot.png")
+knitr::include_graphics("Pictures/final_ols_comp_plot.png")
 ```
 </div>
 </div>
