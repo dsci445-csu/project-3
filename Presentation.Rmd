@@ -1,5 +1,5 @@
 ---
-title: "Group 3: Predicting WAR"
+title: "Group 3: Predicting Baseball WAR"
 author: "Gioia Bonanno-Garcia, Ari Crumley, Vincent West"
 output:
   beamer_presentation: default
@@ -18,7 +18,7 @@ classoption: "t"
 
 - Goal: build a model to predict WAR (Wins Above Replacement)
 - WAR measures a player’s total contribution compared to a replacement-level player
-  - It combines multiple aspects of performance: hitting, baserunning, defensive value, positional difficulty, and their playing time, and puts it into a single number.
+  - It combines multiple aspects of performance: hitting, base running, defensive value, positional difficulty, and their playing time, and puts it into a single number.
   - Interpreted as the number of additional wins a player adds to a team
   - Since it provides a single encompassing measure of a player's value, WAR is greatly relied on by MLB front offices
 
@@ -103,7 +103,7 @@ knitr::include_graphics("Pictures/baseball_player.jpeg")
   - It finds the best-fitting linear trend that minimizes squared error. 
 
 - Pros:
-  - Convenient, 
+  - Convenient
   - Has accurate regression results for linearly related data
 
 - Cons: 
