@@ -98,15 +98,11 @@ knitr::include_graphics("Pictures/baseball_player.jpeg")
 
 \vspace{0.5cm}
 
-<<<<<<< HEAD
+
 <div class="rows">
 <div class="row">
 
-- OLS identifies and measures the relationship between a response variable and predictor variables.
-=======
 - An Ordinary Least Squares (OLS) model identifies and measures the relationship between a response variable and predictor variables
->>>>>>> 126764a (Tidied up my OLS slide)
-
   - It finds the best-fitting linear trend that minimizes squared error. 
 
 - Pros:
