@@ -96,9 +96,6 @@ knitr::include_graphics("Pictures/baseball_player.jpeg")
 
 ## OLS Models
 
-\vspace{0.5cm}
-
-
 <div class="rows">
 <div class="row">
 
