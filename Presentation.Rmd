@@ -98,16 +98,24 @@ knitr::include_graphics("Pictures/baseball_player.jpeg")
 
 \vspace{0.5cm}
 
+<<<<<<< HEAD
 <div class="rows">
 <div class="row">
 
 - OLS identifies and measures the relationship between a response variable and predictor variables.
+=======
+- An Ordinary Least Squares (OLS) model identifies and measures the relationship between a response variable and predictor variables
+>>>>>>> 126764a (Tidied up my OLS slide)
 
-  - Finds a best-fitting line through a set of data points
+  - It finds the best-fitting linear trend that minimizes squared error. 
 
-- Pros: Convenient, accurate regression results for linearly related data
+- Pros:
+  - Convenient, 
+  - Has accurate regression results for linearly related data
 
-- Cons: May be too simplistic for real world examples, assumptions of Linear Regression
+- Cons: 
+  - May be too simplistic for real world examples
+  - Assumptions of Linear Regression
 
 </div>
 <div class="row" style="text-align: center;">
