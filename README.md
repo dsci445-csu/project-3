@@ -56,7 +56,7 @@ To model *next-season* perfomance:
   - Non-numeric or non-performance variables, such as Player, name, team, and awards, are removed before modeling.
 
 ### Prediction Target Definition
-To model *next-season* perfomance:
+To model *next-season* performance:
   - Data is sorted by player and year.
   - A new variable, 'WAR_next', is created using a one-year lead of WAR.
   - This allows current-season statistics to predict WAR in the following season.
