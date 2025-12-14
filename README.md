@@ -60,3 +60,111 @@ To model *next-season* performance:
   - Data is sorted by player and year.
   - A new variable, 'WAR_next', is created using a one-year lead of WAR.
   - This allows current-season statistics to predict WAR in the following season.
+  
+  
+## Methodology
+
+### 1. Data Cleaning
+  - Removed categorical and identifier variables not suitable for regression.
+  - Combined data from 2020-2024 into a single training dataset.
+  - Created test/train splits for model evaluation
+  - The 2025 season is used for our real-world test set.
+  
+
+### 2. Models Implemented
+
+#### Ordinary Least Squares (OLS)
+  - Baseline linear regression model.
+  - Uses all avaialble predictors without regularization.
+  - Provides interpretability but is sensitive to overfitting
+  
+  
+#### LASSO Regression
+  - Penalized linear regression using L1 regularization
+  - Used a 10-fold cross-validation
+  - Performs automatic feature selevtion by shrinking some coefficients to zero.
+  - Allows evaluation of how many predictors meaningfullt contribute to prediction.
+  
+  
+#### Boosting Regression
+  - Nonlinear ensemble method.
+  - Sequentially builds models to correct previous errors.
+  - Captures interactions and nonlinear relationships between predictors
+  - Uses cross-validation
+  
+  
+## Model Evaluation
+
+Models are evaluated using:
+  - **RMSE (Root Mean Squared Error)**
+  - **MAE (Mean Absolute Error)**
+  - **$R^2$ (Coefficient of Determination)**
+  
+Evaluation is performed on:
+  1. Training data
+  2. Test data
+  3. 2025 season data (out-of-sample evaluation)
+  
+
+Visualizations:
+  - Actual vs. Predicted WAR scatterplots for each model
+  - RMSE, MAE, $R^2$ comparisons across models
+  - Error comparisons across datasets (Train/Test/2025)
+  
+  
+
+## Results Summary
+
+  - **OLS** achieved the strongest overall predictive performance, particularly 
+  on the 2025 out-of-sample data, indicating that the next-season WAR is well captured by a linear relationship with current-season performance statistics.
+  - **LASSO** produced comparable results to OLS while reducing model complexity by shrinking several coefficients to zero, suggesting that only a subset of performance metrics meaningfully contribute to future WAR.
+  - **BOOSTING** did not outperform linear models, implying that nonlinear relationships provide limited predictive value in this scenario.
+  
+  Despite predictive accuracy, all models exhibit regression toward the mean, especially for players with extreme WAR values, highlighting the uncertainty in forecasting future player performance.
+  
+  
+  
+## Study Preictions with 2025 examples:
+Predicted vs. actual WAR values are examined for selected high-profile players, including:
+  - Aarin Judge
+  - Bobby Witt Jr.
+  - Michael Toglia
+  - Hunter Goodman
+  - Shohei Ohtani; his WAE was skewed because he has a combined WAR (pitching and hitting statistics, and our model only uses hitting statistics. This shows a limitiation within our model)
+
+
+## Reproducibility
+
+This project is full reproducible:
+  - All code is written in **R**
+  - Models are built using **tidymodels**, **glmnet**, and **yardstick**
+  - Cross-validation and tuning are explicitly defined
+  - Results and figures are generated directly from the data
+  
+  
+To reproduce results:
+  1. Clone this repository
+  2. Ensure the 'Data/' folder contains the CSV files for each season
+  3. Run the R scripts sequentially
+  
+
+$$ Required Packages
+
+```r
+dplyr
+tidymodels
+glmnet
+yardstick
+Metrics
+ggplot2
+```
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
