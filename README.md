@@ -20,7 +20,7 @@ Can we predict a baseball player’s next-season Wins Above Replacement (WAR) us
 ## Background: What is WAR?
 Wins Above Replacement (WAR) is a comprehensive baseball statistic that measures a player's total contribution to their team. It estimates how many additional wins a player provides compared to the hypothetical replacement-level player. 
 
-It combines multiple aspects of performance such as hitting, baserunning, defensive value, positional difficulty, and their playing time, and puts it into a single metric. The lower the war, the worse the player is.
+It combines multiple aspects of performance such as hitting, baserunning, defensive value, positional difficulty, and their playing time, and puts it into a single metric. Lower WAR values inficate lower overall contribution.
 
 Because WAR is an aggregate statistic influenced by many factors, it can be challenging to predict future WAR, furthering our motivation to find the best-fitting model to predict a player's next season WAR.
 
@@ -38,29 +38,10 @@ Because WAR is an aggregate statistic influenced by many factors, it can be chal
   - Non-numeric or non-performance variables, such as Player, name, team, and awards, are removed before modeling.
 
 ### Prediction Target Definition
-To model *next-season* perfomance:
-  - Data is sorted by player and year.
-  - A new variable, 'WAR_next', is created using a one-year lead of WAR.
-  - This allows current-season statistics to predict WAR in the following season.
-
-## Data Description
-
-### Time Frame
-  - **Training Data:** 2020-2024 MLB season
-  - **Out-of-sample evaluation:** 2025 MLB season
-
-### Structure
-  - Each observation represents a single player-season.
-  - The response variable is **WAR**
-  - Predictor variables come from batting statistics, including offensive and performance-related statistics (plate appearances, batting metrics, etc)
-  - Non-numeric or non-performance variables, such as Player, name, team, and awards, are removed before modeling.
-
-### Prediction Target Definition
 To model *next-season* performance:
   - Data is sorted by player and year.
-  - A new variable, 'WAR_next', is created using a one-year lead of WAR.
+  - A new variable, 'WAR_next', is created using a one-year lead of WAR. This constructed variable serves as the response variable in all models.
   - This allows current-season statistics to predict WAR in the following season.
-  
   
 ## Methodology
 
@@ -75,15 +56,15 @@ To model *next-season* performance:
 
 #### Ordinary Least Squares (OLS)
   - Baseline linear regression model.
-  - Uses all avaialble predictors without regularization.
+  - Uses all available predictors without regularization.
   - Provides interpretability but is sensitive to overfitting
   
   
 #### LASSO Regression
   - Penalized linear regression using L1 regularization
   - Used a 10-fold cross-validation
-  - Performs automatic feature selevtion by shrinking some coefficients to zero.
-  - Allows evaluation of how many predictors meaningfullt contribute to prediction.
+  - Performs automatic feature selection by shrinking some coefficients to zero.
+  - Allows evaluation of how many predictors meaningfully contribute to prediction.
   
   
 #### Boosting Regression
@@ -118,24 +99,25 @@ Visualizations:
   - **OLS** achieved the strongest overall predictive performance, particularly 
   on the 2025 out-of-sample data, indicating that the next-season WAR is well captured by a linear relationship with current-season performance statistics.
   - **LASSO** produced comparable results to OLS while reducing model complexity by shrinking several coefficients to zero, suggesting that only a subset of performance metrics meaningfully contribute to future WAR.
-  - **BOOSTING** did not outperform linear models, implying that nonlinear relationships provide limited predictive value in this scenario.
+  - **Boosting** did not outperform linear models, implying that nonlinear relationships provide limited predictive value in this scenario.
   
-  Despite predictive accuracy, all models exhibit regression toward the mean, especially for players with extreme WAR values, highlighting the uncertainty in forecasting future player performance.
+  Despite predictive performance, all models exhibit regression toward the mean, especially for players with extreme WAR values, highlighting the uncertainty in forecasting future player performance.
   
   
   
-## Study Preictions with 2025 examples:
+## Study Predictions with 2025 examples:
 Predicted vs. actual WAR values are examined for selected high-profile players, including:
-  - Aarin Judge
+  - Aaron Judge
   - Bobby Witt Jr.
   - Michael Toglia
   - Hunter Goodman
-  - Shohei Ohtani; his WAE was skewed because he has a combined WAR (pitching and hitting statistics, and our model only uses hitting statistics. This shows a limitiation within our model)
+  - Shohei Ohtani
+      -Shohei Ohtani's predicted WAR is skewed because his observed WAR includes both hitting and pitching contributions, while the model only uses hitting statistics. This highlights a limitation of the current modeling approach.
 
 
 ## Reproducibility
 
-This project is full reproducible:
+This project is fully reproducible:
   - All code is written in **R**
   - Models are built using **tidymodels**, **glmnet**, and **yardstick**
   - Cross-validation and tuning are explicitly defined
@@ -148,7 +130,7 @@ To reproduce results:
   3. Run the R scripts sequentially
   
 
-$$ Required Packages
+## Required Packages
 
 ```r
 dplyr
@@ -158,6 +140,11 @@ yardstick
 Metrics
 ggplot2
 ```
+
+## References
+  - Major League Baseball (MLB). *Wins Above Replacement (WAR).* MLB GLossary of Advanced Stats.
+  - James, G., Witten, D., Hastie, T., & Tibshirani, R. (2013). *An introduction to statistical learning: With applications in R.* Springer.
+
   
   
   
