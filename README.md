@@ -43,6 +43,20 @@ To model *next-season* perfomance:
   - A new variable, 'WAR_next', is created using a one-year lead of WAR.
   - This allows current-season statistics to predict WAR in the following season.
 
+## Data Description
 
+### Time Frame
+  - **Training Data:** 2020-2024 MLB season
+  - **Out-of-sample evaluation:** 2025 MLB season
 
+### Structure
+  - Each observation represents a single player-season.
+  - The response variable is **WAR**
+  - Predictor variables come from batting statistics, including offensive and performance-related statistics (plate appearances, batting metrics, etc)
+  - Non-numeric or non-performance variables, such as Player, name, team, and awards, are removed before modeling.
 
+### Prediction Target Definition
+To model *next-season* perfomance:
+  - Data is sorted by player and year.
+  - A new variable, 'WAR_next', is created using a one-year lead of WAR.
+  - This allows current-season statistics to predict WAR in the following season.
