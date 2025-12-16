@@ -1,6 +1,6 @@
 ---
 title: "Evaluating Statistical Models for Predicting Next-Season Wins Above Replacement"
-author: "Group 3"
+author: "Ari Crumley, Vincent West, Gioia Bonanno-Garcia"
 date: "2025-12-05"
 output:
   pdf_document: default
