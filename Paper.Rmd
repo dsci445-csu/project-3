@@ -53,15 +53,46 @@ knitr::include_graphics("Pictures/OLS Model Actual vs Predicted.png")
 
 ## LASSO
  
- Least Absolute Shrinkage and Selection Operator... explain
- 
- Our LASSO model performs both regulariztion and feature selction of the data 
- #BOOSTING
+LASSO stands for least absolute shrinkage and selection operator and is a popular model due to its feature selection abilities and prevention of overfitting. LASSO models perform L1 regularization, which shrinks some coefficients to exactly zero, removing them from the model entirely. It does this by adding a penalty term to the residual sum of squares which is then multiplied by a regularization parameter. The larger the regularization parameter, the larger the penalty, which shrinks more terms to zero. This type of feature selection makes LASSO models more interpretable than others since irrelevant or redundant predictors are removed, leaving the important ones. We wanted to include a feature selection model within our project for this reason, to see if any of our predictors were redundant or not necessary.
+
+We built our LASSO model using a ten-fold cross-validation to select our regularization parameter and fit it on our training data set. This model yielded some interesting results when compared to the OLS and boosting models. The features that were shrunk were plate appearances, home runs, RBIs, batting average, on-base percentage, OPS+, and rOBA. These shrunken parameters were intriguing to us because they are all very important offensive statistics, which we assumed would be integral to predicting WAR. This resulted in a testing MAE of 0.647, testing RMSE of 0.852, and $R^2$ of 78.4%, which are better than our boosting model but worse than OLS. These metrics suggest that the LASSO model is a solid choice when predicting WAR, since the RMSE of 0.852 infers that our predictions would be within .8-.9 of the player's actual WAR. Given that it also performs feature selection, this model is highly competitive with OLS and boosting. 
+
+```{r boost-comp-plot, echo=FALSE, fig.align="center", out.width="90%"}
+knitr::include_graphics("Pictures/LASSO_comp_plot.png")
+```
+```{r boost-comp-plot, echo=FALSE, fig.align="center", out.width="90%"}
+knitr::include_graphics("Pictures/Lasso Actual vs Predicted 2025.png")
+```
+
+Note: zero was not included in the initial cross validation coding for selecting the penalty parameter. When redone with zero included, it was chosen as the best penalty and the test metrics were extremely similar to OLS. 
+
 
 
 ## Boosting
 
+To evaluate whether a more flexible, non-linear model could improve the prediction of next season WAR, we implemented a gradient boosting regression model using the tidymodels framework. Boosting builds many decision trees sequentially, where each new tree is trained to reduce the errors made by the previous trees. Unlike OLS and LASSO, boosting does not assume linear relationship between predictors and WAR and can naturally capture non linear effects and interactions among offensive statistics.
+
+In our code, we fit a boosted tree model with 500 trees and tuned key hyperparameters that control model complexity and learning behavior: tree depth, learning rate and minimum node size (min_n). We used 10-fold cross-validation on the training data and a random hyperparameter grid, choosing the final configuration that minimized cross-validated RMSE. After selecting the best model, we refit the boosted tree workflow on the full training set and we generated predictions for both the internal test split and the held-out 2025 season, evaluating performance using ME, RMSE, and R2.
+
+The boosting model achieved relatively low error on the training data (RMSE = 0.669, MAE = 0.494) and modestly higher error on the validation test set (RMSE = 0.730, MAE = 0.537). However, predictive performance deteriorated more noticeably on the 2025 data, where the RMSE increased to 0.870, and the MAE rose to 0.657. This gap between training and future-season error suggests that the boosted model may be overfitting patterns present in the historical data that do not generalize as well to new seasons.
+
+```{r boost-comp-plot, echo=FALSE, fig.align="center", out.width="90%"}
+knitr::include_graphics("Pictures/boost_comp_plot.png")
+```
+```{r boost-comp-plot, echo=FALSE, fig.align="center", out.width="90%"}
+knitr::include_graphics("Pictures/Boosting Actual vs Predicted 2025.png")
+```
+Overall, the boosting model did not outperform the linear approaches on the 2025 test set. While Boosting offers greater flexibility, it can be less advantageous in the predictors. In our case, WAR is influenced not only by offense but also by defensive value, positional adjustments, and external factors such as injuries and playing time changes. Since our predictors were limited to offensive stats, the boosted model likely learned some nonlinear patterns in the training data that did not generalize as effectively. Additionally, boosting models are inherently less interpretable than OLS or LASSO, it relies on a large collection of trees, making it harder to clearly describe the marginal impact of a single statistic on predicted WAR
+
+
+
+
 ## Player Examples
+	To see some tangible predictions for our OLS model, we chose five players to see how well the model performed. The players were Aaron Judge, the reigning AL MVP, Hunter Goodman, an All-Star on the Colorado Rockies, Michael Toglia, a player tied for the worst WAR in the data set, Bobby Witt Jr., a superstar offensive and defensive player, and Shohei Ohtani, the reigning NL MVP. Our predictions for the first four players mentioned were quite good, with the residuals ranging from .5 to 1. The exception came with Shohei Ohtani, whose prediction was 1.8 points higher than his actual WAR. This could be an example of the OLS model performing poorly with significant outliers due to Ohtani’s batting statistics being some of the best in the league for 2025. Since our model was trained on batting statistics alone, it predicted a significantly higher WAR than he actually had. In a similar vein, the model predicted Bobby Witt Jr.’s WAR to be one point less than it was. An explanation for this could be due to Bobby Witt Jr. being an excellent defensive player, shown by his winning the Platinum Glove Award in 2025, which is given to the league's best defenders that year. Since our model did not incorporate defensive statistics, it predicted a lower WAR for Witt Jr.. These limitations give insight to how we could tweak our model to be more accurate in the future, mainly by including defensive metrics and giving significant hitting outliers less weight.
+	
+```{r boost-comp-plot, echo=FALSE, fig.align="center", out.width="90%"}
+knitr::include_graphics("Pictures/war_examples.png")
+```
 
  
 ## Key Findings 
