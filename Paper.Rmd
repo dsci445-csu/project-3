@@ -21,20 +21,34 @@ library(ggplot2)
 
  
 ## Motivation
- Wins Above Placement (WAR) is one of the most widely used metrics in modern baseball analytics. It estimates the total number of wins a player contributes to their team compared to a player who could be readily called up from the minor league, or signed for a low cost. Since WAR combines many aspects of performance: hitting, defense, positional value, and baserunning, it is viewed as a comprehensive measure of a player's overall value.
- 
- 
+
+	WAR plays a central role in how Major League Baseball teams evaluate player value, so the ability to accurately predict future WAR has meaningful practical implications. Teams frequently rely on WAR when making roster decisions, negotiating contracts, and allocating payroll. It is important to note that this data can be noisy when categorical or external factors influence a player’s value. That being said, WAR can fluctuate substantially from one season to another due to aging, position changes, or performance trends. Developing a model that predicts next-season WAR from current-season statistics can therefore provide teams with an analytical advantage by helping them anticipate changes in player value before they occur. Such predictions can assist in identifying declining players, support better-informed budgeting and contract planning, and encourage player development and roster optimization. 
+Motivated by these considerations, this project applies statistical and machine learning techniques to evaluate whether a player’s current-season performance statistics can be used to predict their next season's WAR.
+
 ## Data 
  
- 
+	The data used in this study were obtained from Baseball-Reference, a recognized source for comprehensive Major League Baseball statistics. We compiled standard batting performance data for the 2020 through 2025 seasons, with approximately 500 player observations included for each year. To construct and evaluate the predictive models, data from the 2020-2024 seasons were used for training the models, and the 2025 season was reserved as a test set to evaluate predictive performance. The dataset includes a broad range of offensive performance variables, including WAR, age, measures of playing time, traditional batting statistics, and advanced offensive metrics. While WAR incorporates offensive, defensive, and positional components, this analysis focuses exclusively on offensive predictors to examine which batting performance variable best predicts the future WAR.
+	
 ## OLS
  
- The Ordinary Least Squares ...explain the method...
- 
-Our OLS model outputs an $R^2$ value of 0.8219. Meaning that it explains about 82% of the variation in WAR using batting statistics. 
+To explore the relationship between current-season performance and future WAR, we implemented an Ordinary Least Squares (OLS) regression model. OLS identifies and quantifies the linear relationship between a response variable and a set of predictor variables by estimating coefficients that minimize the sum of squared errors. An OLS approach is straightforward, computationally efficient, and provides reliable estimates when the relationships between predictors and the response variable are approximately linear. However, OLS has some limitations, as it assumes linearity, independence, and normality of errors, which may struggle to hold well in real-world sports data, potentially limiting its predictive flexibility. 
 
-It also outputted a Residual Standard Error of 0.73, confirming the model's predictions are consistently within about 0.7-0.8 WAR of the true value
+	For our analysis, we evaluated model performance using error metrics on both the training data and the held-out 2025 season. The model identified several significant predictors of future WAR, including age, games played, plate appearances, at-bats, runs, hits, home runs, stolen bases, and OPS+. These results provide insight into which offensive performance metrics contribute most strongly to the prediction of a player’s subsequent WAR.
+	
+	The scatterplot comparing actual WAR to the predicted WAR for the OLS shows that the points are tightly clustered around the reference line, indicating a strong agreement between observed and predicted values. Compared to the LASSO and boosting models, the OLS model exhibits the strongest correlation between actual and predicted WAR, with predictions most closely aligning with the dotted line representing perfect prediction.
 
+
+```{r ols_fun, echo=FALSE, fig.align="center", out.width="58%"}
+knitr::include_graphics("Pictures/ols_fun.jpeg")
+```
+
+```{r ols-comp-plot, echo=FALSE, fig.align="center", out.width="90%"}
+knitr::include_graphics("Pictures/final_ols_comp_plot.png")
+```
+
+```{r ols-comp-plot, echo=FALSE, fig.align="center", out.width="90%"}
+knitr::include_graphics("Pictures/OLS Model Actual vs Predicted.png")
+```
 
 
 ## LASSO
@@ -51,3 +65,7 @@ It also outputted a Residual Standard Error of 0.73, confirming the model's pred
 
  
 ## Key Findings 
+
+Among the models evaluated, the Ordinary Least Squares (OLS) regression demonstrated the strongest overall performance, achieving the lowest prediction error and the highest explained variance. While the LASSO model did not outperform OLS in terms of predictive accuracy, it proved valuable for variable selection by identifying a smaller subset of meaningful predictors, thereby enhancing interpretability and highlighting which player statistics most strongly influence future WAR. Across models, plate appearances, home runs, hits, OPS+, walks, and strikeouts consistently exhibited strong predictive value. Although OLS is viewed as a sub-case of LASSO, it outperformed in this context primarily because many offensive variables contribute incrementally to WAR, and OLS is able to retain and estimate all of these effects without shrinking coefficients to zero.
+
+	Despite these results, accurately predicting WAR remains inherently challenging, as several components of WAR are not fully captured by batting statistics alone. Additionally, external factors such as injuries, changes in playing time, and other unobserved influences introduce variability that contributes to noise within the data and uncertainty in predictions. 
