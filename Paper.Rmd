@@ -16,24 +16,18 @@ library(knitr)
 library(ggplot2)
 ```
  
+
+## Introduction
+
  
-##Introduction
- 
-##Background and Motivation
+## Motivation
  Wins Above Placement (WAR) is one of the most widely used metrics in modern baseball analytics. It estimates the total number of wins a player contributes to their team compared to a player who could be readily called up from the minor league, or signed for a low cost. Since WAR combines many aspects of performance: hitting, defense, positional value, and baserunning, it is viewed as a comprehensive measure of a player's overall value.
  
  
-##Purpose
- 
-##Data Cleaning
+## Data 
  
  
- ....
- 
- 
-##Methods
- 
-##OLS
+## OLS
  
  The Ordinary Least Squares ...explain the method...
  
@@ -43,7 +37,7 @@ It also outputted a Residual Standard Error of 0.73, confirming the model's pred
 
 
 
-##LASSO
+## LASSO
  
  Least Absolute Shrinkage and Selection Operator... explain
  
@@ -51,19 +45,9 @@ It also outputted a Residual Standard Error of 0.73, confirming the model's pred
  #BOOSTING
 
 
-##GRAPHS
- 
-##OLS Scatterplot
- 
-##LASSO Scatterplot
- 
-##BOOSTING Scatterplot
- 
- 
-##Comparison BAR graphs
+## Boosting
 
+## Player Examples
 
  
-
- 
-##CONCLUSION
+## Key Findings 
